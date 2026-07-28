@@ -12,7 +12,6 @@
 <body>
 
   <?php
-  include_once $content ?? 'public/views/ini.php';
   include_once 'public/views/alert.php';
   ?>
 </body>

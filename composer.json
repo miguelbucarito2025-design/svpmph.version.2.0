@@ -1,6 +1,6 @@
 {
   "name": "miguel/devcore",
-  "description": "Motor modular reutilizable - DevCore Mark 1",
+  "description": "Motor modular en MVC - DevCore ",
   "type": "library",
   "autoload": {
     "psr-4": {
@@ -15,5 +15,11 @@
   "require": {
     "dompdf/dompdf": "*",
     "phpmailer/phpmailer": "^7.1"
+  },
+  "require-dev": {
+    "phpdocumentor/phpdocumentor": "^3.10"
+  },
+  "scripts": {
+    "doc": "phpdoc -d ./app -t ./docs"
   }
 }

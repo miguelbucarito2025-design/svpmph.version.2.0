@@ -7,9 +7,25 @@ git push
 }
 
 
+# 1. Traer y fusionar los últimos cambios que subiste a GitHub
+git pull
+
+si se instala una nueva libreria
+git add composer.json composer.lock
+git commit -m "Instalada nueva librería X"
+git push
+El otro compañero solo ejecuta tras hacer git pull:
+
+Bash
+composer install
+
+
 
 Si quieres silenciar esa advertencia para siempre en tu entorno de Laragon/Windows:
 Ejecuta este comando en la terminal para decirle a Git que maneje la conversión de saltos de línea automáticamente de forma silenciosa:
 
 PowerShell
 
+
+
+para usar phpDocumentor =========> composer doc
