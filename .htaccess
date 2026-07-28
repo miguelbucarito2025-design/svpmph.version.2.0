@@ -1,0 +1,19 @@
+# 1. Evitar que se liste el contenido de los directorios
+Options -Indexes
+
+# 2. Bloquear cualquier archivo .env o .log
+<FilesMatch "\.(env|log)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+RewriteEngine On
+
+# 3. Denegar acceso directo por URL a carpetas sensibles del núcleo
+# Nadie podrá entrar por URL a midominio.com/app/config/.env ni midominio.com/app/
+RewriteRule ^app/(config|class|controllers|model|archivos\ de\ pereza)/ - [F,L]
+
+# 4. Front Controller (Enrutador)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?action=$1 [L,QSA]

@@ -1,0 +1,15 @@
+Esto es para q hagas un commit cuando realices cambios mi broder
+{
+git add .
+git commit -m "Explicación breve de lo que hiciste"
+git push
+
+}
+
+
+
+Si quieres silenciar esa advertencia para siempre en tu entorno de Laragon/Windows:
+Ejecuta este comando en la terminal para decirle a Git que maneje la conversión de saltos de línea automáticamente de forma silenciosa:
+
+PowerShell
+

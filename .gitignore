@@ -1,0 +1,23 @@
+# Archivos de entorno y credenciales (en cualquier carpeta)
+.env
+*.env
+
+# Archivos de log
+*.log
+
+# Entornos de desarrollo y editores (VSCode, PhpStorm, etc.)
+.idea/
+.vscode/
+
+app/Logs/*.log
+
+# Documentación autogenerada (opcional, por si no quieres rastrear la carpeta .phpdoc)
+.phpdoc/
+
+
+/vendor/
+
+docs/
+*.
+
+

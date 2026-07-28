@@ -1,0 +1,19 @@
+{
+  "name": "miguel/devcore",
+  "description": "Motor modular reutilizable - DevCore Mark 1",
+  "type": "library",
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Miguel Bucarito"
+    }
+  ],
+  "require": {
+    "dompdf/dompdf": "*",
+    "phpmailer/phpmailer": "^7.1"
+  }
+}
