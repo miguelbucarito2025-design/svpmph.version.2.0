@@ -1,6 +1,6 @@
 <?php
 
-declare(sytict_types=1);
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -23,32 +23,68 @@ class UserModel
      * Registra un nuevo usuario en la base de datos validando duplicados por correo.
      * 
      * @param array{
-     * 'nombre_completo':string,
-     *      'correo'    :string,
-     *      'nat_id'    :int,
-     *      'tlf'       :int,
-     *      'pass'      :string,
-     *      'assces'    :int,
-     *      'rol_id'    :int
-     * } $valores Arreglo indexado con los datos [nombre, correo, nat_id, tlf, pass, assces, rol_id].
+     *      usuario:string,
+     *      contrasena:string,
+     *      correo:string,
+     *      rol_id:int
+     * } $valores Arreglo indexado con los datos [usuario,contrasena, correo,rol_id].
      * @return bool
+     * @throws AppException en caso de haber duplicados o error en la validadcion de campos para realizar el registro
+     *@throws DatabaseException si es un error de ejecucion critico de sql
      */
-    public function saveUser(array $valores): bool
+    public function save(array $valores): bool
     {
-        $datos = [
-            'nombre_completo' => $valores['nombre_completo'] ?? null,
-            'correo'          => $valores['correo'] ?? null,
-            'nat_id'          => $valores['nat_id'] ?? null,
-            'tlf'             => $valores['tlf'] ?? null,
-            'pass'            => $valores['pass'] ?? null,
-            'assces'          => $valores['assces'] ?? null,
-            'rol_id'          => $valores['rol_id'] ?? null
+
+
+
+        $reglas = [
+            'usuario',
+            'contrasena',
+            'correo',
         ];
 
-        // Validar que no exista otro registro con ese mismo correo
-        $condicion = ['correo' => $datos['correo']];
+        foreach ($reglas as $campo) {
 
-        return $this->db->insert('usuarios', $datos, $condicion);
+            if (!isset($valores[$campo]) || empty(trim((string)$valores[$campo]))) {
+                throw new AppException("El campo {$campo} es obligatorio.", 400);
+            }
+        }
+
+
+        if ((int)$valores['rol_id'] <= 0) {
+            throw new AppException("El rol seleccionado no es válido.", 400);
+        }
+
+        $datos = [
+            'usuario' => $valores['usuario'] ?? null,
+            'contrasena' => $valores['contrasena'] ?? null,
+            'estado' => 1,
+            'correo' => $valores['correo'] ?? null,
+            'rol_id' => $valores['rol_id'] ?? null
+        ];
+
+        $condicion = [
+            'correo' => $datos['correo'],
+            'usuario' => $datos['usuario']
+        ];
+
+
+        try {
+
+            return $this->db->insert(
+                'cuentas',
+                $datos,
+                $condicion
+            );
+        } catch (AppException $e) {
+
+            if ($e->getCode() === 409) {
+                throw new AppException("El correo o usuario ya está registrado.", 409);
+            }
+            throw $e;
+        } catch (\Throwable $e) {
+            throw new DatabaseException("Error al registrar el usuario: " . $e->getMessage(), (string)500);
+        }
     }
 
 
@@ -98,7 +134,7 @@ class UserModel
      * 
      * Si quieres traer registros sin condiciones, pasa null en $condicion:
      * $model->selectUser(null, 'all');
-     * 
+     *  
      * @param array<string, mixed>|null $condicion Arreglo asociativo ['columna' => 'valor'] o null.
      * @param string $mode Modo de retorno: 'all' (lista), 'row' (un solo registro), 'count' (total).
      * 
@@ -131,14 +167,14 @@ class UserModel
     /**
      * Registra una nueva nacionalidad/identificación en la tabla nat.
      * 
-     * asegurate de seguir los campos de la tabla 
+     * asegurarte de seguir los campos de la tabla 
      * esta vez lo hice para q hagas algo asi 
      * 
      *   $valores = [
      *      'id' => null,
-     *      'nacionalidad' => venezuela,
-     *      'codigo' => +58,
-     *      'nat' => VEN
+     *      'nacionalidad' => 'Venezuela',
+     *      'código' => '+58',
+     *      'nat' => 'VEN'
      * ];
      *
      * 

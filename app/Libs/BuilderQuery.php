@@ -144,21 +144,47 @@ class BuilderQuery
     }
 
     /**
-     * Ejecuta una eliminación física de un registro en base a una columna específica.
+     * Elimina registros de una tabla según las condiciones indicadas.
+     * 
+     * @param string $tabla Nombre de la tabla objetivo
+     * @param array<string, mixed> $where Arreglo asociativo ['campo' => valor]
+     * 
+     * @return bool True si la ejecución fue exitosa
+     * 
+     * @throws AppException Si falta la tabla o los criterios
+     * @throws DatabaseException Si ocurre un error en la consulta PDO
      */
     public function delete(string $tabla, array $where): bool
     {
-        if (empty($where[0])) {
-            throw new AppException("Criterio de eliminación no especificado.", 400);
+        $tablaLimpia = trim($tabla);
+
+        if (empty($tablaLimpia) || empty($where)) {
+            throw new AppException("No se proporcionaron la tabla o los criterios de eliminación.", 400);
         }
 
-        $sql = "DELETE FROM {$tabla} WHERE {$where[0]} = ?";
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $tablaLimpia)) {
+            throw new AppException("El nombre de la tabla es inválido.", 400);
+        }
+
+        $whereClauses = [];
+        $valores = [];
+
+        foreach ($where as $campo => $valor) {
+            if (!preg_match('/^[a-zA-Z0-9_]+$/', $campo)) {
+                throw new AppException("El campo '{$campo}' en la condición es inválido.", 400);
+            }
+            $whereClauses[] = "{$campo} = ?";
+            $valores[] = $valor;
+        }
+
+        $whereSql = implode(' AND ', $whereClauses);
+        $sql = "DELETE FROM {$tablaLimpia} WHERE {$whereSql}";
 
         try {
             $stmt = $this->db->prepare($sql);
-            return $stmt->execute([(string)$where[1]]);
-        } catch (PDOException $e) {
-            throw new DatabaseException($e->getMessage(), $sql, 500);
+            return $stmt->execute($valores);
+        } catch (\PDOException $e) {
+            throw new DatabaseException("Error al intentar eliminar en la base de datos", $e->getMessage(), 500);
         }
     }
 }

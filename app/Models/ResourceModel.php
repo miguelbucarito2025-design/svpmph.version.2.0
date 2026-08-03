@@ -18,10 +18,6 @@ class ResourceModel
     {
         $this->db = new BuilderQuery();
     }
-
-
-
-
     /**
      * Registra un nuevo proyecto en la base de datos.
      *

@@ -1,6 +1,6 @@
 {
   "name": "miguel/devcore",
-  "description": "Motor modular en MVC - DevCore ",
+  "description": "Motor de  la Sociedad de mi padre",
   "type": "library",
   "autoload": {
     "psr-4": {
