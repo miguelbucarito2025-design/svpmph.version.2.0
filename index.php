@@ -1,18 +1,31 @@
 <?php
 
-declare(sytict_types=1);
+declare(strict_types=1);
 
 require_once 'vendor/autoload.php';
 
 
 use App\Helpers\EnvLoader;
-use App\Libs\Exceptions\AppException;
-use App\Models\UserModel;
+use App\Models\TerminosModel;
 
 EnvLoader::load('app/Config/.env');
 
-$pdo = new UserModel();
+$pdo = new TerminosModel();
 
+try {
+    $pdo->save([
+        'titulo' => 'Términos de Servicio',
+        'version' => '1.0',
+        'contenido' => 'estos son los términos de servicio. ',
+        'activo' => true,
+        'fecha' => '2024-06-01',
+        'rol_id' => 1
+    ]);
+} catch (App\Libs\Exceptions\AppException $e) {
+    echo "Error: " . $e->getMessage();
+}
+
+print_r($pdo->selectAll());
 
 
 

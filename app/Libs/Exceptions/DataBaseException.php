@@ -1,11 +1,11 @@
 <?php
 
-declare(sytict_types=1);
+declare(strict_types=1);
 
 namespace App\Libs\Exceptions;
 
 use Exception;
-use App\Libs\Logger;
+use App\Helpers\Logger;
 
 
 class DatabaseException extends Exception

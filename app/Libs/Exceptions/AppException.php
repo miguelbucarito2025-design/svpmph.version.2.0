@@ -1,12 +1,12 @@
 <?php
 
-declare(sytict_types=1);
+declare(strict_types=1);
 
 
 namespace App\Libs\Exceptions;
 
 use Exception;
-use DevCore\Libs\Logger;
+use App\Helpers\Logger;
 
 class AppException extends Exception
 {

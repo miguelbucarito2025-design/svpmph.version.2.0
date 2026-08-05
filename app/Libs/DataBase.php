@@ -1,6 +1,6 @@
 <?php
 
-declare(sytict_types=1);
+declare(strict_types=1);
 
 
 /* Conexion a la base de datos con patron Singleton */
