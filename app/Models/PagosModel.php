@@ -13,6 +13,7 @@ class PagosModel  extends Model
     protected string $tabla = 'pagos';
 
     protected array $campos = [
+        'id' => 'esEntero',
         'cuota_id' => 'esEntero',
         'metodo' => 'esTexto',
         'referencia' => 'esTexto',

@@ -6,26 +6,29 @@ require_once 'vendor/autoload.php';
 
 
 use App\Helpers\EnvLoader;
-use App\Models\TerminosModel;
+use App\Models\RolModel;
 
 EnvLoader::load('app/Config/.env');
 
-$pdo = new TerminosModel();
+$pdo = new RolModel();
 
 try {
-    $pdo->save([
-        'titulo' => 'Términos de Servicio',
-        'version' => '1.0',
-        'contenido' => 'estos son los términos de servicio. ',
-        'activo' => true,
-        'fecha' => '2024-06-01',
-        'rol_id' => 1
-    ]);
+    $pdo->update(
+        [
+            'id' => 3,
+            'rol' => 'bruja'
+        ],
+        [
+            'id' => 2
+        ]
+    );
 } catch (App\Libs\Exceptions\AppException $e) {
+    echo "Error: " . $e->getMessage();
+} catch (App\Libs\Exceptions\DatabaseException $e) {
     echo "Error: " . $e->getMessage();
 }
 
-print_r($pdo->selectAll());
+print_r($pdo->select());
 
 
 

@@ -13,6 +13,7 @@ class DestinarioModel  extends Model
     protected string $tabla = 'destinario';
 
     protected array $campos = [
+        'id' => 'esEntero',
         'destinario' => 'esTexto',
         'oferta_id' => 'esEntero',
         'cedula_id' => 'esCedula',

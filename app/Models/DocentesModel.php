@@ -7,24 +7,20 @@ namespace App\Models;
 
 use App\Models\Abstract\Model;
 
-class RolModel  extends Model
+class  DocentesModel extends Model
 {
 
-    protected string $tabla = 'rol';
+    protected string $tabla = 'docentes';
 
     protected array $campos = [
         'id' => 'esEntero',
-        'rol' => 'esCadena',
-        'descripcion' => 'esTexto',
-        'img' => 'esRutaArchivo'
+        'cedula_id' => 'esCedula'
     ];
-
     protected array $camposMinimos = [
-        'rol'
+        'cedula_id'
     ];
 
     protected array $camposUnicos = [
-        'rol',
-        'id'
+        'cedula_id'
     ];
 }

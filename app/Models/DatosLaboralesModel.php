@@ -13,6 +13,7 @@ class DatosLaboralesModel  extends Model
     protected string $tabla = 'datos_laborales';
 
     protected array $campos = [
+        'id' => 'esEntero',
         'cedula_id' => 'esCedula',
         'institucion_id' => 'esEntero',
         'cargo_id' => 'esEntero'

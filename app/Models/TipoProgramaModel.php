@@ -7,24 +7,21 @@ namespace App\Models;
 
 use App\Models\Abstract\Model;
 
-class RolModel  extends Model
+class TipoProgramaModel  extends Model
 {
 
-    protected string $tabla = 'rol';
+    protected string $tabla = 'tipo_programa';
 
     protected array $campos = [
         'id' => 'esEntero',
-        'rol' => 'esCadena',
-        'descripcion' => 'esTexto',
-        'img' => 'esRutaArchivo'
+        'tipo' => 'esCadena'
     ];
 
     protected array $camposMinimos = [
-        'rol'
+        'tipo'
     ];
 
     protected array $camposUnicos = [
-        'rol',
-        'id'
+        'tipo'
     ];
 }

@@ -11,7 +11,9 @@ class UsurioTerminos  extends Model
 {
 
     protected string $tabla = 'usuario_terminos';
+
     protected array $campos = [
+        'id' => 'esEntero',
         'cedula_id' => 'esCedula',
         'terminos_id' => 'esEntero',
         'fecha' => 'esFechaHora',

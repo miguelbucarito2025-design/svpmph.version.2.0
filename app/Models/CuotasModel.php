@@ -13,6 +13,7 @@ class CuotasModel  extends Model
     protected string $tabla = 'cuotas';
 
     protected array $campos = [
+        'id' => 'esEntero',
         'inscripcion_id' => 'esEntero',
         'cuota' => 'esEntero',
         'pago_id' => 'esEntero',

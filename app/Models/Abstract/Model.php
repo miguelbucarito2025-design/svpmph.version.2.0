@@ -115,6 +115,7 @@ abstract class Model
      */
     public function update(array $datos, array $condiciones): bool
     {
+
         if (empty($condiciones)) {
             throw new AppException("Se requieren condiciones válidas para actualizar un registro.", 400);
         }
@@ -153,5 +154,29 @@ abstract class Model
         } catch (DatabaseException $e) {
             throw new AppException("Error al eliminar el registro: " . $e->getMessage(), 500);
         }
+    }
+
+
+
+    /**
+     * funcion para traer registro de una tabla con 3 modos
+     * si quieres q sea mejor reescribela en la clase hija
+     *
+     * @param string $modo  
+     *   all: trae todo de la tabla,
+     *   row: trae una sola fila,
+     *   count:trae el numero de filas
+     * 
+     * @return mixed
+     */
+    public function select(string $modo = 'all'): mixed
+    {
+        $sql = 'select * from ' . $this->tabla;
+
+        return $this->db->select(
+            $sql,
+            [],
+            $modo
+        );
     }
 }

@@ -13,6 +13,7 @@ class DatosModel  extends Model
     protected string $tabla = 'datos';
 
     protected array $campos = [
+        'id' => 'esEntero',
         'nombre' => 'esCadena',
         'apellido' => 'esCadena',
         's_nombre' => 'esCadena',

@@ -13,6 +13,7 @@ class InstitucionModel  extends Model
     protected string $tabla = 'institucion';
 
     protected array $campos = [
+        'id' => 'esEntero',
         'institucion' => 'esCadena'
     ];
     protected array $camposMinimos = [

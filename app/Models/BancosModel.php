@@ -13,6 +13,7 @@ class BancosModel  extends Model
     protected string $tabla = 'bancos';
 
     protected array $campos = [
+        'id' => 'esEntero',
         'banco' => 'esTexto'
     ];
     protected array $camposMinimos = [

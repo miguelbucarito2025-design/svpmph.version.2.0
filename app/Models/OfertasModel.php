@@ -13,6 +13,7 @@ class OfertasModel extends Model
     protected string $tabla = 'ofertas';
 
     protected array $campos = [
+        'id' => 'esEntero',
         'nucleo_id' => 'esEntero',
         'programa_id' => 'esEntero',
         'fecha_ini' => 'esFechaHora',
@@ -34,6 +35,4 @@ class OfertasModel extends Model
         'cuotas',
         'estado'
     ];
-
-    protected array $camposUnicos = [];
 }

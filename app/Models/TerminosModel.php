@@ -13,6 +13,7 @@ class TerminosModel extends Model
     protected string $tabla = 'terminos';
 
     protected array $campos = [
+        'id' => 'esEntero',
         'titulo'    => 'esCadena',
         'version'   => 'esAlfanumerico',
         'contenido' => 'esTexto',

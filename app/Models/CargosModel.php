@@ -13,6 +13,7 @@ class  CargosModel extends Model
     protected string $tabla = 'cargos';
 
     protected array $campos = [
+        'id' => 'esEntero',
         'cargo' => 'esCadena',
         'institucion_id' => 'esEntero'
     ];

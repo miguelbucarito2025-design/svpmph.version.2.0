@@ -15,6 +15,7 @@ class CuentasModel  extends Model
     protected string $tabla = 'cuentas';
 
     protected array $campos = [
+        'id' => 'esEntero',
         'usuario' => 'esNombreUsuario',
         'contrasena' => 'esPassword',
         'estado' => 'esEntero',
