@@ -4,56 +4,97 @@ declare(strict_types=1);
 
 namespace App\Helpers;
 
-use Exception;
+use App\Libs\Exceptions\AppException;
 
 /**
- *clase encargada de leer en archivo .env y usar las claves para iniciar las configuraciones del sistema
- *como nombre de la base de datos , claves y todo eso;
- *esta clase no retorna nada solo ejecuta esa accion
- **/
-
+ * Clase EnvLoader
+ *
+ * Encargada de leer, parsear y cargar las variables definidas en el archivo .env
+ * en el entorno de ejecución del sistema ($_ENV, $_SERVER y putenv).
+ *
+ * @package App\Helpers
+ */
 class EnvLoader
 {
-
-    public static function load($path)
+    /**
+     * Lee un archivo de entorno y registra las variables en el sistema.
+     *
+     * @param string $path Ruta relativa o absoluta del archivo .env.
+     * @return void
+     * @throws AppException Si el archivo no existe, no es legible o falla la lectura.
+     */
+    public static function load(string $path): void
     {
-        if (!file_exists($path)) {
-            throw new Exception(' No se encontro el archivo de configuracion ');
+        if (!is_file($path) || !is_readable($path)) {
+            throw new AppException("No se pudo acceder al archivo de entorno en la ruta: {$path}", 500);
         }
 
         $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
+        if ($lines === false) {
+            throw new AppException("Error al leer las líneas del archivo de entorno: {$path}", 500);
+        }
+
         foreach ($lines as $line) {
             $line = trim($line);
 
+            // Ignorar líneas vacías o comentarios principales
+            if ($line === '' || str_starts_with($line, '#')) {
+                continue;
+            }
 
-            if (empty($line) || str_starts_with($line, '#')) continue;
-            if (!str_contains($line, '=')) continue;
+            // Ignorar líneas que no contengan asignación
+            if (!str_contains($line, '=')) {
+                continue;
+            }
 
+            [$key, $value] = explode('=', $line, 2);
 
-            list($key, $value) = explode('=', $line, 2);
+            $key   = trim($key);
+            $value = trim($value);
 
-
-            $key = trim($key);
-            $value = rtrim(trim($value), ';');
-
-
-            if ((str_starts_with($key, "'") && str_ends_with($key, "'")) ||
-                (str_starts_with($key, '"') && str_ends_with($key, '"'))
-            ) {
+            // Limpieza de comillas en la clave
+            if (strlen($key) >= 2 && self::esEntrecomillado($key)) {
                 $key = substr($key, 1, -1);
             }
 
-
-            if ((str_starts_with($value, "'") && str_ends_with($value, "'")) ||
-                (str_starts_with($value, '"') && str_ends_with($value, '"'))
-            ) {
-                $value = substr($value, 1, -1);
+            if ($key === '') {
+                continue;
             }
 
+            // Procesamiento del valor: preservar comentarios si está entrecomillado
+            if (strlen($value) >= 2 && self::esEntrecomillado($value)) {
+                $value = substr($value, 1, -1);
+            } else {
+                // Si no tiene comillas, se permite la extracción de comentarios en línea
+                if (str_contains($value, ' #')) {
+                    $value = explode(' #', $value, 2)[0];
+                    $value = trim($value);
+                }
+            }
 
-            putenv("{$key}={$value}");
-            $_ENV[$key] = $value;
+            // Asignación segura en el entorno del sistema
+            if (function_exists('putenv')) {
+                putenv("{$key}={$value}");
+            }
+
+            $_ENV[$key]    = $value;
+            $_SERVER[$key] = $value;
         }
+    }
+
+    /**
+     * Evalúa si una cadena de texto está delimitada por comillas simples o dobles.
+     *
+     * @param string $cadena Cadena a verificar.
+     * @return bool True si la cadena comienza y termina con el mismo tipo de comilla.
+     */
+    private static function esEntrecomillado(string $cadena): bool
+    {
+        $primerCaracter = $cadena[0];
+        $ultimoCaracter = $cadena[strlen($cadena) - 1];
+
+        return ($primerCaracter === '"' && $ultimoCaracter === '"') ||
+            ($primerCaracter === "'" && $ultimoCaracter === "'");
     }
 }

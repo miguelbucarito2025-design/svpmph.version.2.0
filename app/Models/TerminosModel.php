@@ -55,4 +55,33 @@ class TerminosModel extends Model
             throw new AppException("Error al obtener los registros: " . $e->getMessage(), 500);
         }
     }
+
+    public function selectId(int $id): array
+    {
+        $sql = "SELECT * FROM {$this->tabla} WHERE id=?";
+
+        try {
+            return $this->db->select(
+                $sql,
+                [$id],
+                'row'
+            );
+        } catch (DatabaseException $e) {
+            throw new AppException("Error al obtener los terminos y condiciones", 500);
+        }
+    }
+    public function selecRolTermminostId(int $id): array
+    {
+        $sql = "SELECT * FROM {$this->tabla} WHERE rol_id=?";
+
+        try {
+            return $this->db->select(
+                $sql,
+                [(int)$id],
+                'row'
+            );
+        } catch (DatabaseException $e) {
+            throw new AppException("Error al obtener los terminos y condiciones", 500);
+        }
+    }
 }

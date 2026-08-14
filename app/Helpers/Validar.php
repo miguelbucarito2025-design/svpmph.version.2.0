@@ -5,116 +5,153 @@ declare(strict_types=1);
 namespace App\Helpers;
 
 use DateTime;
+use App\Libs\Seguridad;
 
+/**
+ * Clase Validar
+ *
+ * Proporciona métodos estáticos para la sanitización, formateo
+ * y validación de diversos tipos de datos en la aplicación.
+ *
+ * @package App\Helpers
+ */
 class Validar
 {
-
-
     /**
-     * Valida textos largos o párrafos permitiendo signos de puntuación comunes.
-     */
-    public static function esTexto(mixed $valor): mixed
-    {
-        $valorTexto = trim((string)$valor);
-
-        // Permite letras (con acentos/ñ), números, espacios y signos de puntuación comunes
-        if (!preg_match('/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\.\,\;\:\!\?\-\_\"\']+$/u', $valorTexto)) {
-            return false;
-        }
-
-        return $valorTexto;
-    }
-
-    /**
-     * verifica si un valor en alfanumerico 
-     * 
-     */
-    public static function esAlfanumerico(mixed $valor): mixed
-    {
-        $valorTexto = trim((string)$valor);
-        // Permite letras, números, puntos, guiones y espacios
-        if (!preg_match('/^[a-zA-Z0-9\.\-\_\s]+$/', $valorTexto)) {
-            return false;
-        }
-        return $valorTexto;
-    }
-
-    /**
-     * Valida si un valor representa un booleano válido y devuelve su equivalente estricto (bool).
+     * Valida párrafos o textos largos permitiendo signos de puntuación comunes.
      *
-     * @param mixed $valor Entrada a evaluar (bool, int, string)
-     * @return bool|false Retorna bool (true/false) si es válido, o false si no es un booleano.
+     * @param mixed $valor Texto a evaluar.
+     * @return string|null Devuelve el texto limpio o null si es inválido.
      */
-    public static function esBooleano(mixed $valor): mixed
+    public static function esTexto(mixed $valor): ?string
     {
-        // filter_var con FILTER_VALIDATE_BOOLEAN procesa "1", "true", "on", "yes", 1, true (y sus variantes)
-        // FILTER_NULL_ON_FAILURE hace que devuelva null si el valor no es un booleano válido
+        if (!is_scalar($valor)) {
+            return null;
+        }
+
+        $valorTexto = trim((string)$valor);
+
+        // Uso de \p{L} para cubrir cualquier letra unicode (acentos, diéresis, ñ)
+        if (!preg_match('/^[\p{L}0-9\s\.\,\;\:\!\?\-\_\"\']+$/u', $valorTexto)) {
+            return null;
+        }
+
+        return $valorTexto;
+    }
+
+    /**
+     * Verifica si un valor es alfanumérico permitiendo caracteres especiales básicos.
+     *
+     * @param mixed $valor Entrada a evaluar.
+     * @return string|null
+     */
+    public static function esAlfanumerico(mixed $valor): ?string
+    {
+        if (!is_scalar($valor)) {
+            return null;
+        }
+
+        $valorTexto = trim((string)$valor);
+
+        if (!preg_match('/^[\p{L}0-9\.\-\_\s]+$/u', $valorTexto)) {
+            return null;
+        }
+
+        return $valorTexto;
+    }
+
+    /**
+     * Valida si un valor representa un booleano válido.
+     *
+     * @param mixed $valor Entrada a evaluar.
+     * @return bool|null Retorna bool (true/false) si es válido, o null si el formato es inválido.
+     */
+    public static function esBooleano(mixed $valor): ?bool
+    {
         $resultado = filter_var($valor, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
 
-        if ($resultado === null) {
-            return false; // Formato inválido para el bucle de validarCampos
-        }
-
-        return $resultado; // Devuelve true o false estricto
+        return $resultado; // Devuelve true, false o null (inválido)
     }
-
 
     /**
      * Valida si un correo electrónico tiene formato correcto.
+     *
+     * @param string $email Correo electrónico.
+     * @return string|null Devuelve el correo o null si es inválido.
      */
-    public static function esCorreo(string $email): bool
+    public static function esCorreo(string $email): ?string
     {
-        $email = trim($email);
-        return (bool) filter_var($email, FILTER_VALIDATE_EMAIL);
+        $emailLimpio = trim($email);
+        $esValido = filter_var($emailLimpio, FILTER_VALIDATE_EMAIL);
+
+        return $esValido !== false ? $emailLimpio : null;
     }
 
     /**
-     * Valida nombres personales (Solo letras de cualquier idioma, tildes y espacios).
-     * Devuelve el string formateado (Title Case) o false si es inválido.
+     * Valida nombres personales y los convierte a formato Title Case.
+     *
+     * @param string $string Cadena de texto con el nombre.
+     * @return string|null
      */
-    public static function esCadena(string $string): string|bool
+    public static function esCadena(string $string): ?string
     {
         $string = trim($string);
 
-        // Regex Unicode compatible con tildes, letras eñes y espacios
         if (preg_match("/^[\p{L} ]+$/u", $string) === 1) {
             return ucwords(mb_strtolower($string, 'UTF-8'));
         }
 
-        return false;
+        return null;
     }
 
     /**
-     * Valida Cédulas/DNI (solo números, longitud entre 7 y 9 dígitos).
+     * Valida documentos de identidad (solo dígitos entre 7 y 9 caracteres).
+     *
+     * @param string $cedula
+     * @return string|null
      */
-    public static function esCedula(string $cedula): bool
+    public static function esCedula(string $cedula): ?string
     {
         $cedula = trim($cedula);
-        return preg_match("/^[0-9]{7,9}$/", $cedula) === 1;
+
+        return preg_match("/^[0-9]{7,9}$/", $cedula) === 1 ? $cedula : null;
     }
 
     /**
-     * Valida números de teléfono (formatos: +584121234567, 0412-1234567, 04121234567).
+     * Valida números telefónicos estándar.
+     *
+     * @param string $telefono
+     * @return string|null
      */
-    public static function esTlf(string $telefono): bool
+    public static function esTlf(string $telefono): ?string
     {
         $telefono = trim($telefono);
         $limpio = str_replace([' ', '-'], '', $telefono);
-        return preg_match("/^\+?[0-9]{7,15}$/", $limpio) === 1;
+
+        return preg_match("/^\+?[0-9]{7,15}$/", $limpio) === 1 ? $limpio : null;
     }
 
     /**
-     * Valida cadenas de texto según rango de longitud.
+     * Valida si la longitud de una cadena se encuentra dentro de un rango determinado.
+     *
+     * @param string $texto
+     * @param int $min
+     * @param int $max
+     * @return string|null
      */
-    public static function esLongitudTexto(string $texto, int $min = 10, int $max = 255): bool
+    public static function esLongitudTexto(string $texto, int $min = 10, int $max = 255): ?string
     {
         $texto = trim($texto);
         $longitud = mb_strlen($texto, 'UTF-8');
-        return $longitud >= $min && $longitud <= $max;
+
+        return ($longitud >= $min && $longitud <= $max) ? $texto : null;
     }
 
     /**
-     * Escapa caracteres HTML para la SALIDA en vistas (XSS).
+     * Escapa caracteres especiales HTML para prevenir ataques XSS en las vistas.
+     *
+     * @param string $dato
+     * @return string
      */
     public static function escape(string $dato): string
     {
@@ -122,9 +159,13 @@ class Validar
     }
 
     /**
-     * Valida si un string cumple un formato de fecha real.
+     * Valida la estructura y coherencia cronológica de una fecha.
+     *
+     * @param string $fecha
+     * @param string $formato Formato esperado (Ej: 'Y-m-d').
+     * @return string|null
      */
-    public static function esFecha(string $fecha, string $formato = 'Y-m-d'): string|bool
+    public static function esFecha(string $fecha, string $formato = 'Y-m-d'): ?string
     {
         $fecha = trim($fecha);
         $d = DateTime::createFromFormat($formato, $fecha);
@@ -133,96 +174,78 @@ class Validar
             return $fecha;
         }
 
-        return false;
+        return null;
     }
 
-
     /**
-     * Valida si una contraseña en texto plano cumple con las reglas de seguridad.
+     * Valida que una contraseña cumpla con los límites de longitud.
      *
-     * @param mixed $valor La contraseña que envía el usuario
-     * @return string|false Devuelve la contraseña sin modificar si pasa los filtros, o false si falla.
+     * @param mixed $valor
+     * @return string|null
      */
-    public static function esPassword(mixed $valor): mixed
+    public static function esPassword(mixed $valor): ?string
     {
-        // En contraseñas NO usamos trim() previo si los espacios iniciales/finales fueran intencionales,
-        // pero aseguramos que sea cadena.
+        if (!is_scalar($valor)) {
+            return null;
+        }
+
         $valorTexto = (string)$valor;
+        $longitud = mb_strlen($valorTexto);
 
-        // Regla 1: Longitud mínima (ejemplo: mínimo 8 caracteres, máximo 255)
-        if (mb_strlen($valorTexto) < 8 || mb_strlen($valorTexto) > 255) {
-            return false;
+        if ($longitud < 8 || $longitud > 255) {
+            return null;
         }
-
-        // Opcional (Regla estricta): Debe tener al menos una letra y un número
-        // if (!preg_match('/[A-Za-z]/', $valorTexto) || !preg_match('/[0-9]/', $valorTexto)) {
-        //     return false;
-        // }
 
         return $valorTexto;
     }
 
-
-
-
-
-
     /**
-     * Valida nombres de usuario (usernames).
-     * Permite letras, números, guiones, guiones bajos y puntos. Sin espacios.
+     * Valida identificadores o nombres de usuario.
      *
-     * @param mixed $valor Ejemplo: 'miguel_2026', 'admin.user', 'user-123'
-     * @return string|false
+     * @param mixed $valor
+     * @return string|null
      */
-    public static function esNombreUsuario(mixed $valor): mixed
+    public static function esNombreUsuario(mixed $valor): ?string
     {
+        if (!is_scalar($valor)) {
+            return null;
+        }
+
         $valorTexto = trim((string)$valor);
 
-        // Permite alfanuméricos, guion bajo, guion y punto. Entre 3 y 30 caracteres.
         if (!preg_match('/^[a-zA-Z0-9\._\-]{3,30}$/', $valorTexto)) {
-            return false;
+            return null;
         }
 
         return $valorTexto;
     }
 
-
-
-
     /**
-     * Valida rutas de archivos o directorios locales/relativos.
+     * Valida la estructura de una fecha y hora completa.
      *
-     * @param mixed $valor Ejemplo: 'uploads/documentos/carnet_2026.pdf' o '/var/www/archivos/'
-     * @return string|false
+     * @param mixed $valor
+     * @return string|null
      */
-    public static function esRutaArchivo(mixed $valor): mixed
+    public static function esFechaHora(mixed $valor): ?string
     {
-        $valorTexto = trim((string)$valor);
-
-        if ($valorTexto === '') {
-            return false;
-        }
-
-        // Permite letras, números, /, \, ., _, -, espacios y paréntesis
-        if (!preg_match('/^[a-zA-Z0-9\/\_\\\\\.\-\s\(\)]+$/u', $valorTexto)) {
-            return false;
-        }
-
-        return $valorTexto;
+        return is_string($valor) ? self::esFecha($valor, 'Y-m-d H:i:s') : null;
     }
 
-
-    public static function esFechaHora(mixed $valor): mixed
-    {
-        return self::esFecha($valor, 'Y-m-d H:i:s');
-    }
     /**
-     * Valida y parsea números enteros dentro de un rango determinado.
+     * Valida y filtra números enteros en un rango.
+     *
+     * @param mixed $valor
+     * @param int $min
+     * @param int $max
+     * @return int|null
      */
-    public static function esEntero(mixed $valor, int $min = 0, int $max = PHP_INT_MAX): int|bool
+    public static function esEntero(mixed $valor, int $min = 0, int $max = PHP_INT_MAX): ?int
     {
-        $valorLimpio = trim((string)$valor);
+        if (!is_scalar($valor)) {
+            return null;
+        }
 
+        $valorLimpio = trim((string)$valor);
         $opciones = [
             "options" => [
                 "min_range" => $min,
@@ -232,23 +255,43 @@ class Validar
 
         $resultado = filter_var($valorLimpio, FILTER_VALIDATE_INT, $opciones);
 
-        return $resultado !== false ? $resultado : false;
+        return $resultado !== false ? $resultado : null;
     }
 
-    /**
-     * Valida y parsea números decimales (acepta comas como separadores).
-     */
-    public static function esDecimal(mixed $valor): float|bool
-    {
-        $valorLimpio = str_replace(',', '.', trim((string)$valor));
 
+    public static function esDesencriptarId(string $id): ?int
+    {
+        if (empty($id)) {
+            return null;
+        }
+        $id = Seguridad::desencriptarID($id);
+        return self::esEntero((int)$id);
+    }
+    /**
+     * Valida y parsea valores numéricos decimales.
+     *
+     * @param mixed $valor
+     * @return float|null
+     */
+    public static function esDecimal(mixed $valor): ?float
+    {
+        if (!is_scalar($valor)) {
+            return null;
+        }
+
+        $valorLimpio = str_replace(',', '.', trim((string)$valor));
         $resultado = filter_var($valorLimpio, FILTER_VALIDATE_FLOAT);
 
-        return $resultado !== false ? (float)$resultado : false;
+        return $resultado !== false ? (float)$resultado : null;
     }
 
     /**
-     * Valida la subida segura de un archivo ($_FILES).
+     * Valida la integridad y seguridad de un archivo cargado ($_FILES).
+     *
+     * @param array $archivo
+     * @param array $extensionesPermitidas
+     * @param int $maxMegas
+     * @return array{valido: bool, mensaje: string}
      */
     public static function esArchivoValido(array $archivo, array $extensionesPermitidas, int $maxMegas = 2): array
     {
@@ -258,10 +301,10 @@ class Validar
 
         $maxBytes = $maxMegas * 1024 * 1024;
         if ($archivo['size'] > $maxBytes) {
-            return ['valido' => false, 'mensaje' => "El archivo supera los $maxMegas MB."];
+            return ['valido' => false, 'mensaje' => "El archivo supera los {$maxMegas} MB."];
         }
 
-        // Se usa finfo con namespace global
+        // Uso de \finfo importado correctamente desde el espacio de nombres global
         $finfo = new finfo(FILEINFO_MIME_TYPE);
         $tipoMimeReal = $finfo->file($archivo['tmp_name']);
 
@@ -288,29 +331,29 @@ class Validar
     }
 
     /**
-     * Valida múltiples campos de un arreglo asociativo contra las reglas de esta clase.
-     * 
-     * @param array $reglas Ej: ['nombre' => 'esCadena', 'correo' => 'esCorreo']
-     * @param array|null $origenDatos Datos a validar (si es null toma $_POST por defecto)
+     * Valida un conjunto de datos contra un mapa de reglas definidas en esta clase.
+     *
+     * @param array<string, string> $reglas Mapa de campos y métodos (Ej: ['correo' => 'esCorreo'])
+     * @param array|null $origenDatos Datos a evaluar. Si es null, toma $_POST por defecto.
+     * @return array{datos: array, errores: array}
      */
     public static function validarFormulario(array $reglas, ?array $origenDatos = null): array
     {
+        // Corrección del fallback implícito hacia $_POST
         $datosEntrada = $origenDatos ?? $_POST;
         $datosLimpios = [];
         $errores = [];
 
         foreach ($reglas as $campo => $metodoValidacion) {
-            $valor = trim((string)($datosEntrada[$campo] ?? ''));
-            $datosLimpios[$campo] = $valor;
+            $valor = $datosEntrada[$campo] ?? null;
 
             if (method_exists(self::class, $metodoValidacion)) {
-                // Ejecutamos la validación
                 $resultado = self::$metodoValidacion($valor);
 
-                if ($resultado === false) {
+                // Si el método retorna null, la validación falló
+                if ($resultado === null) {
                     $errores[] = "El campo '{$campo}' es inválido.";
-                } else if (is_string($resultado) || is_int($resultado) || is_float($resultado)) {
-                    // Si el método transformó el dato (como esCadena que hace ucwords), guardamos el dato formateado
+                } else {
                     $datosLimpios[$campo] = $resultado;
                 }
             } else {

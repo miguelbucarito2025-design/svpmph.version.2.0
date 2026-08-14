@@ -2,27 +2,47 @@
 
 declare(strict_types=1);
 
-
 namespace App\Helpers;
 
+/**
+ * Clase Logger
+ *
+ * Se encarga de la escritura estructurada y segura de eventos
+ * y errores en archivos de registro dentro del disco.
+ *
+ * @package App\Helpers
+ */
 class Logger
 {
+    /**
+     * Escribe un mensaje formateado en un archivo de registro específico.
+     *
+     * @param string $filename Nombre del archivo de log (sin extensión).
+     * @param string $message Detalle principal del evento.
+     * @param array<string, mixed> $context Información adicional de contexto.
+     * @return void
+     */
     public static function log(string $filename, string $message, array $context = []): void
     {
-        $logDir = '/app/Logs/';
+        // Resolución correcta y limpia de la ruta absoluta hacia la carpeta Logs/
+        $logDir = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'app/Logs';
 
-        // Crear la carpeta /logs si no existe
-        if (!is_dir($logDir)) {
-            mkdir($logDir, 0755, true);
+        if (!is_dir($logDir) && !mkdir($logDir, 0755, true) && !is_dir($logDir)) {
+            return;
         }
 
         $date = date('Y-m-d H:i:s');
-        $contextString = !empty($context) ? ' | Context: ' . json_encode($context) : '';
+        $contextString = !empty($context)
+            ? ' | Context: ' . json_encode($context, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+            : '';
 
-        // Formato: [2026-07-23 14:30:00] ERROR: Mensaje de error | Context: {...}
         $formattedMessage = "[{$date}] {$message}{$contextString}" . PHP_EOL;
 
-        // Escribir en el archivo de log especificado sin borrar lo anterior (FILE_APPEND)
-        file_put_contents("{$logDir}/{$filename}.log", $formattedMessage, FILE_APPEND);
+        // Uso obligatorio de LOCK_EX para evitar colisiones entre procesos
+        file_put_contents(
+            $logDir . DIRECTORY_SEPARATOR . "{$filename}.log",
+            $formattedMessage,
+            FILE_APPEND | LOCK_EX
+        );
     }
 }

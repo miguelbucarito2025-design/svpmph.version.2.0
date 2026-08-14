@@ -1,0 +1,265 @@
+.header-form-container {
+  width: 100%;
+  height: 100px;
+}
+.form-container-menu {
+  max-width: 700px;
+  margin: 15px auto;
+  background-color: var(--color-blanco);
+  height: 60px;
+  border-radius: 10px;
+  box-shadow: 0 0 5px var(--sombra--);
+}
+.form-container-menu > ul {
+  height: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.form-container-menu > ul > li {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  line-height: 50px;
+  padding: 0 10px;
+  flex: 1;
+  margin: 5px;
+  text-align: center;
+  transition: all ease-in 0.09s;
+  &:hover {
+    color: var(--body-segundary-from---);
+    font-size: 15px;
+  }
+}
+
+.volver {
+  background-color: var(--color-danger);
+  color: var(--color-blanco);
+  &:hover {
+    color: var(--color-blanco) !important;
+    background-color: var(--color-danger--hover--);
+  }
+}
+
+body {
+  background: linear-gradient(
+    to bottom,
+    var(--body-segundary-from---),
+    var(--body-primary-from---)
+  );
+  background-repeat: no-repeat;
+  height: 100vh;
+}
+
+.container-login {
+  width: 300px;
+  margin: 50px auto;
+  padding-bottom: 1px;
+  background-color: var(--color-blanco);
+  border-radius: 10px;
+  box-shadow: 0 0 7px var(--sombra--);
+}
+
+.btn-summit {
+  border: none;
+  border-radius: 5px;
+  width: 90%;
+  height: 40px;
+  margin: 0 5% 10px 5%;
+  background-color: var(--color-success);
+  color: var(--color-blanco);
+  line-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container-login figure {
+  width: 50%;
+  margin: auto;
+}
+
+.container-login .title-login {
+  text-align: center;
+  line-height: 1.7;
+  font-size: 30px;
+  color: var(--color-text-muted);
+  margin: 0 0 15px 0;
+  padding: 0;
+}
+
+.item.activo {
+  color: var(--color-primary-hover);
+}
+
+.container-registro-form {
+  background-color: var(--color-blanco);
+  max-width: 498px;
+  margin: 50px auto;
+  border-radius: 10px;
+}
+
+.title-login {
+  text-align: left;
+  padding: 0 0 0 20px;
+  height: 60px;
+  line-height: 60px;
+  font-size: 30px;
+  color: var(--color-text-muted);
+}
+
+.container-registro-form {
+  background-color: var(--color-blanco);
+  max-width: 520px; /* Ancho optimizado para acomodar los dos campos de lado */
+  margin: 50px auto;
+  border-radius: 10px;
+  box-shadow: 0 0 7px var(--sombra--);
+}
+
+.form-registro {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Separación uniforme entre filas */
+  padding: 0 20px 0 20px;
+}
+
+.form-registro .btn-summit {
+  margin: 0;
+  width: 100%;
+}
+
+.enlace-terminos-condiciones {
+  color: var(--body-segundary-from---);
+  text-decoration: underline;
+}
+
+/* Contenedor de la fila dual (Usuario y Contraseña) */
+.reg-row-dual {
+  display: flex;
+  gap: 15px;
+  width: 100%;
+}
+
+/* Grupo de cada input individual */
+.reg-field-group {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.reg-row-dual .reg-field-group {
+  flex: 1; /* Divide el espacio estrictamente a 50% para cada uno */
+}
+
+.reg-full-width {
+  width: 100%;
+}
+
+/* Contenedor del Icono con la misma identidad visual de tu app */
+.reg-container-svg {
+  height: 40px; /* Misma altura que tus inputs previos */
+  width: 45px;
+  background-color: var(--body-primary-from---);
+  color: var(--color-blanco);
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Sobrescribe el SVG dentro del contenedor para que encaje perfectamente */
+.reg-container-svg .icono-outline {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  stroke: currentColor;
+}
+
+/* Estilo del Input unificado con tus bordes y colores */
+.reg-input {
+  width: 100%;
+  height: 40px;
+  padding: 0 14px 0 52px; /* Deja espacio a la izquierda para el icono fijo */
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--color-text-main);
+  background-color: var(--color-bg-surface, #ffffff);
+  border: 2px solid var(--color-secondary, #475569);
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+/* Cambio de color al hacer foco */
+.reg-input:focus {
+  border-color: var(--color-primary, #2563eb);
+}
+
+/* Estilo Base del Label Flotante */
+.reg-label {
+  position: absolute;
+  left: 52px; /* Comienza justo después del icono */
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: var(--color-bg-surface, #ffffff);
+  padding: 0 4px;
+  color: var(--color-text-muted, #64748b);
+  pointer-events: none;
+  transition: all 0.25s ease;
+}
+
+/* Animación cuando el input tiene foco o texto escrito */
+.reg-input:focus ~ .reg-label,
+.reg-input:not(:placeholder-shown) ~ .reg-label {
+  top: 0;
+  left: 40px;
+  transform: translateY(-50%) scale(0.85);
+  color: var(--color-primary, #2563eb);
+  font-weight: bold;
+}
+
+.button-token {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  flex: 1;
+  background-color: var(--color-warning);
+  color: var(--color-blanco);
+  border: none;
+  border-radius: 7px;
+}
+
+.container-registro-form p {
+  margin: 10px 20px 30px 20px;
+}
+
+@media (max-width: 600px) {
+  .form-container-menu {
+    margin: 15px 10px;
+    height: 80px;
+  }
+
+  .form-container-menu > ul > li {
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    line-height: 20px;
+  }
+  .volver {
+    max-width: 70px;
+    height: 70px;
+  }
+
+  .container-registro-form {
+    background-color: var(--color-blanco);
+    max-width: calc(100vw - 20px);
+  }
+}

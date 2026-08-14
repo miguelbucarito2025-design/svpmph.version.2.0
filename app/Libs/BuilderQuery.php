@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace App\Libs;
 
 use App\Libs\Exceptions\DatabaseException;
@@ -14,21 +13,62 @@ class BuilderQuery
 {
     private ?PDO $db = null;
     public mixed $resul = null;
-
+    public int $idSave;
     public function __construct()
     {
-
         $this->db = DataBase::getConnect();
     }
 
     /**
-     * Ejecuta una inserción segura en la base de datos controlando duplicados.
+     * Inicia una transacción en la base de datos.
+     * 
+     * @return bool
+     */
+    public function beginTransaction(): bool
+    {
+        return $this->db->beginTransaction();
+    }
+
+    /**
+     * Confirma (commit) los cambios de la transacción actual.
+     * 
+     * @return bool
+     */
+    public function commit(): bool
+    {
+        return $this->db->commit();
+    }
+
+    /**
+     * Revierte (rollBack) los cambios realizados durante la transacción.
+     * 
+     * @return bool
+     */
+    public function rollBack(): bool
+    {
+        return $this->db->rollBack();
+    }
+
+    /**
+     * Obtiene el ID del último registro insertado.
+     * 
+     * @param string|null $name Nombre de la secuencia si el motor lo requiere (ej. PostgreSQL).
+     * @return string|false
+     */
+    public function lastInsertId(?string $name = null): string|false
+    {
+        return $this->db->lastInsertId($name);
+    }
+
+    /**
+     * Ejecuta una inserción segura en la base de datos controlando duplicados
+     * y devolviendo el ID del registro insertado.
      * 
      * @param string $tabla Nombre de la tabla.
      * @param array $datos Datos a insertar ['campo' => 'valor'].
      * @param array|null $condicion Campos para verificar duplicados ['campo' => 'valor'].
      * 
-     * @return bool
+     * @return string|false Devuelve el ID de la inserción o false en caso de fallo.
      * 
      * @throws AppException
      * @throws DatabaseException
@@ -42,17 +82,14 @@ class BuilderQuery
             throw new AppException("No se enviaron valores para insertar.", 400);
         }
 
-        // 2. Control de duplicados opcional
+        // Control de duplicados opcional
         if (!empty($condicion)) {
             try {
-                // Generamos 'campo1 = ? AND campo2 = ?' de forma limpia
                 $clausulas = array_map(fn($campo) => "{$campo} = ?", array_keys($condicion));
-                $whereSql = implode(' AND ', $clausulas);
+                $whereSql = implode(' OR ', $clausulas);
 
                 $checkSql = "SELECT COUNT(*) FROM {$tabla} WHERE {$whereSql}";
                 $checkStmt = $this->db->prepare($checkSql);
-
-                // Ejecutamos pasando solo el arreglo plano de valores
                 $checkStmt->execute(array_values($condicion));
 
                 if ($checkStmt->fetchColumn() > 0) {
@@ -64,19 +101,25 @@ class BuilderQuery
             }
         }
 
-        // 3. Inserción
+        // Inserción
         $placeholders = implode(', ', array_fill(0, count($valores), '?'));
         $sql = "INSERT INTO {$tabla} ({$campos}) VALUES ({$placeholders})";
 
         try {
             $stmt = $this->db->prepare($sql);
-            return $stmt->execute($valores);
+            $ejecutado = $stmt->execute($valores);
+
+            if ($ejecutado) {
+
+
+                return true;
+            }
+
+            return false;
         } catch (PDOException $e) {
             throw new DatabaseException($e->getMessage(), $sql, 500);
         }
     }
-
-
 
     /**
      * Ejecuta una actualización dinámica y segura en la base de datos.
@@ -92,7 +135,6 @@ class BuilderQuery
      */
     public function update(string $tabla, array $datos, array $condicion): bool
     {
-        // 1. Validaciones iniciales
         if (empty($datos)) {
             throw new AppException("No se enviaron datos para actualizar.", 400);
         }
@@ -101,18 +143,13 @@ class BuilderQuery
             throw new AppException("Se requiere al menos una condición (WHERE) para actualizar.", 400);
         }
 
-        // 2. Construir el SET dinámico ('columna1 = ?, columna2 = ?')
         $setClauses = array_map(fn($campo) => "{$campo} = ?", array_keys($datos));
         $setSql = implode(', ', $setClauses);
 
-        // 3. Construir el WHERE dinámico ('id = ? AND estado = ?')
         $whereClauses = array_map(fn($campo) => "{$campo} = ?", array_keys($condicion));
         $whereSql = implode(' AND ', $whereClauses);
 
-        // 4. Armar la consulta SQL final
         $sql = "UPDATE {$tabla} SET {$setSql} WHERE {$whereSql}";
-
-        // 5. Unir los valores para el execute (Primero los del SET, luego los del WHERE)
         $valores = array_merge(array_values($datos), array_values($condicion));
 
         try {

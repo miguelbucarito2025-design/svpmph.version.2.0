@@ -1,0 +1,379 @@
+/* ==========================================================================
+   VARIABLES GLOBALES (:root)
+   Aquí definimos la paleta de colores. Usar variables te permite cambiar 
+   el tema completo de la aplicación modificando solo este bloque.
+   ========================================================================== */
+:root {
+  /* Paleta de Colores Principales */
+  --sombra--: #1d1d1d8d;
+  --color-blanco: #fafbfb;
+  --color-primary: #2563eb; /* Azul principal para botones y acciones */
+  --color-primary-hover: #1d4ed8; /* Tono más oscuro para el hover del ratón */
+  --color-secondary: #475569; /* Gris para elementos secundarios */
+  --body-primary-from---: #080b67; /* Colores Estructurales (Fondo y Texto) */
+  --body-segundary-from---: #087fff; /* Colores Estructurales (Fondo y Texto) */
+  --color-bg-body: #fffefb; /* Fondo general de la página */
+  --color-bg-surface: #ffffff; /* Fondo para tarjetas, modales o cajas */
+  --color-text-main: #0f172a; /* Texto principal (nunca negro puro, cansa la vista) */
+  --color-text-muted: #64748b; /* Texto secundario o descriptivo */
+
+  /* Colores de Estado (Feedback para el usuario) */
+  --color-success: #16a34a; /* Verde para operaciones exitosas */
+  --color-danger: #dc2626; /* Rojo para errores o acciones destructivas */
+  --color-danger--hover--: #cd0d0d;
+  --color-warning: #d97706; /* Naranja para advertencias */
+
+  /* Configuraciones Base */
+  --font-main:
+    system-ui, -apple-system, sans-serif; /* Fuente nativa del sistema */
+}
+
+/* ==========================================================================
+   RESET MODERNO
+   Limpia las inconsistencias que los navegadores aplican por defecto.
+   ========================================================================== */
+
+/* 1. Modelo de caja predecible y reseteo de espaciados */
+*,
+*::before,
+*::after {
+  box-sizing: border-box; /* Fundamental: El padding y el borde no aumentan el ancho/alto del elemento */
+  margin: 0;
+  padding: 0;
+}
+
+/* 2. Comportamiento base del documento */
+html {
+  scroll-behavior: smooth; /* Desplazamiento suave al hacer clic en enlaces internos (#id) */
+}
+
+/* 3. Aplicación de las variables en el cuerpo del documento */
+body {
+  font-family: var(--font-main);
+  background-color: var(--color-bg-body);
+  color: var(--color-text-main);
+  line-height: 1.5; /* Mejora la legibilidad del texto en párrafos */
+  -webkit-font-smoothing: antialiased; /* Suaviza los bordes de la fuente en pantallas de alta resolución */
+  font-size: 14px;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* 4. Elementos multimedia responsivos por defecto */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block; /* Evita el espacio fantasma que dejan las imágenes en línea por debajo */
+  max-width: 100%; /* Evita que una imagen grande rompa tu diseño al salirse de su contenedor */
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* 5. Controles de formulario consistentes */
+input,
+button,
+textarea,
+select {
+  font: inherit; /* Los inputs suelen usar una fuente distinta al body; esto los obliga a heredarla */
+  color: inherit;
+}
+
+/* 6. Mejoras tipográficas modernas para títulos */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-wrap: balance; /* Evita que una sola palabra quede "huérfana" en la última línea de un título */
+  line-height: 1.2;
+}
+
+/* 7. Limpieza de listas */
+ul,
+ol {
+  list-style: none; /* Elimina las viñetas por defecto, dándote control para estilizarlas tú mismo */
+}
+
+/* ==========================================================================
+   HOJA DE ESTILOS (.css)
+   ========================================================================== */
+
+/* Control global para todos tus iconos */
+.icono-sistema {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke-width: 2;
+  stroke: currentColor;
+  margin: 5px;
+}
+/* Clase global para cualquier icono de líneas (Outline) */
+.icono-outline {
+  margin: 5px;
+
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor; /* Hereda el color del botón o texto padre */
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.icon-sistema-rellen {
+  margin: 5px;
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+  stroke: none;
+}
+
+/* Estilos de los contenedores */
+.btn-perfil {
+  color: #2563eb; /* El icono del usuario será azul */
+  /* (tus demás estilos de botones) */
+}
+
+.enlace-accion {
+  color: #16a34a; /* El icono de la flecha será verde */
+}
+
+/* ==========================================================================
+   CONTENEDOR DEL CAMPO
+   Define el contexto de posicionamiento para que el label flote dentro de él.
+   ========================================================================== */
+.div-input {
+  position: relative; /* Clave: Permite posicionar el label de forma absoluta respecto a este div */
+  margin-bottom: 15px;
+  width: 100% !important; /* Espacio separador entre cada campo */
+}
+
+.container-svg {
+  background-color: var(--body-primary-from---);
+  color: var(--color-blanco);
+  border-bottom-left-radius: 6px;
+  border-top-left-radius: 6px;
+}
+
+.campo-icon {
+  position: relative; /* Clave: Permite posicionar el label de forma absoluta respecto a este div */
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: center;
+}
+
+.campo-icon input {
+  width: 80%;
+  padding: 16px 14px; /* Espacio interno para que el texto no choque con los bordes */
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--color-text-main, #0f172a);
+  background-color: var(--color-bg-surface, #ffffff);
+  border: 2px solid var(--color-secondary, #475569);
+  border-bottom-right-radius: 6px;
+  border-top-right-radius: 6px;
+  outline: none;
+  transition: border-color 0.2s ease;
+  height: 40px;
+}
+
+/* ==========================================================================
+   ESTILOS BASE DEL LABEL (Estado Normal)
+   ========================================================================== */
+.campo-icon label {
+  position: absolute;
+  left: 50px;
+  top: 50%;
+  transform: translateY(-50%); /* Lo centra verticalmente de forma perfecta */
+  background-color: var(
+    --color-bg-surface,
+    #ffffff
+  ); /* Fondo opcional para cortar el borde del input al flotar */
+  padding: 0 4px;
+  color: var(--color-text-muted, #64748b);
+  pointer-events: none; /* Evita que el ratón interfiera al hacer clic sobre el texto del label */
+  transition: all 0.25s ease; /* Suaviza el movimiento de subida y el cambio de tamaño */
+}
+
+/* ==========================================================================
+   ESTADOS DE ANIMACIÓN (Cuando el input recibe foco o tiene texto)
+   ========================================================================== */
+
+/* 1. Cambia el borde del input al estar activo */
+.campo-icon input:focus {
+  border-color: var(--color-primary, #2563eb);
+}
+
+/* 2. Mueve el label hacia arriba cuando el input tiene foco */
+.campo-icon input:focus ~ label,
+.campo-icon input:not(:placeholder-shown) ~ label {
+  top: 0; /* Lo lleva al borde superior del contenedor */
+  transform: translateY(-50%) scale(0.85); /* Lo reduce ligeramente de tamaño para darle elegancia */
+  color: var(
+    --color-primary,
+    #2563eb
+  ); /* Cambia al color principal del sistema */
+  font-weight: bold;
+}
+
+hr {
+  max-width: 97%;
+  margin: 0 auto 20px auto;
+}
+
+/**
+ * @file alert.css
+ * @description Estilos profesionales para el componente nativo de alertas (<dialog>).
+ * @author Arquitectura SVPMPH
+ * @version 1.0.0
+ */
+
+dialog {
+  margin: auto;
+}
+
+/* 1. La estructura principal del modal nativo */
+dialog.custom-alert {
+  border: none;
+  border-radius: 12px;
+  padding: 0;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+  background-color: #ffffff;
+  overflow: hidden;
+  transform: translateY(-10px);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+/* 2. El telón de fondo oscuro que aísla la interfaz */
+dialog.custom-alert::backdrop {
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(3px);
+}
+
+/* 3. Contenedor interno y distribución de elementos */
+.alert-content {
+  padding: 28px 24px 20px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 4. Icono representativo */
+.alert-icon {
+  font-size: 38px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+/* 5. Título de la alerta */
+.alert-title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1e293b;
+  font-family: inherit;
+}
+
+/* 6. Cuerpo dinámico (texto o elementos HTML inyectados) */
+.alert-body {
+  font-size: 0.95rem;
+  color: #475569;
+  width: 100%;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* 7. Contenedor de acciones */
+.alert-actions {
+  margin-top: 12px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* 8. Botón base de acción */
+.alert-btn {
+  background-color: #0f172a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
+  width: 100%;
+}
+
+.alert-btn:hover {
+  background-color: #1e293b;
+}
+
+.alert-btn:active {
+  transform: scale(0.98);
+}
+
+/* --- VARIANTES DE COLOR SEGÚN EL TIPO DE ALERTA --- */
+
+/* Éxito */
+dialog.custom-alert.success .alert-btn {
+  background-color: #16a34a;
+}
+dialog.custom-alert.success .alert-btn:hover {
+  background-color: #15803d;
+}
+
+/* Error */
+dialog.custom-alert.error .alert-btn {
+  background-color: #dc2626;
+}
+dialog.custom-alert.error .alert-btn:hover {
+  background-color: #b91c1c;
+}
+
+/* Advertencia */
+dialog.custom-alert.warning .alert-btn {
+  background-color: #d97706;
+}
+dialog.custom-alert.warning .alert-btn:hover {
+  background-color: #b45309;
+}
+
+/* Animación de entrada para los vectores SVG */
+@keyframes popInVector {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Aplicamos la animación al contenedor del icono cuando el modal está activo */
+dialog.custom-alert .alert-icon svg {
+  animation: popInVector 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+.disable {
+  display: none !important;
+}

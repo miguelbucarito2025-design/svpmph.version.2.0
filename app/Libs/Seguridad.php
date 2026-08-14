@@ -1,130 +1,145 @@
 <?php
 
-declare(sytict_types=1);
-
-
+declare(strict_types=1);
 
 namespace App\Libs;
 
-/* Departamento de seguridad - MVC Dinámico */
+use App\Libs\Response;
+
+/* Departamento de Seguridad - MVC Dinámico */
 
 class Seguridad
 {
-    private static $key;
-    private static $method = "aes-256-cbc";
-    private static $iv;
+    private static string $key = '';
+    private static string $method = "aes-256-cbc";
+    private static string $iv = '';
 
-    public static function init()
+    public static function init(): void
     {
-        if (self::$key === null) {
-            // Usamos la superglobal $_ENV para garantizar compatibilidad total con Laragon/XAMPP
-            self::$key = $_ENV['DB_KEY'] ?? getenv('key') ?: '';
-            self::$iv = $_ENV['DB_IV'] ?? getenv('iv') ?: '';
+        if (empty(self::$key)) {
+            self::$key = $_ENV['DB_KEY'] ?? getenv('key') ?: 'clave_secreta_por_defecto_32bytes';
+            self::$iv  = $_ENV['DB_IV']  ?? getenv('iv')  ?: '1234567890123456'; // 16 bytes exactos
         }
     }
 
-
-
-
-    public static function encriptarID($id)
+    public static function encriptarID(int|string $id): string
     {
         self::init();
-        $encriptado = openssl_encrypt($id, self::$method, self::$key, 0, self::$iv);
+        $encriptado = openssl_encrypt((string)$id, self::$method, self::$key, OPENSSL_RAW_DATA, self::$iv);
+
+        if ($encriptado === false) {
+            return '';
+        }
+
         return str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($encriptado));
     }
 
-    public static function desencriptarID($id_encriptado)
+    public static function desencriptarID(string $idEncriptado): ?string
     {
         self::init();
-        $data = str_replace(['-', '_'], ['+', '/'], $id_encriptado);
-        return openssl_decrypt(base64_decode($data), self::$method, self::$key, 0, self::$iv);
-    }
 
-    public static function setParams(string $cadena, string $separacion): array
-    {
-        $cadenaLimpia = rtrim($cadena, $separacion);
-        return explode($separacion, $cadenaLimpia);
-    }
-
-    public static function responderError($mensaje, $titulo = "Error de Sistema", $codigo = 500)
-    {
-        $fecha = date("Y-m-d H:i:s");
-
-        // 💡 Obtenemos el rastro de la ejecución para saber quién llamó a este método
-        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-        $archivoFallo = isset($trace[0]['file']) ? basename($trace[0]['file']) : 'Desconocido';
-        $lineaFallo   = isset($trace[0]['line']) ? $trace[0]['line'] : '0';
-
-        // 💡 Formateamos el mensaje incluyendo el Archivo y la Línea exacta
-        $msj = "[" . $fecha . "] Error en la App [Archivo: $archivoFallo | Línea: $lineaFallo]: $mensaje\n";
-        file_put_contents('app/class/log/erroresApp.log', $msj, FILE_APPEND);
-
-        http_response_code($codigo);
-        header('Content-Type: application/json');
-        echo json_encode([
-            "status"  => "error",
-            "code"    => $codigo,
-            "title"   => $titulo,
-            "message" => 'Hubo un problema al procesar la solicitud de forma segura.',
-            "data"    => null
-        ]);
-        exit;
-    }
-
-    public static function responderExito($mensaje, $datos = null, $titulo = "Operación Exitosa")
-    {
-        // 💡 Si por error llega un objeto, lo casteamos a array para que json_encode no explote
-        if (is_object($datos)) {
-            // Si el objeto tiene un método para convertirse en array (ej: toArray), lo usamos
-            if (method_exists($datos, 'toArray')) {
-                $datos = $datos->toArray();
-            } else {
-                // Si no, lo forzamos a un array de sus propiedades públicas
-                $datos = (array) $datos;
-            }
+        $data = str_replace(['-', '_'], ['+', '/'], $idEncriptado);
+        $modulo = strlen($data) % 4;
+        if ($modulo) {
+            $data .= str_repeat('=', 4 - $modulo);
         }
 
-        http_response_code(200);
-        header('Content-Type: application/json');
-        echo json_encode([
-            "status"  => "success",
-            "code"    => 200,
-            "title"   => $titulo,
-            "message" => $mensaje,
-            "data"    => $datos
-        ]);
-        exit;
+        $bytes = base64_decode($data, true);
+
+        if ($bytes === false) {
+            return null;
+        }
+
+        $desencriptado = openssl_decrypt($bytes, self::$method, self::$key, OPENSSL_RAW_DATA, self::$iv);
+
+        return ($desencriptado !== false) ? $desencriptado : null;
     }
 
-    public static function detectorDeBots()
+    /**
+     * Empaqueta un arreglo asociativo y le añade tiempo de expiración.
+     * 
+     * @param array $params Datos a ocultar (ej: ['cedula' => 821928192, 'seccion' => 1])
+     * @param int $minutosExpiracion Minutos de validez. Usar 0 para enlaces permanentes.
+     */
+    public static function encriptarParams(array $params, int $minutosExpiracion = 60): string
+    {
+        if ($minutosExpiracion > 0) {
+            $params['_exp'] = time() + ($minutosExpiracion * 60);
+        }
+
+        $json = json_encode($params);
+        if ($json === false) {
+            return '';
+        }
+
+        return self::encriptarID($json);
+    }
+
+    /**
+     * Desencripta el token y valida integridad y expiración.
+     * Devuelve el arreglo de datos original, un arreglo vacío si no vino token, 
+     * o NULL si el token fue manipulado o expiró.
+     */
+    public static function desencriptarParams(string $token): ?array
+    {
+        if (empty($token)) {
+            return [];
+        }
+
+        $json = self::desencriptarID($token);
+        if ($json === null) {
+            return null; // Token corrupto o alterado
+        }
+
+        $params = json_decode($json, true);
+        if (!is_array($params)) {
+            return null;
+        }
+
+        // Validación de expiración
+        if (isset($params['_exp'])) {
+            if (time() > $params['_exp']) {
+                return null; // Enlace caducado
+            }
+            unset($params['_exp']); // Limpiar metadata antes de entregar los datos
+        }
+
+        return $params;
+    }
+
+    public static function detectorDeBots(): void
     {
         $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 
-        // 1. Bloqueo por Identidad Sospechosa
-        $botsConocidos = ['Python', 'curl', 'PostmanRuntime', 'Wget', 'libwww-perl'];
+        $botsConocidos = ['Python', 'curl', 'Wget', 'libwww-perl'];
         foreach ($botsConocidos as $bot) {
             if (stripos($userAgent, $bot) !== false) {
-                manejarError("Acceso denegado: Herramienta no permitida. Bot Detectado 403");
+                self::registrarYAbortar("Acceso denegado: Bot no permitido.", 403);
             }
         }
 
-        // 2. Control de Velocidad (Rate Limiting)
         $ahora = microtime(true);
         if (isset($_SESSION['ultima_peticion'])) {
             $tiempoTranscurrido = $ahora - $_SESSION['ultima_peticion'];
-            if ($tiempoTranscurrido < 0.2) { // 200 ms
-                manejarError("Demasiadas peticiones. Calma, humano. Flood Control 429");
+            if ($tiempoTranscurrido < 0.2) {
+                self::registrarYAbortar("Demasiadas peticiones consecutivas.", 429);
             }
         }
         $_SESSION['ultima_peticion'] = $ahora;
     }
-}
 
-function manejarError($detalle)
-{
-    $fecha = date("Y-m-d H:i:s");
-    $mensaje = "[" . $fecha . "] Error en el servidor: $detalle\n";
-    file_put_contents(__DIR__ . '/log/erroresApp.log', $mensaje, FILE_APPEND);
+    private static function registrarYAbortar(string $detalle, int $codigoHttp): void
+    {
+        $fecha = date("Y-m-d H:i:s");
+        $logDir = 'app/Logs/';
 
-    http_response_code(404);
+        if (!is_dir($logDir)) {
+            mkdir($logDir, 0755, true);
+        }
+
+        $mensaje = "[" . $fecha . "] [{$codigoHttp}] $detalle - IP: " . ($_SERVER['REMOTE_ADDR'] ?? 'desconocida') . "\n";
+        file_put_contents($logDir . '/erroresApp.log', $mensaje, FILE_APPEND);
+
+        Response::json(null, $codigoHttp, $detalle);
+    }
 }

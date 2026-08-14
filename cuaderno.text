@@ -163,3 +163,164 @@ div.sidebar ul.menu li.item a {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+como hacer un trait 
+
+
+4. CÓDIGO DE REFERENCIA COMPLETO
+Trait de Respuesta HTTP (src/Traits/ResponseTrait.php)
+PHP
+<?php
+
+declare(strict_types=1);
+
+namespace App\Traits;
+
+/**
+ * Trait ResponseTrait
+ *
+ * Proporciona métodos auxiliares para la estandarización y emisión 
+ * de respuestas HTTP en formato JSON.
+ *
+ * @package App\Traits
+ */
+trait ResponseTrait
+{
+    /**
+     * Emite una respuesta estructurada en formato JSON y finaliza la ejecución.
+     *
+     * @param mixed $data Datos o mensaje a responder.
+     * @param int $codigoHttp Código de estado HTTP (Por defecto 200).
+     * @return void
+     */
+    protected function jsonResponse(mixed $data, int $codigoHttp = 200): void
+    {
+        http_response_code($codigoHttp);
+        header('Content-Type: application/json; charset=utf-8');
+
+        echo json_encode([
+            'status' => $codigoHttp >= 200 && $codigoHttp < 300 ? 'success' : 'error',
+            'data'   => $data
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+        exit;
+    }
+}
+Modelo Limpio (src/Models/CuentaModel.php)
+PHP
+<?php
+
+declare(strict_types=1);
+
+namespace App\Models;
+
+use App\Libs\Exceptions\DatabaseException;
+
+/**
+ * Clase CuentaModel
+ *
+ * Gestiona la persistencia y consultas referentes a las cuentas de usuario.
+ *
+ * @package App\Models
+ */
+class CuentaModel
+{
+    private mixed $db;
+
+    /**
+     * Consulta una cuenta de usuario y su perfil asociado mediante el nombre de usuario.
+     *
+     * @param string $usuario Nombre de usuario a consultar.
+     * @return array<string, mixed>|null Retorna los datos de la cuenta o null si no se encuentra.
+     * @throws DatabaseException Si ocurre una falla en la ejecución de la consulta SQL.
+     */
+    public function obtenerPorUsuario(string $usuario): ?array
+    {
+        $sql = 'SELECT 
+                    c.id,
+                    c.usuario,
+                    c.contrasena,
+                    c.estado,
+                    c.rol_id,
+                    d.nombre,
+                    d.apellido
+                FROM cuentas c 
+                LEFT JOIN datos d ON c.id = d.cuenta_id
+                WHERE c.usuario = ? 
+                LIMIT 1';
+
+        /** @var array<string, mixed>|false|null $resultado */
+        $resultado = $this->db->select($sql, [$usuario], 'row');
+
+        return is_array($resultado) ? $resultado : null;
+    }
+}
+Controlador Modelo (src/Controllers/CuentaController.php)
+PHP
+<?php
+
+declare(strict_types=1);
+
+namespace App\Controllers;
+
+use App\Models\CuentaModel;
+use App\Helpers\Validar;
+use App\Libs\Exceptions\AppException;
+use App\Traits\ResponseTrait;
+
+/**
+ * Clase CuentaController
+ *
+ * Procesa las peticiones HTTP referentes a las cuentas de usuario.
+ *
+ * @package App\Controllers
+ */
+class CuentaController
+{
+    use ResponseTrait;
+
+    private CuentaModel $cuentaModel;
+
+    public function __construct()
+    {
+        $this->cuentaModel = new CuentaModel();
+    }
+
+    /**
+     * Consulta y retorna los datos de una cuenta por su nombre de usuario.
+     *
+     * @param array<string, mixed> $params Parámetros capturados en la ruta HTTP.
+     * @return void Método con retorno void por emitir la respuesta HTTP directamente.
+     * @throws AppException Si el parámetro de usuario es inválido o no existe la cuenta.
+     */
+    public function obtenerPorUsuario(array $params): void
+    {
+        $usuario = Validar::esNombreUsuario($params['usuario'] ?? null);
+
+        if ($usuario === null) {
+            throw new AppException('El nombre de usuario proporcionado no es válido.', 400);
+        }
+
+        $cuenta = $this->cuentaModel->obtenerPorUsuario($usuario);
+
+        if ($cuenta === null) {
+            throw new AppException('La cuenta solicitada no existe.', 404);
+        }
+
+        $this->jsonResponse($cuenta, 200);
+    }
+}

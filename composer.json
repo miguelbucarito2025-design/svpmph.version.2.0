@@ -5,7 +5,10 @@
   "autoload": {
     "psr-4": {
       "App\\": "app/"
-    }
+    },
+    "files": [
+      "app/Config/Constantes.php"
+    ]
   },
   "authors": [
     {

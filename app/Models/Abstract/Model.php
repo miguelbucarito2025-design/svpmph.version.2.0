@@ -6,7 +6,6 @@ namespace App\Models\Abstract;
 
 use App\Libs\BuilderQuery;
 use App\Libs\Exceptions\AppException;
-use App\Libs\Exceptions\DatabaseException;
 use App\Helpers\Validar;
 
 abstract class Model
@@ -91,18 +90,14 @@ abstract class Model
      */
     public function save(array $datos): bool
     {
-        try {
-            $datosValidados = $this->validarCampos($datos, true);
-            $datosUnicos = array_intersect_key($datosValidados, array_flip($this->camposUnicos));
+        $datosValidados = $this->validarCampos($datos, true);
+        $datosUnicos = array_intersect_key($datosValidados, array_flip($this->camposUnicos));
 
-            return $this->db->insert(
-                $this->tabla,
-                $datosValidados,
-                $datosUnicos
-            );
-        } catch (DatabaseException $e) {
-            throw new AppException("Error al guardar el registro: " . $e->getMessage(), 500);
-        }
+        return $this->db->insert(
+            $this->tabla,
+            $datosValidados,
+            $datosUnicos
+        );
     }
 
     /**
@@ -122,17 +117,13 @@ abstract class Model
 
         $condicionesValidadas = $this->validarCampos($condiciones, false);
 
-        try {
-            $datosValidados = $this->validarCampos($datos, false);
+        $datosValidados = $this->validarCampos($datos, false);
 
-            return $this->db->update(
-                $this->tabla,
-                $datosValidados,
-                $condicionesValidadas
-            );
-        } catch (DatabaseException $e) {
-            throw new AppException("Error al actualizar el registro: " . $e->getMessage(), 500);
-        }
+        return $this->db->update(
+            $this->tabla,
+            $datosValidados,
+            $condicionesValidadas
+        );
     }
 
     /**
@@ -148,12 +139,8 @@ abstract class Model
             throw new AppException("Se requieren condiciones válidas para eliminar un registro.", 400);
         }
 
-        try {
-            $condicionesValidadas = $this->validarCampos($condiciones, false);
-            return $this->db->delete($this->tabla, $condicionesValidadas);
-        } catch (DatabaseException $e) {
-            throw new AppException("Error al eliminar el registro: " . $e->getMessage(), 500);
-        }
+        $condicionesValidadas = $this->validarCampos($condiciones, false);
+        return $this->db->delete($this->tabla, $condicionesValidadas);
     }
 
 
