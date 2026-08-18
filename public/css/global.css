@@ -6,6 +6,7 @@
 :root {
   /* Paleta de Colores Principales */
   --sombra--: #1d1d1d8d;
+  --fondo--: #e6e6e6;
   --color-blanco: #fafbfb;
   --color-primary: #2563eb; /* Azul principal para botones y acciones */
   --color-primary-hover: #1d4ed8; /* Tono más oscuro para el hover del ratón */
@@ -16,6 +17,8 @@
   --color-bg-surface: #ffffff; /* Fondo para tarjetas, modales o cajas */
   --color-text-main: #0f172a; /* Texto principal (nunca negro puro, cansa la vista) */
   --color-text-muted: #64748b; /* Texto secundario o descriptivo */
+  --info--: #036dde;
+  --warning--: #cf7d01;
 
   /* Colores de Estado (Feedback para el usuario) */
   --color-success: #16a34a; /* Verde para operaciones exitosas */
@@ -331,6 +334,7 @@ dialog.custom-alert::backdrop {
 
 /* Éxito */
 dialog.custom-alert.success .alert-btn {
+  color: var(--color-blanco);
   background-color: #16a34a;
 }
 dialog.custom-alert.success .alert-btn:hover {
@@ -376,4 +380,37 @@ dialog.custom-alert .alert-icon svg {
 
 .disable {
   display: none !important;
+}
+
+/* Animación de rotación continua */
+@keyframes girarIcono {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.icono-girando {
+  animation: girarIcono 0.8s linear infinite;
+  display: inline-block;
+  color: #2563eb; /* Azul institucional */
+}
+
+/* Helper para mostrar u ocultar el estado de carga */
+.cargando-oculto {
+  display: none !important;
+}
+
+.cargando-visible {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+.amarillo {
+  background-color: #dead0e;
 }

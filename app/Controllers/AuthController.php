@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Controllers\Abstract\Controller;
-use App\Libs\Exceptions\AppException;
 use App\Models\CuentasModel;
 use App\Traits\MensageTrait;
 
@@ -13,17 +12,13 @@ use App\Traits\MensageTrait;
  * Clase AuthController
  *
  * Controlador encargado de la autenticación de usuarios, despliegue del 
- * formulario de acceso e inicio/cierre de sesiones en el sistema.
+ * formulario de acceso, inicio/cierre de sesiones y recuperación pública de clave.
  *
  * @package App\Controllers
  */
 class AuthController extends Controller
 {
-
     use MensageTrait;
-
-
-
 
     /**
      * Renderiza la vista del formulario de inicio de sesión.
@@ -36,7 +31,7 @@ class AuthController extends Controller
             'form/login',
             [
                 'ventana' => 'login',
-                'token' => $this->session->get('csrf_token')
+                'token'   => $this->session->get('csrf_token')
             ],
             'form'
         );
@@ -44,15 +39,11 @@ class AuthController extends Controller
 
     /**
      * Procesa la petición de inicio de sesión mediante POST.
-     * 
-     * Valida la protección CSRF, sanitiza la entrada, verifica las credenciales
-     * contra la base de datos y establece las variables globales de sesión.
      *
      * @return void
      */
     public function autenticar(): void
     {
-        // NO se llama a requerirAutenticacion() porque es una ruta pública de acceso.
         $this->verificarCSRF();
 
         $datos = $this->filtrarDatos([
@@ -63,7 +54,7 @@ class AuthController extends Controller
         $modelo = new CuentasModel();
         $resultado = $modelo->obtenerPorUsuario($datos['usuario']);
 
-        // Verificación de existencia del usuario y hash de contraseña
+        // Verificación de credenciales
         if (empty($resultado) || !password_verify($datos['contrasena'], $resultado['contrasena'])) {
             $this->respuesta->json(
                 null,
@@ -73,8 +64,8 @@ class AuthController extends Controller
             return;
         }
 
-        // Asignación de claves estandarizadas de sesión
-        $this->session->set('usuario_datos', $resultado);
+        // Asignación de variables globales de sesión
+        $this->session->set('nombre_rol', $resultado['rol']);
         $this->session->set('usuario_id', $resultado['id']);
         $this->session->set('usuario_rol', $resultado['rol_id']);
         $this->session->set('usuario_nombre', $resultado['usuario']);
@@ -86,51 +77,58 @@ class AuthController extends Controller
         );
     }
 
-
+    /**
+     * Genera y envía un código de recuperación al correo del usuario.
+     *
+     * @return void
+     */
     public function enviarRecuperacion(): void
     {
         $this->verificarCSRF();
 
-        $correo = $this->filtrarDatos([
+        $datos = $this->filtrarDatos([
             'correo' => 'esCorreo'
         ]);
 
         $modelo = new CuentasModel();
-        $token = random_int(100000, 999999);
-        $fecha = date('Y-m-d H:i:s', strtotime('+30 minutes'));
 
-        $modelo->insertarCodigo($correo['correo'], $token, $fecha);
+        // Código de 6 dígitos formateado como string puro
+        $token = (string) random_int(100000, 999999);
+        $expiracion = date('Y-m-d H:i:s', strtotime('+30 minutes'));
 
-        $this->enviarToken($correo['correo'], $token);
+        $modelo->insertarCodigo($datos['correo'], $token, $expiracion);
 
-        $this->session->set('correo_de_verificacion', $correo['correo']);
+        // Envío manteniendo el tipo string (evita recorte de ceros a la izquierda)
+        $this->enviarToken($datos['correo'], $token);
 
-        $this->respuesta->json(null, 200, 'token enviado');
+        $this->session->set('correo_de_verificacion', $datos['correo']);
+
+        $this->respuesta->json(null, 200, 'Código de recuperación enviado exitosamente.');
     }
 
 
-
     /**
-     * verifica el token del usuario
+     * Verifica el token de 6 dígitos ingresado por el usuario para recuperar acceso.
      *
      * @return void
      */
-    public function tokenResivido(): void
+    public function tokenRecibido(): void
     {
         $this->verificarCSRF();
 
         $datos = $this->filtrarDatos([
-            'token'    => 'esEntero',
+            'token'  => 'esTexto',
             'correo' => 'esCorreo'
         ]);
 
         $modelo = new CuentasModel();
         $tiempoActual = date('Y-m-d H:i:s');
+
+        // Si el token es inválido o venció, el modelo dispara una AppException
+        // que flota directo a tu Atrapador Global de Errores.
         $resultado = $modelo->validarToken($datos['correo'], $datos['token'], $tiempoActual);
 
-
-        // Asignación de claves estandarizadas de sesión
-        $this->session->set('usuario_datos', $resultado);
+        $this->session->set('nombre_rol', $resultado['rol']);
         $this->session->set('usuario_id', $resultado['id']);
         $this->session->set('usuario_rol', $resultado['rol_id']);
         $this->session->set('usuario_nombre', $resultado['usuario']);
@@ -138,14 +136,12 @@ class AuthController extends Controller
         $this->respuesta->json(
             true,
             200,
-            'Inicio de sesión exitoso'
+            'Acceso concedido correctamente'
         );
     }
 
-
-
     /**
-     * renderiza la vista para recuperar la clave
+     * Renderiza la vista para solicitar la recuperación de clave.
      *
      * @return void
      */
@@ -155,35 +151,38 @@ class AuthController extends Controller
             'form/recuperar',
             [
                 'ventana' => 'recuperar',
-                'token' => $this->session->get('csrf_token')
+                'token'   => $this->session->get('csrf_token')
             ],
             'form'
         );
     }
 
-
-    public function resividoToken(): void
+    /**
+     * Renderiza la vista donde el usuario ingresa el código de 6 dígitos.
+     *
+     * @return void
+     */
+    public function vistaColocarCodigo(): void
     {
         $this->vista->render(
             'form/colocarCodigo',
             [
                 'ventana' => 'recuperar',
-                'token' => $this->session->get('csrf_token'),
-                'correo' => $this->session->get('correo_de_verificacion')
+                'token'   => $this->session->get('csrf_token'),
+                'correo'  => $this->session->get('correo_de_verificacion')
             ],
             'form'
         );
     }
 
-
     /**
-     * Destruye la session
+     * Destruye la sesión activa del usuario y redirige al inicio.
      *
      * @return void
      */
     public function logout(): void
     {
         $this->session->destroy();
-        $this->respuesta->redirect('http://localhost/svpmph.version.2.0/');
+        $this->respuesta->redirect('home/');
     }
 }

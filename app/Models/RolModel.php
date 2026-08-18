@@ -27,4 +27,16 @@ class RolModel  extends Model
         'rol',
         'id'
     ];
+
+    /**
+     * optiene el rol por el id
+     *
+     * @param integer $id
+     * @return string devuelve solo el nombre
+     */
+    public function obtenerPorId(int $id): string
+    {
+        $sql = 'SELECT rol FROM rol WHERE id=?';
+        return $this->db->select($sql, [$id], 'row')['rol'];
+    }
 }

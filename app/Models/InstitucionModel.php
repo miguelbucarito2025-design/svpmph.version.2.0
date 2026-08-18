@@ -23,4 +23,10 @@ class InstitucionModel  extends Model
     protected array $camposUnicos = [
         'institucion'
     ];
+
+    public function selectNoId(int $id)
+    {
+        $sql = 'SELECT * FROM institucion WHERE id!=?';
+        return $this->db->select($sql, [$id], 'all');
+    }
 }

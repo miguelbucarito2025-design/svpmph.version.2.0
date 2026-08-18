@@ -14,15 +14,27 @@ class DatosLaboralesModel  extends Model
 
     protected array $campos = [
         'id' => 'esEntero',
-        'cedula_id' => 'esCedula',
+        'cuenta_id' => 'esEntero',
         'institucion_id' => 'esEntero',
         'cargo_id' => 'esEntero'
     ];
     protected array $camposMinimos = [
-        'cedula_id',
+        'cuenta_id',
         'institucion_id',
         'cargo_id'
     ];
 
-    protected array $camposUnicos = ['cedula_id'];
+    protected array $camposUnicos = ['cuenta_id'];
+
+    public function datosLaborales(int $id): array|null
+    {
+        $sql = 'SELECT 
+        i.institucion,
+        d.institucion_id,
+        c.cargo,
+        d.cargo_id
+        FROM datos_laborales d LEFT JOIN institucion i ON d.institucion_id=i.id 
+        LEFT JOIN cargos c ON d.cargo_id=c.id WHERE d.cuenta_id=?';
+        return $this->db->select($sql, [$id], 'row');
+    }
 }

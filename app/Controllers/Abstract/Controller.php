@@ -175,8 +175,30 @@ abstract class Controller
     {
         if (!$this->session->has('usuario_id')) {
             $this->session->destroy();
-            $this->respuesta->json(null, 401, 'Acceso denegado: Sesión no iniciada o expirada.');
+            $this->respuesta->json(null, 403, 'Acceso denegado: Sesión no iniciada o expirada.');
             exit;
         }
+    }
+
+    /**
+     * verifica la existencia de datos en un array 
+     *
+     * @return bool false si estan bien y true si uno no existe
+     */
+    protected function faltanDatos(array $reglas, array|null $datos): bool
+    {
+
+        if (empty($datos)) {
+            return false;
+        }
+
+
+        foreach ($reglas as $r) {
+            if (empty($datos[$r])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

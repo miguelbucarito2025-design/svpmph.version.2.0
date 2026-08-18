@@ -30,6 +30,8 @@ class Enrutador
         self::registrar('GET', $ruta, $handler, $rolesPermitidos);
     }
 
+
+
     public static function post(string $ruta, array $handler, array $rolesPermitidos = []): void
     {
         self::registrar('POST', $ruta, $handler, $rolesPermitidos);
@@ -142,7 +144,7 @@ class Enrutador
             return false;
         }
 
-        $rolUsuario = $session->get('rol_id');
+        $rolUsuario = $session->get('usuario_rol');
         if (!$rolUsuario) {
             return false;
         }

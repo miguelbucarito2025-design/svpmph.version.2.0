@@ -14,7 +14,7 @@ trait MensageTrait
     private Correo $correo;
 
 
-    public function enviarToken(string $correo, int $token): void
+    public function enviarToken(string $correo, string $token): void
     {
 
         $rutaPlantilla = 'public/mensages/token.html';

@@ -32,7 +32,7 @@ class Validar
         $valorTexto = trim((string)$valor);
 
         // Uso de \p{L} para cubrir cualquier letra unicode (acentos, diéresis, ñ)
-        if (!preg_match('/^[\p{L}0-9\s\.\,\;\:\!\?\-\_\"\']+$/u', $valorTexto)) {
+        if (!preg_match('/^[\p{L}0-9\s\.\,\;\:\!\?\#\-\_\"\']+$/u', $valorTexto)) {
             return null;
         }
 
@@ -265,8 +265,9 @@ class Validar
             return null;
         }
         $id = Seguridad::desencriptarID($id);
-        return self::esEntero((int)$id);
+        return (int)self::esEntero($id);
     }
+
     /**
      * Valida y parsea valores numéricos decimales.
      *
@@ -334,13 +335,13 @@ class Validar
      * Valida un conjunto de datos contra un mapa de reglas definidas en esta clase.
      *
      * @param array<string, string> $reglas Mapa de campos y métodos (Ej: ['correo' => 'esCorreo'])
-     * @param array|null $origenDatos Datos a evaluar. Si es null, toma $_POST por defecto.
+     * @param array|null $origenDatos Datos a evaluar. Si es null.
      * @return array{datos: array, errores: array}
      */
     public static function validarFormulario(array $reglas, ?array $origenDatos = null): array
     {
-        // Corrección del fallback implícito hacia $_POST
-        $datosEntrada = $origenDatos ?? $_POST;
+
+        $datosEntrada = $origenDatos;
         $datosLimpios = [];
         $errores = [];
 

@@ -1,0 +1,393 @@
+body {
+  background-color: var(--fondo--) !important;
+}
+
+header {
+  box-shadow: 0 0 7px var(--sombra--);
+  color: var(--color-blanco);
+  background: linear-gradient(
+    to top,
+    var(--body-segundary-from---),
+    var(--body-primary-from---)
+  );
+}
+
+header nav {
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  height: 80px;
+}
+
+header nav ul li {
+  justify-content: left;
+  align-items: center;
+  display: flex;
+}
+header nav ul svg {
+  width: 20px;
+  padding: 0;
+  margin: 0 !important;
+}
+
+header nav figure img {
+  height: 60px;
+  border-radius: 100%;
+  max-width: 60px;
+}
+
+header nav ul {
+  margin: 0 10px;
+}
+
+.container-article-aside {
+  display: flex;
+  flex-direction: row-reverse;
+  padding: 0;
+  margin: 0;
+  justify-content: left;
+  color: var(--color-blanco);
+}
+
+aside {
+  width: 20vw;
+  height: calc(100vh - 80px);
+  border-right: 1px solid var(--color-text-muted);
+  line-height: 2;
+  background-color: #18191cf8;
+}
+
+.section-usuario {
+  background-color: var(--color-blanco);
+  margin: 20px 0;
+  border-radius: 10px;
+  box-shadow: 0 0 3px var(--sombra--);
+  padding: 10px 0;
+  color: black;
+}
+
+article {
+  width: 80vw;
+  padding: 20px;
+  overflow: auto;
+  scrollbar-width: thin;
+  height: calc(100vh - 80px);
+}
+
+.title-pag {
+  color: #042d58d6;
+}
+
+.text-pag {
+  color: var(--color-text-muted);
+}
+
+.section-usuario-h2 {
+  color: black;
+  font-size: 17px;
+  line-height: 2;
+  margin: 0 0 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-usuario-text {
+  margin: 0 20px 20px 20px;
+  a {
+    color: var(--body-segundary-from---);
+    text-decoration: underline;
+  }
+}
+
+.section-inf {
+  border-left: 5px solid var(--info--);
+
+  h2 {
+    color: var(--info--);
+  }
+}
+
+.section-warning {
+  border-left: 5px solid var(--warning--);
+
+  h2 {
+    color: var(--warning--);
+  }
+}
+
+.sidebar {
+  padding: 20px;
+}
+/* Estilo del título del grupo */
+.grupo-titulo {
+  height: 50px;
+  width: 100%;
+  padding: 0;
+  background: transparent;
+  color: #e2e8f0;
+  border: none;
+  cursor: pointer;
+}
+
+/* Ocultamos la lista del grupo por defecto */
+.grupo-lista {
+  transition: all 1s ease;
+
+  list-style: none;
+  margin: 0;
+  max-height: 0;
+  overflow: hidden; /* Esto es vital: corta lo que se sale cuando mide 0px */
+  opacity: 0; /* Opcional: para que también se desvanezca suavemente */
+  transition:
+    max-height 0.5s ease-out,
+    opacity 0.4s ease-out;
+}
+
+.grupo-lista li {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  height: 40px;
+  transition: all 0.4s ease;
+}
+
+.grupo-lista a {
+  display: block;
+  padding: 0;
+  line-height: 2;
+  margin: 5px 0;
+  color: var(--color-blanco);
+  text-decoration: none;
+}
+
+.menu-link svg,
+.menu-grupo svg {
+  width: 30px;
+  fill: currentColor;
+  /* Hereda el color del botón o texto padre */
+}
+
+.menu-grupo {
+  margin: 20px auto 0 auto;
+  border: 2px solid #2c2c2c;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-radius: 10px;
+  background-color: #2d2d2e;
+  transition: all 0.5s ease;
+}
+.menu-link {
+  display: flex;
+  height: 50px;
+  align-items: center;
+  border-radius: 10px;
+  padding: 0 5px;
+  &:hover {
+    background-color: var(--body-segundary-from---);
+  }
+}
+
+/* =========================================================
+   LA MAGIA DE PHP Y CSS:
+   Cuando la <section> tiene la clase .abierto
+   ========================================================= */
+.menu-grupo.abierto .grupo-lista {
+  max-height: 300px; /* Pon un valor mayor a lo que crees que ocupará tu menú */
+  opacity: 1;
+  padding: 0 0 15px 0;
+}
+
+.grupo-lista li:hover {
+  background-color: var(--body-segundary-from---);
+}
+
+.link-content {
+  display: flex;
+  height: 100%;
+  color: var(--color-blanco);
+  align-items: center;
+}
+
+.menu-grupo.abierto .grupo-titulo {
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.linkactivo {
+  background-color: var(--body-segundary-from---);
+}
+
+/* La flecha por defecto (apunta abajo) */
+.flecha {
+  transition: transform 0.3s ease;
+  display: inline-block;
+  margin-left: 7px;
+}
+
+/* Cuando el padre está abierto, la flecha gira 180 grados */
+.menu-grupo.abierto .grupo-titulo .flecha {
+  transform: rotate(180deg);
+}
+
+.button-anuncio {
+  max-width: 100%;
+  min-width: 100px;
+  height: 40px;
+  display: flex;
+  border: none;
+  line-height: 40px;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  border-radius: 5px; /* Crecimiento | Encogimiento | Ancho Base */
+  flex: 1 1 300px;
+}
+
+.success {
+  background-color: var(--color-success);
+}
+
+.limpiar {
+  color: var(--color-danger);
+  background-color: var(--color-blanco);
+}
+
+.container-button-anuncion {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 20px;
+}
+
+.card-header h2 {
+  margin: 0 0 6px 0;
+  color: #0f172a;
+  font-size: 1.4rem;
+}
+
+.card-header p {
+  margin: 0 0 24px 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+/* Aplicación práctica de Flexbox fluido */
+.grid-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  padding: 20px;
+}
+
+/* Cada input tomará 2 columnas en PC y 1 columna en teléfonos */
+.campo-grupo {
+  flex: 1 1 240px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Forzar a que la dirección ocupe todo el ancho horizontal */
+.campo-full {
+  flex: 1 1 100%;
+}
+
+/* Labels e Inputs */
+.campo-grupo label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 6px;
+}
+
+.campo-grupo input,
+.campo-grupo textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: #1e293b;
+  background-color: #f8fafc;
+  box-sizing: border-box;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+/* Efectos al enfocar el campo (Focus) */
+.campo-grupo input:focus,
+.campo-grupo textarea:focus {
+  outline: none;
+  border-color: #0284c7; /* Azul primario del panel */
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+}
+
+.campo-grupo textarea {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+}
+
+/* Botón de guardar */
+.form-acciones {
+  margin-top: 25px;
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 20px;
+}
+
+.btn-guardar {
+  background-color: #10b981; /* Verde idéntico a tus tarjetas */
+  color: #ffffff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
+}
+
+.btn-guardar:hover {
+  background-color: #059669;
+}
+
+.btn-guardar:active {
+  transform: scale(0.98);
+}
+
+/* Bordes rojos para el input de fecha si no cumple el rango */
+.campo-invalido {
+  border: 1px solid #ef4444 !important;
+  background-color: #fef2f2;
+}
+
+/* Mensaje de texto en rojo debajo de la casilla */
+.mensaje-error {
+  color: #dc2626;
+  font-size: 0.8rem;
+  margin-top: 4px;
+  font-weight: 500;
+  display: none; /* Oculto por defecto */
+}
+
+hr {
+  flex: 1 1 100%;
+}
+
+.campo-grupo select {
+  height: 40px;
+  padding: 3px 5px;
+  border-radius: 5px;
+  border: 1px solid #9c9d9d;
+}

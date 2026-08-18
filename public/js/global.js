@@ -58,7 +58,7 @@ async function realizarPeticion(url, metodo = "GET", datos = null) {
     return await respuesta.json();
   } catch (error) {
     // Registramos en la consola de CodeLink para depuración interna
-    console.error("Error en la petición AJAX:", error);
+    //console.error("Error en la petición AJAX:", error);
     // Re-lanzamos el error para que llegue vivo al catch de formEnv()
     throw error;
   }
@@ -141,7 +141,8 @@ function inicializarFormulario(idFormulario, urlDestino, callbackExito = null) {
       }
     } catch (error) {
       // 5. Atrapamos errores de red o códigos HTTP críticos (400, 401, 429, 500)
-      console.error("[Error Crítico en Petición]:", error);
+      //console.error("[Error Crítico en Petición]:", error);
+      AlertApp.show("Error del Sistema", error, "error");
 
       const mensajeErrorServidor =
         error.message || "No se pudo establecer comunicación con el servidor.";
@@ -200,7 +201,7 @@ const AlertApp = {
     // 2. Diccionario de iconos vectoriales (SVG) limpios y profesionales
     const iconos = {
       success: `
-        <svg class="svg-icon success" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="svg-icon successAlert" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
           <polyline points="22 4 12 14.01 9 11.01"></polyline>
         </svg>`,
@@ -244,4 +245,134 @@ AlertApp.init();
 
 function redirec(url) {
   window.location.href = url;
+}
+
+/**
+ * Realiza una consulta silenciosa al servidor PHP controlando el estado visual de carga.
+ *
+ * @param {string} urlDestino - Ruta del controlador PHP.
+ * @param {FormData|Object|null} datos - Parámetros a enviar a PHP.
+ * @param {Function} callbackExito - Función que recibe la respuesta (respuesta.data).
+ * @param {string|null} [idLoader=null] - ID del elemento HTML que contiene el indicador visual de carga.
+ */
+async function consultarServidor(
+  urlDestino,
+  datos = null,
+  callbackExito = null,
+  idLoader = null,
+) {
+  let datosAEnviar = datos;
+
+  if (datos && !(datos instanceof FormData)) {
+    datosAEnviar = new FormData();
+    Object.keys(datos).forEach((key) => {
+      datosAEnviar.append(key, datos[key]);
+    });
+  }
+
+  // 1. ACTIVAR ESTADO DE CARGA (Si se proporcionó un ID de loader)
+  const elementoLoader = idLoader ? document.getElementById(idLoader) : null;
+  if (elementoLoader) {
+    elementoLoader.classList.remove("cargando-oculto");
+    elementoLoader.classList.add("cargando-visible");
+  }
+
+  try {
+    const respuesta = await realizarPeticion(urlDestino, "POST", datosAEnviar);
+
+    if (respuesta.status === "success") {
+      if (typeof callbackExito === "function") {
+        callbackExito(respuesta.data || respuesta.datos || respuesta);
+      }
+    } else {
+      console.warn("[Consulta SVPMPH]:", respuesta.message || "Sin datos.");
+      if (typeof callbackExito === "function") callbackExito([]);
+    }
+  } catch (error) {
+    loader();
+
+    console.error("[Error en Consulta]:", error);
+    if (typeof AlertApp !== "undefined") {
+      AlertApp.show(
+        "Error de Red",
+        error.message || "No se pudo consultar el servidor.",
+        "error",
+      );
+    }
+  } finally {
+    // 2. DESACTIVAR ESTADO DE CARGA (Garantizado aunque haya error)
+    if (elementoLoader) {
+      elementoLoader.classList.remove("cargando-visible");
+      elementoLoader.classList.add("cargando-oculto");
+    }
+  }
+}
+
+/**
+ * Vincula un input o select a una consulta en tiempo real con control de rebote (debounce).
+ *
+ * @param {string} idElemento - ID del input o select que dispara la búsqueda.
+ * @param {string} urlDestino - Ruta del controlador PHP.
+ * @param {Function} callbackProcesar - Callback que recibe (datos, valorIngresado) para actualizar la UI.
+ * @param {Object} [opciones={}] - Opciones adicionales (tiempoDebounce, nombreParametro, evento).
+ */
+function configurarBusquedaTiempoReal(
+  idElemento,
+  urlDestino,
+  callbackProcesar,
+  opciones = {},
+) {
+  const elemento = document.getElementById(idElemento);
+  const token = document.getElementById("csrf_token");
+  const elementoLoader = document.getElementById("loader");
+
+  if (!elemento) {
+    console.error(
+      `[Arquitectura SVPMPH]: El elemento ID "${idElemento}" no existe.`,
+    );
+    return;
+  }
+
+  if (!token) {
+    console.error(`[Arquitectura SVPMPH]: El token   no existe.`);
+    return;
+  }
+
+  // Configuraciones por defecto
+  const tiempoDebounce = opciones.tiempoDebounce || 300;
+  const nombreParametro =
+    opciones.nombreParametro || elemento.name || "busqueda";
+  const tipoEvento =
+    opciones.evento || (elemento.tagName === "SELECT" ? "change" : "input");
+
+  let temporizador = null;
+
+  elemento.addEventListener(tipoEvento, function () {
+    clearTimeout(temporizador);
+    loader();
+
+    temporizador = setTimeout(() => {
+      const valor = elemento.value.trim();
+      const valorToken = token.value.trim();
+
+      const payload = {};
+      payload[nombreParametro] = valor;
+      payload["csrf_token"] = valorToken;
+
+      // Invocamos la consulta silenciosa pasándole el callback
+      consultarServidor(urlDestino, payload, (datos) => {
+        loader();
+
+        if (typeof callbackProcesar === "function") {
+          callbackProcesar(datos, valor);
+        }
+      });
+    }, tiempoDebounce);
+  });
+}
+
+function loader() {
+  const prueva = document.getElementById("loader");
+
+  prueva.classList.toggle("cargando-visible");
 }

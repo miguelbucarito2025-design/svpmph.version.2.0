@@ -27,14 +27,9 @@ abstract class Model
         $this->db = new BuilderQuery();
     }
 
-    /**
-     * Valida los campos antes de pasarlos al constructor de la consulta
-     *
-     * @param array $datos Lista de datos con sus respectivas llaves para validar 
-     * @param bool $esInsercion Regla para ejecutar validación estricta en true y opcional en false
-     * @return array Lista de datos validados a usar en la consulta
-     * @throws AppException Si algún campo no cumple con la validación
-     */
+
+
+
     protected function validarCampos(array $datos, bool $esInsercion = true): array
     {
         if ($esInsercion) {
@@ -49,6 +44,12 @@ abstract class Model
 
         foreach ($datos as $columna => $valor) {
             if (!array_key_exists($columna, $this->campos)) {
+                continue;
+            }
+
+            // Si es una actualización y se envía NULL explícitamente, lo conservamos para limpiar el campo en SQL
+            if (!$esInsercion && is_null($valor)) {
+                $datosLimpios[$columna] = null;
                 continue;
             }
 
@@ -80,7 +81,6 @@ abstract class Model
 
         return $datosLimpios;
     }
-
     /**
      * Función para guardar un registro en la base de datos.
      *
