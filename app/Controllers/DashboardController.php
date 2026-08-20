@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Controllers\Abstract\Controller;
 use App\Models\DatosModel;
+use App\Helpers\R2Service;
 
 class DashboardController extends Controller
 {
@@ -27,14 +28,19 @@ class DashboardController extends Controller
             'id_cedula',
             'tlf',
             'direccion',
-            'edad'
+            'edad',
+            'foto'
         ];
 
         $reglasLaboral = [
             'institucion_id',
             'cargo_id'
         ];
+        $r2Service = new R2Service();
+        $foto = $datos['foto'] ?? 'perfiles/user.png';
+        $urlPublica = $r2Service->obtenerUrlPublica($foto);
 
+        $this->session->set('foto_perfil', $foto);
 
         $datosFaltantes = !$this->faltanDatos($reglasUsuario, $datos);
         $datosLaboralesFaltantes  = !$this->faltanDatos($reglasLaboral, $datos);
@@ -47,7 +53,8 @@ class DashboardController extends Controller
                 'nombreUsuario' => $this->session->get('usuario_nombre'),
                 'datos' => $datos,
                 'nombreRol' => $this->session->get('nombre_rol'),
-                'titlePag' => 'Dashboard'
+                'titlePag' => 'Dashboard',
+                'fotoUsuario' => $urlPublica
             ],
             'usuario'
         );

@@ -33,9 +33,11 @@ Enrutador::get('home', [HomeController::class, 'index']);
 
 Enrutador::get('login', [AuthController::class, 'login']);
 Enrutador::get('logout', [AuthController::class, 'logout']);
+Enrutador::get('logout', [AuthController::class, 'logout']);
 Enrutador::post('login/auth', [AuthController::class, 'autenticar']);
 Enrutador::get('recuperar', [AuthController::class, 'recuperarClave']);
 Enrutador::post('token', [AuthController::class, 'enviarRecuperacion']);
+Enrutador::post('cuenta/recuperada', [AuthController::class, 'actualizarUsuarioContrasena']);
 
 Enrutador::get('recibido', [AuthController::class, 'vistaColocarCodigo']);
 Enrutador::post('token/verificar', [AuthController::class, 'tokenRecibido']);
@@ -50,9 +52,13 @@ Enrutador::post('cuenta/actualizar-usuario', [CuentaController::class, 'actualiz
 Enrutador::post('cuenta/solicitar-correo', [CuentaController::class, 'solicitarCodigoCorreo'], [1]);
 Enrutador::post('cuenta/verificar-correo', [CuentaController::class, 'verificarCodigoCorreo'], [1]);
 Enrutador::post('cuenta/cambiar-contrasena', [CuentaController::class, 'cambiarContrasena'], [1]);
+Enrutador::post('foto/guardar', [CuentaController::class, 'cambiarFotoPerfil'], [1]);
+Enrutador::get('foto', [CuentaController::class, 'fotoPerfil'], [1]);
+
 
 
 Enrutador::get('perfil', [UsuariosController::class, 'perfil'], [1]);
+Enrutador::get('perfil/', [UsuariosController::class, 'perfil'], [1]);
 Enrutador::post('perfil/guardar', [UsuariosController::class, 'guardar'], [1]);
 Enrutador::post('perfil/actualizar', [UsuariosController::class, 'actualizar'], [1]);
 Enrutador::get('laboral', [UsuariosController::class, 'datosLaborales'], [1]);

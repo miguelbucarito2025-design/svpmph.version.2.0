@@ -48,4 +48,4 @@
      </form>
  </div>
 
- <script src="public/js/login.js" defer></script>
+ <script src="<?= URL_BASE ?>public/js/login.js" defer></script>

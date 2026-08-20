@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Controllers\Abstract\Controller;
+use App\Libs\Exceptions\AppException;
 use App\Models\CuentasModel;
 use App\Traits\MensageTrait;
 
@@ -132,6 +133,43 @@ class AuthController extends Controller
         $this->session->set('usuario_id', $resultado['id']);
         $this->session->set('usuario_rol', $resultado['rol_id']);
         $this->session->set('usuario_nombre', $resultado['usuario']);
+        $this->session->set('correo_usuario', $datos['correo']);
+
+        $this->respuesta->json(
+            true,
+            200,
+            'Acceso concedido correctamente'
+        );
+    }
+
+    /**
+     * actualiza el usuario y la contraseña para q pueda acceder asu cuenta
+     *
+     * @return void
+     */
+    public function actualizarUsuarioContrasena(): void
+    {
+        $this->verificarCSRF();
+        $this->requerirAutenticacion();
+
+        $datos = $this->filtrarDatos([
+            'usuario'  => 'esNombreUsuario',
+            'contrasena' => 'esPassword',
+            'contrasena_confirm' => 'esPassword'
+        ]);
+        if ($datos['contrasena'] !== $datos['contrasena_confirm']) {
+            throw new AppException('Datos invalidos Verifique y vuelva a intentarlo', 400);
+        }
+
+        $modelo = new CuentasModel();
+        $datos['contrasena'] = password_hash($datos['contrasena'], PASSWORD_BCRYPT);
+
+        $correo = $this->session->get('correo_usuario');
+        $resultado = $modelo->actualizarUsuarioContrasenaPorCorreo($correo, $datos['usuario'], $datos['contrasena']);
+        if (!$resultado) {
+            throw new AppException('No se pudo actualizar los nuevos datos', 500);
+        }
+        $this->session->set('usuario_nombre', $datos['usuario']);
 
         $this->respuesta->json(
             true,
@@ -183,6 +221,6 @@ class AuthController extends Controller
     public function logout(): void
     {
         $this->session->destroy();
-        $this->respuesta->redirect('home/');
+        $this->respuesta->redirect('login');
     }
 }

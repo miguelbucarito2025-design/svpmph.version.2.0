@@ -62,7 +62,6 @@ class RegistroController extends Controller
         // Valores asignados por defecto para el registro público
         $datos['estado'] = 1;
         $datos['rol_id'] = 1;
-
         // Hasheo obligatorio de la contraseña antes de guardar
         $datos['contrasena'] = password_hash($datos['contrasena'], PASSWORD_BCRYPT);
 
@@ -123,10 +122,12 @@ class RegistroController extends Controller
             );
         } catch (\Throwable $e) {
             $db->rollBack();
+            throw  $e;
+        } finally {
             $this->respuesta->json(
                 false,
                 500,
-                'Error interno al procesar el registro: ' . $e->getMessage()
+                'Error interno al procesar el registro '
             );
         }
     }

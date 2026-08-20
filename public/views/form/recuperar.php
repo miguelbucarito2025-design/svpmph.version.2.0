@@ -3,7 +3,7 @@
     <hr>
     <p>Bienvenido aqui podras recuperar el acceso a tu cuenta si haz olvidado tu usuario o contraseña coloca tu correo electronico para continuar con la verificacion y el envio del token,
         o pulsa en el siguiente link para ir a colocar el token de una vez. <br>
-        <a href="resivido" class="enlace-terminos-condiciones">Has click aqui para Verificar el token de confirmacion</a>
+        <a href="recibido" class="enlace-terminos-condiciones">Has click aqui para Verificar el token de confirmacion</a>
 
     </p>
     <form method="post" class="form-registro" id="form-recuperacion">
@@ -39,4 +39,4 @@
 
 
 </div>
-<script src="public/js/recuperar.js" defer></script>
+<script src="<?= URL_BASE ?>public/js/recuperar.js" defer></script>

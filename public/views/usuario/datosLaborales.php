@@ -79,4 +79,4 @@
 
 </article>
 
-<script src="public/js/laboral.js" defer></script>
+<script src="<?= URL_BASE ?>public/js/laboral.js" defer></script>

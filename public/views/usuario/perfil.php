@@ -78,5 +78,5 @@
         </div>
     </section>
 
-    <script src="public/js/perfil.js" defer></script>
+    <script src="<?= URL_BASE ?>public/js/perfil.js" defer></script>
 </article>

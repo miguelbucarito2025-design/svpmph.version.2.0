@@ -170,7 +170,9 @@ function inicializarFormulario(idFormulario, urlDestino, callbackExito = null) {
     }
   });
 }
-
+/**
+ * Componente AlertApp - Alertas y Modales Nativos con HTML5 <dialog>.
+ */
 const AlertApp = {
   dialog: document.getElementById("custom-alert"),
   icon: document.getElementById("alert-icon"),
@@ -186,49 +188,50 @@ const AlertApp = {
   },
 
   /**
-   * Muestra la alerta ultra flexible.
-   * @param {string} titulo - El título de la cabecera.
-   * @param {string|HTMLElement} contenido - Texto plano, HTML en string o un Elemento del DOM real.
-   * @param {string} tipo - 'success', 'error', 'info', 'warning', 'custom'.
+   * Muestra la alerta o modal dinámico.
+   *
+   * @param {string} titulo - Título de la cabecera.
+   * @param {string|HTMLElement} contenido - Mensaje, String HTML o Nodo DOM.
+   * @param {string} tipo - 'success', 'error', 'warning', 'info', 'none'.
+   * @param {Function|string|null} accion - Callback al confirmar o URL de redirección.
+   * @param {Object} opciones - Configuración avanzada del modal y botón.
    */
-  show(titulo, contenido, tipo = "info") {
+  show(titulo, contenido, tipo = "info", accion = null, opciones = {}) {
     if (!this.dialog) return;
 
-    // 1. Configurar tipo y título
-    this.dialog.className = "custom-alert " + tipo;
-    this.title.textContent = titulo;
-
-    // 2. Diccionario de iconos vectoriales (SVG) limpios y profesionales
-    const iconos = {
-      success: `
-        <svg class="svg-icon successAlert" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-          <polyline points="22 4 12 14.01 9 11.01"></polyline>
-        </svg>`,
-      error: `
-        <svg class="svg-icon error" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="15" y1="9" x2="9" y2="15"></line>
-          <line x1="9" y1="9" x2="15" y2="15"></line>
-        </svg>`,
-      warning: `
-        <svg class="svg-icon warning" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-          line x1="12" y1="9" x2="12" y2="13"></line>
-          <line x1="12" y1="17" x2="12.01" y2="17"></line>
-        </svg>`,
-      info: `
-        <svg class="svg-icon info" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#0284c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="16" x2="12" y2="12"></line>
-          <line x1="12" y1="8" x2="12.01" y2="8"></line>
-        </svg>`,
+    // Configuración con valores por defecto
+    const config = {
+      btnTexto: opciones.btnTexto || "Aceptar",
+      btnIcono: opciones.btnIcono || "", // String con etiqueta SVG o <use>
+      btnClase: opciones.btnClase || "", // Ej: 'btn-ghost-danger'
+      ocultarHeader: opciones.ocultarHeader || false,
+      claseExtra: opciones.claseExtra || "", // Ej: 'modal-formulario-expandido'
     };
-    // Inyectamos el SVG directamente en el contenedor del icono
-    this.icon.innerHTML = iconos[tipo] || iconos.info;
-    this.icon.style.display = tipo === "none" ? "none" : "block";
 
-    // 3. Limpiar el cuerpo e inyectar el contenido dinámico
+    // 1. Limpieza y asignación de clases al diálogo principal
+    this.dialog.className = `custom-alert ${tipo} ${config.claseExtra}`.trim();
+
+    // 2. Manejo de la cabecera (Título e Icono principal)
+    if (config.ocultarHeader) {
+      this.title.style.display = "none";
+      this.icon.style.display = "none";
+    } else {
+      this.title.style.display = "block";
+      this.title.textContent = titulo;
+
+      const iconos = {
+        success: `<svg class="svg-icon successAlert" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#16a34a" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`,
+        error: `<svg class="svg-icon error" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#dc2626" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`,
+        warning: `<svg class="svg-icon warning" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#d97706" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`,
+        info: `<svg class="svg-icon info" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#0284c7" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`,
+      };
+
+      this.icon.innerHTML = iconos[tipo] || "";
+      this.icon.style.display =
+        tipo === "none" || !iconos[tipo] ? "none" : "block";
+    }
+
+    // 3. Inyección de contenido en el cuerpo del modal
     this.body.innerHTML = "";
     if (contenido instanceof HTMLElement) {
       this.body.appendChild(contenido);
@@ -236,7 +239,30 @@ const AlertApp = {
       this.body.innerHTML = contenido;
     }
 
-    // 4. Mostrar el diálogo de forma nativa
+    // 4. Reemplazo del Botón con Estilos e Iconos Personalizados
+    const nuevoBoton = this.btnClose.cloneNode(true);
+
+    // Aplicamos las clases base + la clase personalizada (ej: btn-ghost-danger)
+    nuevoBoton.className = `alert-btn ${config.btnClase}`.trim();
+
+    // Insertamos el SVG opcional junto al texto
+    nuevoBoton.innerHTML =
+      `${config.btnIcono} <span>${config.btnTexto}</span>`.trim();
+
+    this.actions.replaceChild(nuevoBoton, this.btnClose);
+    this.btnClose = nuevoBoton;
+
+    // 5. Escuchador de clic para cerrar o ejecutar la acción
+    this.btnClose.addEventListener("click", () => {
+      this.dialog.close();
+      if (typeof accion === "function") {
+        accion();
+      } else if (typeof accion === "string" && accion.trim() !== "") {
+        window.location.href = accion;
+      }
+    });
+
+    // 6. Desplegar diálogo nativo
     this.dialog.showModal();
   },
 };
@@ -246,6 +272,66 @@ AlertApp.init();
 function redirec(url) {
   window.location.href = url;
 }
+
+/**
+ * 
+ * 
+ * // Icono SVG de una 'X' de cerrar
+const svgCerrar = `
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18"></line>
+    <line x1="6" y1="6" x2="18" y2="18"></line>
+  </svg>
+`;
+
+AlertApp.show(
+  "",                // Título (vacío porque usaremos ocultarHeader: true)
+  formUsuario,       // Tu elemento HTML con el formulario
+  "none",            // Sin tipo de icono predeterminado
+  null,              // Sin redirección previa
+  {
+    btnTexto: "Cerrar",
+    btnIcono: svgCerrar,               // <--- Le pasamos el SVG de la 'X'
+    btnClase: "btn-ghost-danger",      // <--- Aplica el CSS transparente y letras rojas
+    ocultarHeader: true,               // <--- Oculta el icono y título superior del modal
+    claseExtra: "modal-formulario"     // <--- Clase CSS para ajustar el tamaño del modal
+  }
+);
+ * 
+ * 
+ * 
+ * // Si le pasas una cadena de texto como 4to parámetro, JS lo entenderá como una URL
+AlertApp.show(
+    "Expediente Incompleto", 
+    "Debes completar tus datos antes de subir una foto.", 
+    "warning", 
+    "/cuenta/completar-datos" // <--- Redirige automáticamente aquí
+);
+ *
+// Si le pasas una función como 4to parámetro, se ejecutará al pulsar Aceptar
+AlertApp.show(
+    "Sesión Expirada", 
+    "Tu sesión ha caducado por inactividad.", 
+    "info", 
+    function() {
+        console.log("Limpiando datos locales...");
+        window.location.href = "/login";
+    }
+); 
+ * // 1. Creas el elemento en memoria
+const contenedor = document.createElement("div");
+contenedor.innerHTML = `
+  <p>Ingresa tu clave actual para confirmar:</p>
+  <input type="password" id="clave-confirm" class="form-control mb-2">
+`;
+
+// 2. Lo envías como 2do parámetro a la alerta
+AlertApp.show("Confirmación Requerida", contenedor, "warning", () => {
+    const clave = document.getElementById("clave-confirm").value;
+    console.log("Clave ingresada:", clave);
+});
+ * 
+ */
 
 /**
  * Realiza una consulta silenciosa al servidor PHP controlando el estado visual de carga.

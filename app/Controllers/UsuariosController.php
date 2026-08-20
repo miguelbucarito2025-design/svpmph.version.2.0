@@ -12,6 +12,7 @@ use App\Models\DatosModel;
 use App\Traits\ManejoFechasTrait;
 use App\Models\DatosLaboralesModel;
 use App\Models\InstitucionModel;
+use App\Helpers\R2Service;
 
 class UsuariosController extends Controller
 {
@@ -31,6 +32,8 @@ class UsuariosController extends Controller
         $datos = $model->datosPersonales(
             $this->session->get('usuario_id')
         );
+        $r2Service = new R2Service();
+        $urlPublica = $r2Service->obtenerUrlPublica($this->session->get('foto_perfil'));
 
         $ruta = empty($datos) ? 'perfil/guardar' : 'perfil/actualizar';
 
@@ -44,7 +47,9 @@ class UsuariosController extends Controller
                 'grup' => 'perfil',
                 'pag' => 'datosPersonales',
                 'token' => $this->session->get('csrf_token'),
-                'ruta' => $ruta
+                'ruta' => $ruta,
+                'fotoUsuario' => $urlPublica
+
 
             ],
             'usuario'
@@ -170,6 +175,8 @@ class UsuariosController extends Controller
             }
             unset($i);
         }
+        $r2Service = new R2Service();
+        $urlPublica = $r2Service->obtenerUrlPublica($this->session->get('foto_perfil'));
 
         $ruta = empty($datos) ? 'laboral/guardar' : 'laboral/actualizar';
 
@@ -184,7 +191,10 @@ class UsuariosController extends Controller
                 'pag'           => 'datosLaborales',
                 'token'         => $this->session->get('csrf_token'),
                 'ruta'          => $ruta,
-                'institucion'   => $institucion
+                'institucion'   => $institucion,
+                'fotoUsuario' => $urlPublica
+
+
             ],
             'usuario'
         );

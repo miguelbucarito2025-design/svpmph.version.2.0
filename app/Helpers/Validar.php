@@ -60,6 +60,41 @@ class Validar
         return $valorTexto;
     }
 
+
+    /**
+     * Valida si una cadena representa una ruta relativa de archivo o Key de almacenamiento válida y segura.
+     *
+     * Documentación de reglas de validación:
+     * 1. Comprueba que la cadena no esté vacía ni supere el límite de almacenamiento (255 caracteres).
+     * 2. Bloquea cualquier intento de Directory Traversal ('..') y barras invertidas de Windows ('\').
+     * 3. Garantiza que la ruta no comience ni termine con barra inclinada '/'.
+     * 4. Valida mediante expresión regular que solo contenga caracteres seguros (a-z, A-Z, 0-9, _, -, /, .)
+     *    y que posea una extensión de archivo al final.
+     *
+     * @param string $ruta Cadena a evaluar (ej: 'perfiles/usuario_16_17240000.jpg').
+     * @return bool Retorna true si la ruta es segura y válida; false si es sospechosa o inválida.
+     */
+    public static function esRutaArchivo(string $ruta): bool
+    {
+        $ruta = trim($ruta);
+
+        // 1. Longitud básica (las claves de BD no deben estar vacías ni saturar el campo VARCHAR)
+        if (empty($ruta) || strlen($ruta) > 255) {
+            return false;
+        }
+
+        // 2. Control de seguridad contra saltos de directorio o rutas absolutas del SO
+        if (str_contains($ruta, '..') || str_contains($ruta, '\\')) {
+            return false;
+        }
+
+        // 3. Expresión regular para rutas relativas limpias de almacenamiento (ej: carpeta/subcarpeta/archivo.ext)
+        // Estructura: [nombre_carpeta/]*nombre_archivo.extension
+        $patron = '/^[a-zA-Z0-9_\-]+(?:\/[a-zA-Z0-9_\-]+)*\.[a-zA-Z0-9]{2,5}$/';
+
+        return preg_match($patron, $ruta) === 1;
+    }
+
     /**
      * Valida si un valor representa un booleano válido.
      *
@@ -285,34 +320,61 @@ class Validar
 
         return $resultado !== false ? (float)$resultado : null;
     }
-
     /**
-     * Valida la integridad y seguridad de un archivo cargado ($_FILES).
+     * Valida la integridad, tamaño y seguridad de un archivo cargado ($_FILES).
      *
-     * @param array $archivo
-     * @param array $extensionesPermitidas
-     * @param int $maxMegas
-     * @return array{valido: bool, mensaje: string}
+     * Inspecciona los bytes mágicos del archivo mediante Fileinfo para evitar la suplantación
+     * de extensiones (spoofing) y garantiza que el tipo MIME coincida con la extensión.
+     *
+     * @param array $archivo Arreglo proveniente de $_FILES['input_name'].
+     * @param array $extensionesPermitidas Lista de extensiones en minúscula (ej: ['jpg', 'png', 'pdf']).
+     * @param int $maxMegas Límite máximo permitido en Megabytes (Por defecto: 2 MB).
+     * @return array{valido: bool, mensaje: string, mime?: string, extension?: string}
      */
     public static function esArchivoValido(array $archivo, array $extensionesPermitidas, int $maxMegas = 2): array
     {
-        if (!isset($archivo['error']) || $archivo['error'] !== UPLOAD_ERR_OK) {
-            return ['valido' => false, 'mensaje' => 'Error al subir el archivo.'];
+        // 1. Verificación de la estructura básica del arreglo $_FILES
+        if (!isset($archivo['error'], $archivo['tmp_name'], $archivo['name'], $archivo['size'])) {
+            return ['valido' => false, 'mensaje' => 'La estructura del archivo cargado no es válida.'];
         }
 
+        // 2. Control detallado de errores de carga nativos de PHP
+        if ($archivo['error'] !== UPLOAD_ERR_OK) {
+            $mensajesError = [
+                UPLOAD_ERR_INI_SIZE   => 'El archivo excede el tamaño máximo permitido por el servidor.',
+                UPLOAD_ERR_FORM_SIZE  => 'El archivo excede el límite especificado en el formulario.',
+                UPLOAD_ERR_PARTIAL    => 'El archivo solo se cargó parcialmente. Intente de nuevo.',
+                UPLOAD_ERR_NO_FILE     => 'No se seleccionó ningún archivo para subir.',
+                UPLOAD_ERR_NO_TMP_DIR => 'Error interno: Falta la carpeta temporal en el servidor.',
+                UPLOAD_ERR_CANT_WRITE => 'Error interno: No se pudo escribir el archivo en el disco.',
+                UPLOAD_ERR_EXTENSION  => 'Una extensión del servidor detuvo la subida del archivo.'
+            ];
+
+            $mensaje = $mensajesError[$archivo['error']] ?? 'Error desconocido al procesar la subida del archivo.';
+            return ['valido' => false, 'mensaje' => $mensaje];
+        }
+
+        // 3. Validación del tamaño máximo especificado
         $maxBytes = $maxMegas * 1024 * 1024;
         if ($archivo['size'] > $maxBytes) {
-            return ['valido' => false, 'mensaje' => "El archivo supera los {$maxMegas} MB."];
+            return ['valido' => false, 'mensaje' => "El archivo supera el límite permitido de {$maxMegas} MB."];
         }
 
-        // Uso de \finfo importado correctamente desde el espacio de nombres global
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        // 4. Verificación de seguridad de carga HTTP POST
+        if (!is_uploaded_file($archivo['tmp_name'])) {
+            return ['valido' => false, 'mensaje' => 'El archivo no fue cargado mediante un origen HTTP POST válido.'];
+        }
+
+        // 5. Lectura del tipo MIME real desde los bytes mágicos (vía raíz global \finfo)
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
         $tipoMimeReal = $finfo->file($archivo['tmp_name']);
 
+        // Mapa estricto de extensiones vs MIME types aceptados por la aplicación
         $mimesAceptados = [
             'jpg'  => 'image/jpeg',
             'jpeg' => 'image/jpeg',
             'png'  => 'image/png',
+            'webp' => 'image/webp',
             'pdf'  => 'application/pdf',
             'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             'zip'  => 'application/zip'
@@ -320,15 +382,26 @@ class Validar
 
         $extension = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
 
+        // 6. Validación de la extensión contra la lista blanca entregada por parámetro
         if (!in_array($extension, $extensionesPermitidas, true)) {
-            return ['valido' => false, 'mensaje' => 'Extensión no permitida.'];
+            return ['valido' => false, 'mensaje' => "La extensión '.{$extension}' no está permitida."];
         }
 
+        // 7. Verificación de coherencia entre extensión y contenido real del archivo
         if (!isset($mimesAceptados[$extension]) || $mimesAceptados[$extension] !== $tipoMimeReal) {
-            return ['valido' => false, 'mensaje' => 'El contenido real del archivo no coincide con su extensión.'];
+            return [
+                'valido' => false,
+                'mensaje' => 'El contenido real del archivo no coincide con su extensión o es un formato manipulado.'
+            ];
         }
 
-        return ['valido' => true, 'mensaje' => 'Archivo válido y seguro.'];
+        // 8. Retorno exitoso enriquecido con metadatos para el servicio R2
+        return [
+            'valido'    => true,
+            'mensaje'   => 'Archivo válido y seguro.',
+            'mime'      => $tipoMimeReal,
+            'extension' => $extension
+        ];
     }
 
     /**

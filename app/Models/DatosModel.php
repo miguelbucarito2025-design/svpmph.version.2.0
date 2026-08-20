@@ -77,6 +77,7 @@ class DatosModel  extends Model
                 d.tlf,
                 d.direccion,
                 d.edad,
+                d.foto,
                 l.institucion_id,
                 l.cargo_id
                 FROM
@@ -86,5 +87,36 @@ class DatosModel  extends Model
      ';
 
         return $this->db->select($sql, [$id], 'row');
+    }
+
+
+
+
+
+    public function guardarFoto(int $idCuenta, string $key): ?string
+    {
+        try {
+
+            $sql = 'SELECT foto,cuenta_id FROM datos WHERE cuenta_id=?';
+            $this->db->beginTransaction();
+            $result = $this->db->select($sql, [$idCuenta], 'row');
+            if (empty($result['cuenta_id'])) {
+                $this->db->rollBack();
+                return null;
+            }
+
+
+            $actualizar = $this->update(['foto' => $key], ['cuenta_id' => $idCuenta]);
+            if (!$actualizar) {
+                $this->db->rollBack();
+                return null;
+            }
+
+            $this->db->commit();
+            return $result['foto'];
+        } catch (\Throwable $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
     }
 }

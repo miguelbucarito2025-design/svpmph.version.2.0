@@ -191,7 +191,7 @@ ol {
    ========================================================================== */
 .campo-icon label {
   position: absolute;
-  left: 50px;
+  left: 70px;
   top: 50%;
   transform: translateY(-50%); /* Lo centra verticalmente de forma perfecta */
   background-color: var(
@@ -413,4 +413,43 @@ dialog.custom-alert .alert-icon svg {
 
 .amarillo {
   background-color: #dead0e;
+}
+
+.custom-alert.modal-formulario-expandido {
+  max-width: 500px;
+  width: 90%;
+}
+
+/* Botón sin fondo con texto rojo e icono para modales de formulario */
+.alert-btn.btn-ghost-danger {
+  background: transparent;
+  border: 1px solid transparent;
+  color: #dc2626; /* Rojo */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.alert-btn.btn-ghost-danger:hover {
+  background-color: rgba(
+    220,
+    38,
+    38,
+    0.08
+  ); /* Sombra tenue roja al pasar el cursor */
+  color: #991b1b;
+}
+
+.alert-btn.btn-ghost-danger svg {
+  stroke: currentColor; /* El SVG hereda el color rojo del texto automáticamente */
+  width: 18px;
+  height: 18px;
 }

@@ -160,6 +160,7 @@
             </button>
         </div>
     </section>
+
 </article>
 
-<script src="public/js/cuenta.js" defer></script>
+<script src="<?= URL_BASE ?>public/js/cuenta.js" defer></script>

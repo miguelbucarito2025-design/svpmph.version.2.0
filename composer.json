@@ -17,7 +17,8 @@
   ],
   "require": {
     "dompdf/dompdf": "*",
-    "phpmailer/phpmailer": "^7.1"
+    "phpmailer/phpmailer": "^7.1",
+    "aws/aws-sdk-php": "^3.393"
   },
   "require-dev": {
     "phpdocumentor/phpdocumentor": "^3.10"

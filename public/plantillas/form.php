@@ -4,9 +4,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="public/css/form.css?v=<?php echo time(); ?>" />
-  <link rel="stylesheet" href="public/css/global.css?v=<?php echo time(); ?>" />
-  <script defer src="public/js/global.js?v=<?php echo time(); ?>"></script>
+  <link rel="stylesheet" href="<?= URL_BASE ?>public/css/form.css?v=<?php echo time(); ?>" />
+  <link rel="stylesheet" href="<?= URL_BASE ?>public/css/global.css?v=<?php echo time(); ?>" />
+  <script defer src="<?= URL_BASE ?>public/js/global.js?v=<?php echo time(); ?>"></script>
 
   <base href="/svpmph.version.2.0/">
 

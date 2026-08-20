@@ -8,6 +8,8 @@ use App\Controllers\Abstract\Controller;
 use App\Libs\Exceptions\AppException;
 use App\Models\CuentasModel;
 use App\Traits\MensageTrait;
+use App\Helpers\R2Service;
+use App\Models\DatosModel;
 
 /**
  * Clase CuentaController
@@ -37,6 +39,8 @@ class CuentaController extends Controller
         if (empty($datosCuenta)) {
             throw new AppException('No se encontraron los datos de la cuenta.', 404);
         }
+        $r2Service = new R2Service();
+        $urlPublica = $r2Service->obtenerUrlPublica($this->session->get('foto_perfil'));
 
         // Retiramos la contraseña del arreglo por seguridad antes de pasar a la vista
         unset($datosCuenta['contrasena']);
@@ -51,12 +55,36 @@ class CuentaController extends Controller
                 'nombreRol' => $this->session->get('nombre_rol'),
                 'titlePag' => 'Cuenta',
                 'pag' => 'cuenta',
-                'grup' => 'perfil'
+                'grup' => 'perfil',
+                'fotoUsuario' => $urlPublica
+
             ],
             'usuario'
         );
     }
+    public function fotoPerfil(): void
+    {
+        $this->requerirAutenticacion();
 
+        $r2Service = new R2Service();
+        $urlPublica = $r2Service->obtenerUrlPublica($this->session->get('foto_perfil'));
+
+
+        $this->vista->render(
+            'usuario/fotoPerfil',
+            [
+                'token'   => $this->session->get('csrf_token'),
+                'nombreUsuario' => $this->session->get('usuario_nombre'),
+                'nombreRol' => $this->session->get('nombre_rol'),
+                'titlePag' => 'Foto Perfil',
+                'pag' => 'foto',
+                'grup' => 'perfil',
+                'fotoUsuario' => $urlPublica,
+
+            ],
+            'usuario'
+        );
+    }
     /**
      * Procesa la actualización del nombre de usuario mediante AJAX.
      *
@@ -221,6 +249,78 @@ class CuentaController extends Controller
             true,
             200,
             'Contraseña actualizada con éxito.'
+        );
+    }
+    /**
+     * Procesa la carga asíncrona de la foto de perfil del usuario.
+     * Actualiza el registro en la base de datos, refresca la sesión y retorna la URL pública.
+     * 
+     * Ruta esperada: POST /cuenta/foto-perfil
+     *
+     * @return void Emite respuesta JSON directa.
+     */
+    public function cambiarFotoPerfil(): void
+    {
+        // 1. Capturar y validar el archivo recibido
+        $archivo = $this->filtrarArchivo('foto', ['jpg', 'jpeg', 'png', 'webp'], 2);
+
+        if (empty($archivo['valido'])) {
+            $this->respuesta->json(
+                null,
+                400,
+                $archivo['error'] ?? 'El archivo seleccionado no es válido.',
+                ['foto' => 'Archivo no permitido o excede el tamaño']
+            );
+            return;
+        }
+        $this->verificarCSRF();
+        $this->requerirAutenticacion();
+
+        $usuarioId  = $this->session->get('usuario_id');
+        $extension  = $archivo['extension'];
+
+        $keyDestino = "perfiles/usuario_{$usuarioId}_" . time() . ".{$extension}";
+
+        $r2Service = new R2Service();
+        $resultado = $r2Service->subirArchivo($archivo['tmp_name'], $keyDestino, $archivo['mime']);
+
+        if (!$resultado['exito']) {
+            $this->respuesta->json(
+                null,
+                500,
+                $resultado['error'] ?? 'Error al almacenar el archivo en la nube.',
+                ['storage' => 'Fallo al conectar con Cloudflare R2']
+            );
+            return;
+        }
+
+
+
+        $model = new DatosModel();
+        $actualizado = $model->guardarFoto($usuarioId, $keyDestino);
+
+
+        if (!$actualizado) {
+            $r2Service->eliminarArchivo($keyDestino);
+            $this->respuesta->json(
+                null,
+                400,
+                'No se pudo guardar la imagen ya que Usted no se ha registrado, debe registrar sus datos personales antes para continuar con esta accion.'
+            );
+            return;
+        }
+
+        $r2Service->eliminarArchivo($actualizado);
+        $urlPublica = $r2Service->obtenerUrlPublica($keyDestino);
+
+        $this->session->set('foto_perfil', $keyDestino);
+
+        $this->respuesta->json(
+            [
+                'url' => $urlPublica
+            ],
+            200,
+            'Foto subida correctamente'
         );
     }
 }

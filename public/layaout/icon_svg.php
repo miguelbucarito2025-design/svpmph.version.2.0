@@ -104,6 +104,21 @@
             <path d="M4 16h6v4h-6z" />
             <path d="M14 12h6v8h-6z" />
             <path d="M14 4h6v4h-6z" />
+
+        </symbol>
+
+
+        <!-- 
+  Símbolo SVG: Icono de Imagen / Fotografía
+  ID: icono-foto
+  Documentación: Definición reutilizable para el sistema de Sprites SVG.
+  Hereda el color del texto mediante stroke="currentColor".
+-->
+        <symbol id="icono-foto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <polyline points="21 15 16 10 5 21" />
         </symbol>
 
         <!-- Icono de Configuración / Ajustes -->

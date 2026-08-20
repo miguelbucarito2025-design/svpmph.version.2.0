@@ -361,4 +361,20 @@ class CuentasModel extends Model
             'token_intentos'   => 0
         ], ['id' => $id]);
     }
+
+
+    public function actualizarUsuarioContrasenaPorCorreo(string $correo, string $usuario, string $contrasena): bool
+    {
+        return $this->update(
+            [
+                'usuario' => $usuario,
+                'contrasena' => $contrasena,
+                'fecha_codigo'     => null,
+                'token_intentos'   => 0
+            ],
+            [
+                'correo' => $correo
+            ]
+        );
+    }
 }

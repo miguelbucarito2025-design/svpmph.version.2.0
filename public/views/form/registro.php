@@ -80,4 +80,4 @@
     </form>
     <br>
 </div>
-<script defer src="public/js/registro.js"></script>
+<script defer src="<?= URL_BASE ?>public/js/registro.js"></script>

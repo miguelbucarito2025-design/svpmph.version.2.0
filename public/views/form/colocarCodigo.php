@@ -64,4 +64,4 @@
     <br>
 
 </div>
-<script src="public/js/verificarCodigo.js" defer></script>
+<script src="<?= URL_BASE ?>public/js/verificarCodigo.js" defer></script>

@@ -4,11 +4,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="public/css/usuario.css" />
-  <link rel="stylesheet" href="public/css/global.css" />
-  <script defer src="public/js/global.js?v=<?php echo time(); ?>"></script>
+  <link rel="stylesheet" href="<?= URL_BASE ?>public/css/usuario.css" />
+  <link rel="stylesheet" href="<?= URL_BASE ?>public/css/global.css" />
+  <script defer src="<?= URL_BASE ?>public/js/global.js?v=<?php echo time(); ?>"></script>
 
-  <base href="/svpmph.version.2.0/">
+  <base href="/<?= HOST ?>/">
 
   <title><?= $titlePag ?? '' ?> -SVPMPH</title>
 </head>
@@ -20,8 +20,8 @@
   <header>
     <nav>
       <figure>
-        <img
-          src="public/multimedia/ichigo-dos-espadas-bleach-thousand-year-blood-war_3840x2160_xtrafondos.com.jpg" />
+        <img id="foto-perfil"
+          src="<?= $fotoUsuario ?? '' ?>" />
       </figure>
       <ul>
         <li>
@@ -29,7 +29,7 @@
             <use href="#icono-usuario" />
           </svg> <?= $nombreUsuario ?? '' ?>
         </li>
-        <li><b><?= $nombreRol ?? '' ?></b></li>
+        <li><b><?= $nombreRol ?? '' ?>-LTE</b></li>
       </ul>
     </nav>
   </header>
@@ -84,15 +84,30 @@
               </svg>
               Cuenta de Usuario
             </li>
+            <li onclick="redirec('foto')" class="<?= (($pag ?? '')  === 'foto') ? 'linkactivo' : ''; ?>  ">
+              <svg class="icono-outline">
+                <use href="#icono-foto" />
+              </svg>
+              Foto de Perfil
+            </li>
           </ul>
 
         </section>
+        <!-- Enlace Suelto (Sin Grupo) -->
+        <a href="logout">
+          <div class="logout">
+            <svg class="icono-outline">
+              <use href="#icon-salir" />
+            </svg>
+            <span>Logout</span>
+          </div>
+        </a>
 
 
       </nav>
     </aside>
   </div>
-  <script src="public/js/asideUsuario.js"></script>
+  <script src="<?= URL_BASE ?>public/js/asideUsuario.js"></script>
 </body>
 
 </html>

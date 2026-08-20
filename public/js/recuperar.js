@@ -1,5 +1,5 @@
 inicializarFormulario("form-recuperacion", "token", (res) => {
   setTimeout(() => {
-    window.location.href = "resivido";
+    window.location.href = "recibido";
   }, 1500);
 });

@@ -102,6 +102,56 @@ abstract class Controller
     }
 
     /**
+     * Obtiene el arreglo de metadatos de un archivo cargado en la petición HTTP ($_FILES).
+     *
+     * @param string $clave Nombre del campo de entrada tipo file (ej: 'foto_perfil').
+     * @return array<string, mixed>|null Arreglo nativo de $_FILES o null si el campo no existe.
+     */
+    protected function getArchivoEntrada(string $clave): ?array
+    {
+        return $_FILES[$clave] ?? null;
+    }
+
+    /**
+     * Filtra, inspecciona y valida la seguridad de un archivo recibido en la petición.
+     *
+     * Evalúa el archivo contra la clase Validar. Si la validación falla por tamaño,
+     * extensión o incongruencia MIME, interrumpe el flujo emitiendo una respuesta JSON 400.
+     *
+     * @param string $clave Nombre del campo input en la petición.
+     * @param array $extensionesPermitidas Lista de extensiones válidas en minúscula (ej: ['jpg', 'png']).
+     * @param int $maxMegas Límite máximo de peso permitido en MB (Por defecto 2 MB).
+     * @return array{mime: string, extension: string, tmp_name: string, name: string, size: int} Metadatos validados del archivo.
+     */
+    protected function filtrarArchivo(string $clave, array $extensionesPermitidas, int $maxMegas = 2): array
+    {
+        $archivo = $this->getArchivoEntrada($clave);
+
+        if (!$archivo) {
+            $this->respuesta->json(null, 400, "No se recibió ningún archivo en el campo '{$clave}'.");
+            exit;
+        }
+
+        // Ejecutamos la validación profunda de bytes mágicos con el Helper Validar
+        $validacion = Validar::esArchivoValido($archivo, $extensionesPermitidas, $maxMegas);
+
+        if (!$validacion['valido']) {
+            $this->respuesta->json(null, 400, $validacion['mensaje']);
+            exit;
+        }
+
+        return [
+            'valido'    => true,
+            'mime'      => $validacion['mime'],
+            'extension' => $validacion['extension'],
+            'tmp_name'  => $archivo['tmp_name'],
+            'name'      => $archivo['name'],
+            'size'      => $archivo['size']
+        ];
+    }
+
+
+    /**
      * Valida la coincidencia del token CSRF y la procedencia del dominio (Origen/Referer).
      *
      * Garantiza que la petición provenga del cliente autorizado y no de sitios de terceros.
