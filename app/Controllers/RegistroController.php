@@ -10,7 +10,9 @@ use App\Libs\Exceptions\AppException;
 use App\Models\CuentasModel;
 use App\Libs\Seguridad;
 use App\Models\RolModel;
+use App\Models\TerminosModel;
 use App\Models\UsuarioTerminosModel;
+use App\Traits\MensageTrait;
 
 /**
  * Clase RegistroController
@@ -22,6 +24,9 @@ use App\Models\UsuarioTerminosModel;
  */
 class RegistroController extends Controller
 {
+
+    use MensageTrait;
+
     /**
      * Renderiza la vista del formulario de registro con los datos iniciales.
      *
@@ -29,12 +34,16 @@ class RegistroController extends Controller
      */
     public function registro(): void
     {
+
+
+        $model = new TerminosModel();
+        $idTermino = $model->seleccionarPorRol(1);
         $this->vista->render(
             'form/registro',
             [
                 'ventana'   => 'registro',
                 'token'     => $this->session->get('csrf_token'),
-                'idTermino' => Seguridad::encriptarID(1)
+                'idTermino' => Seguridad::encriptarID($idTermino['id'])
             ],
             'form'
         );
@@ -62,6 +71,7 @@ class RegistroController extends Controller
         // Valores asignados por defecto para el registro público
         $datos['estado'] = 1;
         $datos['rol_id'] = 1;
+        $datos['correo_pendiente'] = $datos['correo'];
         // Hasheo obligatorio de la contraseña antes de guardar
         $datos['contrasena'] = password_hash($datos['contrasena'], PASSWORD_BCRYPT);
 
@@ -95,14 +105,18 @@ class RegistroController extends Controller
                 throw new AppException('No se pudo registrar la aceptación de términos', 500);
             }
 
-            // 3. Obtener el nombre del rol para la sesión
             $rolData = $rolModel->obtenerPorId($datos['rol_id']);
             $nombreRol = $rolData['rol'] ?? 'Usuario';
 
-            // Confirmar la transacción antes de iniciar sesión
+
+            $token = (string) random_int(100000, 999999);
+            $expiracion = date('Y-m-d H:i:s', strtotime('+30 minutes'));
+
+            $cuentasModel->insertarCodigo($datos['correo'], $token, $expiracion);
+
+            $this->enviarToken($datos['correo'], $token);
             $db->commit();
 
-            // 4. Asignación de variables globales de sesión utilizando el ID correcto ($cuentaId)
             $this->session->set('nombre_rol', $nombreRol);
             $this->session->set('usuario_id', $cuentaId);
             $this->session->set('usuario_rol', $datos['rol_id']);
@@ -118,17 +132,12 @@ class RegistroController extends Controller
             $this->respuesta->json(
                 false,
                 $e->getCode() > 0 ? $e->getCode() : 400,
-                $e->getMessage()
+                ($e->getCode() == 409) ? 'Usuario o Correo Duplicado' : '',
+                []
             );
         } catch (\Throwable $e) {
             $db->rollBack();
-            throw  $e;
-        } finally {
-            $this->respuesta->json(
-                false,
-                500,
-                'Error interno al procesar el registro '
-            );
+            throw new  AppException('Error Interno : ' . $e->getMessage(), 500);
         }
     }
 }

@@ -29,7 +29,8 @@
         </div>
         <!-- FORMULARIO DE CARGA -->
         <form id="formCambiarFoto" class="form-usuario" action="foto/guardar" method="POST" enctype="multipart/form-data">
-            <input type="hidden" value="<?= $token ?? '' ?>" id="csrf_token" name="csrf_token">
+
+            <input type="hidden" name="csrf_token" value="<?= $token ?? '' ?>">
 
             <div class="grid-form">
 

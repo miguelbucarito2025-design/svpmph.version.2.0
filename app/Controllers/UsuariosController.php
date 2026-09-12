@@ -13,6 +13,8 @@ use App\Traits\ManejoFechasTrait;
 use App\Models\DatosLaboralesModel;
 use App\Models\InstitucionModel;
 use App\Helpers\R2Service;
+use App\Helpers\Validar;
+use App\Models\RolModel;
 
 class UsuariosController extends Controller
 {
@@ -65,9 +67,7 @@ class UsuariosController extends Controller
         $datos = $this->filtrarDatos(
             [
                 'nombre' => 'esCadena',
-                's_nombre' => 'esCadena',
                 'apellido' => 'esCadena',
-                's_apellido' => 'esCadena',
                 'id_cedula' => 'esCedula',
                 'tlf' => 'esTlf',
                 'edad' => 'esFecha',
@@ -75,20 +75,24 @@ class UsuariosController extends Controller
 
             ]
         );
+        $opcional = $this->getDatosEntrada();
+        $datos['s_nombre'] = Validar::esCadena($opcional['s_nombre']);
+        $datos['s_apellido'] = Validar::esCadena($opcional['s_apellido']);
+
 
         $edad = $this->obtenerEdad($datos['edad']);
         if ($edad < 17 || $edad > 80) {
             throw new AppException('Usted no esta en el rango de edad Permitido');
         }
-
         $datos['ingreso'] =  date('Y-m-d H:i:s');
         $datos['cuenta_id'] = $this->session->get('usuario_id');
+
         $model = new DatosModel();
 
 
         $result = $model->save($datos);
         if (!$result) {
-            throw new AppException('Error inesperado al guardar el dato');
+            throw new AppException('Error inesperado al guardar los datos');
         }
         $this->respuesta->json(
             null,
@@ -106,9 +110,7 @@ class UsuariosController extends Controller
         $datos = $this->filtrarDatos(
             [
                 'nombre' => 'esCadena',
-                's_nombre' => 'esCadena',
                 'apellido' => 'esCadena',
-                's_apellido' => 'esCadena',
                 'id_cedula' => 'esCedula',
                 'tlf' => 'esTlf',
                 'edad' => 'esFecha',
@@ -116,6 +118,10 @@ class UsuariosController extends Controller
 
             ]
         );
+        $opcional = $this->getDatosEntrada();
+
+        $datos['s_nombre'] = Validar::esCadena($opcional['s_nombre']);
+        $datos['s_apellido'] = Validar::esCadena($opcional['s_apellido']);
 
 
         $edad = $this->obtenerEdad($datos['edad']);
@@ -288,6 +294,61 @@ class UsuariosController extends Controller
             200,
             'Actualizado con exito',
             []
+        );
+    }
+
+
+
+    public function index(): void
+    {
+        $this->requerirAutenticacion();
+        $r2Service = new R2Service();
+        $urlPublica = $r2Service->obtenerUrlPublica($this->session->get('foto_perfil'));
+        $model = new RolModel();
+        $roles = $model->traerIds();
+
+
+        $this->vista->render(
+            'usuario/usuarios',
+            [
+                'nombreUsuario' => $this->session->get('usuario_nombre'),
+                'nombreRol' => $this->session->get('nombre_rol'),
+                'titlePag' => 'Usuarios ',
+                'grup' => 'administracion',
+                'pag' => 'usuarios',
+                'token' => $this->session->get('csrf_token'),
+                'fotoUsuario' => $urlPublica,
+                'roles' => $roles
+            ],
+            'usuario'
+        );
+    }
+
+
+
+    public function paginar(): void
+    {
+        $this->requerirAutenticacion();
+        $this->verificarCSRF();
+        $datos = $this->filtrarDatos([
+            'limit' => 'esEntero',
+            'offset' => 'esEntero'
+        ]);
+
+        $condicion = $this->getDatosEntrada();
+        $datos['buscar'] = Validar::esTexto($condicion['buscar']);
+        $datos['rol_id'] = Validar::esDesencriptarId($condicion['rol_id']);
+
+        $model = new DatosModel();
+        $result = $model->paginar($datos);
+        $total = $model->total();
+
+        $this->respuesta->json(
+            $result,
+            200,
+            '',
+            [],
+            $total
         );
     }
 }

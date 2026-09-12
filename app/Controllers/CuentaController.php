@@ -9,6 +9,7 @@ use App\Libs\Exceptions\AppException;
 use App\Models\CuentasModel;
 use App\Traits\MensageTrait;
 use App\Helpers\R2Service;
+use App\Helpers\Validar;
 use App\Models\DatosModel;
 
 /**
@@ -300,7 +301,7 @@ class CuentaController extends Controller
         $actualizado = $model->guardarFoto($usuarioId, $keyDestino);
 
 
-        if (!$actualizado) {
+        if ($actualizado === null) {
             $r2Service->eliminarArchivo($keyDestino);
             $this->respuesta->json(
                 null,
@@ -310,7 +311,24 @@ class CuentaController extends Controller
             return;
         }
 
-        $r2Service->eliminarArchivo($actualizado);
+
+        if ($actualizado === false) {
+            $r2Service->eliminarArchivo($keyDestino);
+            $this->respuesta->json(
+                null,
+                500,
+                'Hubo un error al actualizar'
+            );
+            return;
+        }
+
+
+        if ($actualizado !== 'none') {
+            $r2Service->eliminarArchivo($actualizado);
+        }
+
+
+
         $urlPublica = $r2Service->obtenerUrlPublica($keyDestino);
 
         $this->session->set('foto_perfil', $keyDestino);
@@ -322,5 +340,73 @@ class CuentaController extends Controller
             200,
             'Foto subida correctamente'
         );
+    }
+
+    public function actualizarDatos(): void
+    {
+
+
+        $this->requerirAutenticacion();
+        $this->verificarCSRF();
+        $condicion = $this->filtrarDatos(['id' => 'esDesencriptarId']);
+        $datos = $this->filtrarDatos([
+            'rol_id' => 'esDesencriptarId',
+            'estado' => 'esEntero'
+        ]);
+        $model = new CuentasModel();
+        $model->update($datos, $condicion);
+
+
+        $this->respuesta->json(true, 200);
+    }
+
+
+
+
+
+    public function eliminarMasivo(): void
+    {
+        $this->verificarCSRF();
+        $this->requerirAutenticacion();
+        $entrada = $this->getDatosEntrada();
+        $datos = $entrada['ids'] ?? [];
+
+        $idsOriginales = [];
+
+        if (is_array($datos) && !empty($datos)) {
+            foreach ($datos as $d) {
+                $idDesencriptado = Validar::esDesencriptarId($d);
+
+                $idEntero = (int) $idDesencriptado;
+                if ($idEntero > 0) {
+                    $idsOriginales[] = $idEntero;
+                }
+            }
+        }
+        $model = new CuentasModel;
+        $r2Service = new R2Service();
+        $recursos = $model->selecionarPorIds($idsOriginales);
+        foreach ($recursos as $r) {
+
+            $foto = $r2Service->eliminarArchivo($r['foto']);
+
+            if (!$foto) {
+
+                throw new AppException('No se pudo eliminar El recurso ' . $r['foto'], 500);
+            }
+        }
+        $registrosEliminados = $model->eliminarPorIds($idsOriginales);
+
+        if ($registrosEliminados > 0) {
+            $this->respuesta->json([
+                'exito' => true,
+                'mensaje' => "Se eliminaron {$registrosEliminados} Usuarios(s) correctamente."
+            ], 200, '');
+        } else {
+            $this->respuesta->json([
+                'exito' => false,
+                'mensaje' => 'No se pudo eliminar ninguno de los registros seleccionados.'
+            ], 409, '');
+        }
     }
 }

@@ -26,10 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const ruta = elementoForm.action;
 
       inicializarFormulario(idForm, ruta, (respuesta) => {
-        // Una vez guardado con éxito por el servidor, recargamos para reflejar cambios
-        setTimeout(() => {
-          window.location.reload();
-        }, 1500);
+        AlertApp.show("La Accion fue todo un Exito ", "", "success", "cuenta");
       });
     }
   });

@@ -1,6 +1,3 @@
-const tokenCsrfActual =
-  document.querySelector('input[name="csrf_token"]')?.value || "";
-
 // Icono SVG para el botón de cierre del modal
 const svgCerrar = `
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -41,7 +38,6 @@ formUsuario.innerHTML = `
             <label for="contrasena-nueva">Confirmar Contraseña</label>
         </div>
 
-        <input type="hidden" name="csrf_token" value="${tokenCsrfActual}">
 
         <button class="btn-summit" type="submit">
             <svg class="icono-outline"><use href="#icono-login"></use></svg>

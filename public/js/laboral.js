@@ -4,13 +4,13 @@ configurarBusquedaTiempoReal(
   function (datosAgremiado) {
     const contenedor = document.getElementById("cargo_id");
 
-    if (!datosAgremiado || datosAgremiado.length === 0) {
-      contenedor.innerHTML = ` <option value="">no se encontro nada relacionado</option>`;
+    if (!datosAgremiado.data || datosAgremiado.data.length === 0) {
+      contenedor.innerHTML = ` <option value="">No se encontro nada relacionado</option>`;
 
       return;
     }
 
-    const m = datosAgremiado[0] || datosAgremiado;
+    const m = datosAgremiado.data[0] || datosAgremiado.data;
     contenedor.innerHTML = `
     <option value="${m.id}">
     ${m.cargo}
@@ -25,8 +25,6 @@ configurarBusquedaTiempoReal(
 
 const ruta = document.getElementById("perfilLaboral").action;
 
-inicializarFormulario("perfilLaboral", ruta, (res) => {
-  setTimeout(() => {
-    window.location.href = "laboral";
-  }, 1500);
+inicializarFormulario("perfilLaboral", ruta, () => {
+  AlertApp.show("Guardado con Exito", "", "success", "laboral");
 });

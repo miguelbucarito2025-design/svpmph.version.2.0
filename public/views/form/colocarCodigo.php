@@ -31,7 +31,6 @@
 
 
 
-        <input type="hidden" name="csrf_token" value="<?= $token ?? '' ?>">
 
         <div class="reg-row-dual">
 

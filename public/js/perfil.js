@@ -1,9 +1,7 @@
 const ruta = document.getElementById("perfil").action;
 
 inicializarFormulario("perfil", ruta, (res) => {
-  setTimeout(() => {
-    window.location.href = "perfil";
-  }, 1500);
+  AlertApp.show("Guardado con Exito", "", "success", "perfil");
 });
 
 function validarEdadDirecta(input) {

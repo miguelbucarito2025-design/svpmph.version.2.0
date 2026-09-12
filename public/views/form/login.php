@@ -2,7 +2,7 @@
      <form method="post" class="body-div-from" id="form-login">
          <figure>
              <img
-                 src="public/multimedia/log/001.png"
+                 src="<?= URL_BASE ?>public/multimedia/log/001.png"
                  alt="logo de la sociedad venezolana de profesionales en medicina prehospitalaria" />
          </figure>
 
@@ -38,7 +38,6 @@
                  required />
              <label for="contrasena">Contraseña</label>
          </div>
-         <input type="hidden" name="csrf_token" value="<?= $token ?? '' ?>">
          <button class="btn-summit" type="submit">
              <svg class="icono-outline">
                  <use href="#icono-login"></use>

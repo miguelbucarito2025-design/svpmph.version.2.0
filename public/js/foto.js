@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
       divMensaje.innerHTML = "";
 
       try {
-        loader();
+        AlertCargando();
 
         const respuesta = await fetch(formFoto.getAttribute("action"), {
           method: "POST",
@@ -89,7 +89,6 @@ document.addEventListener("DOMContentLoaded", () => {
           if (imgFotoPerfilActual && resultado.data.url) {
             imgFotoPerfilActual.src = resultado.data.url;
           }
-          loader();
 
           let imgUsuario = document.getElementById("foto-perfil").src;
           let imgMuestra = (document.getElementById("foto-perfil-actual").src =
@@ -99,7 +98,6 @@ document.addEventListener("DOMContentLoaded", () => {
           if (contenedorPreview) contenedorPreview.style.display = "none";
           imgVistaPrevia.src = "";
         } else {
-          loader();
           if (resultado.code === 400) {
             AlertApp.show(
               "Advertencia",

@@ -19,6 +19,13 @@ class BuilderQuery
         $this->db = DataBase::getConnect();
     }
 
+
+    public function inTransaction()
+    {
+        $this->db->inTransaction();
+    }
+
+
     /**
      * Inicia una transacción en la base de datos.
      * 

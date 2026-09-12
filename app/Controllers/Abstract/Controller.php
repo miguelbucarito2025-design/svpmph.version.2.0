@@ -61,23 +61,32 @@ abstract class Controller
     }
 
     /**
-     * Obtiene y unifica los datos de entrada de la petición HTTP actual.
+     * Captura y devuelve los datos crudos de la petición (JSON o POST tradicional).
      *
-     * Lee payloads codificados en formato JSON (Fetch/Ajax) o arreglos
-     * de datos de formulario tradicional ($_POST).
-     *
-     * @return array<string, mixed> Arreglo asociativo de datos recibidos.
+     * @return array
      */
     protected function getDatosEntrada(): array
     {
-        $json = file_get_contents('php://input');
-        $datos = json_decode($json, true);
+        static $datosEnMemoria = null;
 
-        if (!is_array($datos)) {
-            $datos = $_POST;
+        // Si ya procesamos la entrada en este ciclo de ejecución, la devolvemos inmediatamente
+        if ($datosEnMemoria !== null) {
+            return $datosEnMemoria;
         }
 
-        return $datos;
+        // 1. Intentamos leer el flujo JSON de la petición
+        $jsonCrudo = file_get_contents('php://input');
+        $datos = json_decode($jsonCrudo, true);
+
+        // 2. Si no es un JSON válido o viene vacío, tomamos $_POST
+        if (!is_array($datos) || empty($datos)) {
+            $datos = $_POST ?? [];
+        }
+
+        // Guardamos en memoria estática y retornamos
+        $datosEnMemoria = $datos;
+
+        return $datosEnMemoria;
     }
 
     /**
@@ -94,7 +103,8 @@ abstract class Controller
         $datos = Validar::validarFormulario($reglas, $entrada);
 
         if (!empty($datos['errores'])) {
-            $this->respuesta->json(null, 400, 'Formato de datos inválido.', $datos['errores']);
+            $errores = implode(',', $datos['errores']);
+            $this->respuesta->json(null, 400, $errores);
             exit;
         }
 

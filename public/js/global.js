@@ -6,10 +6,14 @@
  * @returns {Promise<object>} - Devuelve la respuesta del servidor convertida en JSON
  */
 async function realizarPeticion(url, metodo = "GET", datos = null) {
+  const tokenCSRF = document
+    .querySelector('meta[name="csrf-token"]')
+    .getAttribute("content");
   const opciones = {
     method: metodo.toUpperCase(),
     headers: {
       "X-Requested-With": "XMLHttpRequest",
+      "X-CSRF-TOKEN": tokenCSRF,
       // 💡 Quitamos el 'Content-Type: application/json' para que actúe como un formulario normal
     },
   };
@@ -64,13 +68,33 @@ async function realizarPeticion(url, metodo = "GET", datos = null) {
   }
 }
 
-/**
- * @file formHandler.js
- * @description Módulo encargado de interceptar el envío de formularios HTML,
- * empaquetarlos mediante FormData y procesar la respuesta asíncrona del servidor.
- * @author Arquitectura SVPMPH
- * @version 1.0.0
- */
+function AlertCargando() {
+  const cargando = document.createElement("div");
+  cargando.innerHTML = `<span id="loader" class="enviando-alerta"><svg class="icono-girando icono-girando-alerta"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" /></svg>Enviando por favor espere.....</span>`;
+  AlertApp.show("", cargando, "loader", null, {
+    btnTexto: "",
+    btnClase: "none", // <--- Aplica el CSS transparente y letras rojas
+  });
+}
+
+function TableCargando() {
+  const tableAnimation = document.getElementById("tablaCuerpo");
+  if (!tableAnimation) return;
+
+  // OPCIÓN A: Inyección de cadena directa (Más limpia y rápida)
+  tableAnimation.innerHTML = `
+    <tr>
+      <td colspan="10" class="td-cargando">
+        <span id="loader" class="enviando-alerta">
+          <svg class="icono-girando icono-girando-alerta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+          </svg>
+          
+          Cargando datos, por favor espere...
+        </span>
+      </td>
+    </tr>`;
+}
 
 /**
  * Configura un formulario de manera genérica para enviar sus datos al servidor
@@ -81,97 +105,91 @@ async function realizarPeticion(url, metodo = "GET", datos = null) {
  * @param {Function} [callbackExito] - Función opcional que se ejecuta al completarse con éxito (ej: redirecciones o cierres de modales).
  * @returns {void}
  */
+// Variable fuera de la función para evitar envíos dobles por clics rápidos
+let enviandoFormularioGlobal = false;
+
 function inicializarFormulario(idFormulario, urlDestino, callbackExito = null) {
-  // 1. Buscamos la estructura del formulario en el documento
   const formulario = document.getElementById(idFormulario);
 
   if (!formulario) {
     console.error(
-      `[Arquitectura SVPMPH]: El formulario con ID "${idFormulario} no existe en el DOM.`,
+      `[Arquitectura SVPMPH]: El formulario con ID "${idFormulario}" no existe.`,
     );
     return;
   }
 
-  // 2. Escuchamos el evento de envío (submit)
-  formulario.addEventListener("submit", async function (evento) {
-    // Detenemos el comportamiento nativo para evitar recargas bruscas de página
+  // 1. Asignamos directamente la propiedad .onsubmit.
+  // Esto SOBREESCRIBE cualquier función o evento que se haya pegado antes.
+  formulario.onsubmit = async function (evento) {
     evento.preventDefault();
 
-    // Empaquetamos todos los campos del formulario (incluyendo archivos y token CSRF oculto)
+    // Bloqueo de peticiones si ya hay una en curso
+    if (enviandoFormularioGlobal) return;
+    enviandoFormularioGlobal = true;
+
+    AlertCargando();
+
     const datosFormulario = new FormData(formulario);
 
     try {
-      // 3. Invocamos nuestra función global de red
+      // 2. Disparar la petición AJAX única
       const respuesta = await realizarPeticion(
         urlDestino,
         "POST",
         datosFormulario,
       );
 
-      // 4. Evaluamos el contrato de éxito dictado por el backend PHP
       if (respuesta.status === "success") {
-        const titulo = respuesta.title || "¡Operación Exitosa!";
-        const mensaje =
-          respuesta.message || "Los datos se procesaron correctamente.";
-
-        // Mostramos la alerta estandarizada (asumiendo que usas tu sistema AlertApp)
         if (typeof AlertApp !== "undefined") {
-          AlertApp.show(titulo, mensaje, "success");
-        } else {
-          alert(mensaje);
+          AlertApp.show(
+            respuesta.title || "¡Éxito!",
+            respuesta.message || "Guardado con éxito.",
+            "success",
+          );
         }
 
-        // Limpiamos los campos del formulario para dejar el taller limpio
         formulario.reset();
 
-        // Si se definió una acción extra de éxito, la disparamos
         if (typeof callbackExito === "function") {
           callbackExito(respuesta);
         }
       } else {
-        // Si el backend respondió con un estado lógico alternativo (ej: validación fallida controlada)
         const mensajeAdvertencia =
           respuesta.message || "Verifique los datos ingresados.";
-
         if (typeof AlertApp !== "undefined") {
           AlertApp.show("Atención", mensajeAdvertencia, "warning");
-        } else {
-          alert("Atención: " + mensajeAdvertencia);
         }
       }
     } catch (error) {
-      // 5. Atrapamos errores de red o códigos HTTP críticos (400, 401, 429, 500)
-      //console.error("[Error Crítico en Petición]:", error);
-      AlertApp.show("Error del Sistema", error, "error");
-
       const mensajeErrorServidor =
-        error.message || "No se pudo establecer comunicación con el servidor.";
+        error.message || "No se pudo completar la solicitud.";
 
       if (typeof AlertApp !== "undefined") {
-        // Evaluamos el código HTTP que viene atrapado en el objeto de error para refinar la alerta
         if (error.status === 409) {
           AlertApp.show("Registro Duplicado", mensajeErrorServidor, "warning");
-        } else if (error.status === 401) {
-          AlertApp.show("Acceso Denegado", mensajeErrorServidor, "warning");
-        } else if (error.status === 403) {
-          AlertApp.show("Usuario Bloqueado", mensajeErrorServidor, "warning");
-        } else if (error.status === 429) {
+        } else if (error.status === 400) {
           AlertApp.show(
-            "Límite Excedido",
-            "Demasiados intentos. Intente más tarde.",
+            "Formato de Datos Invalidos",
+            mensajeErrorServidor,
             "warning",
           );
         } else {
           AlertApp.show("Error de Sistema", mensajeErrorServidor, "error");
         }
-      } else {
-        alert("Error: " + mensajeErrorServidor);
       }
+    } finally {
+      // Liberamos el bloqueo al terminar (tanto en éxito como en fallo)
+      enviandoFormularioGlobal = false;
     }
-  });
+  };
 }
+
 /**
  * Componente AlertApp - Alertas y Modales Nativos con HTML5 <dialog>.
+ * Manejo dinámico de botones de confirmación y cancelación.
+ *
+ * @author Miguel
+ * @version 1.1.1
  */
 const AlertApp = {
   dialog: document.getElementById("custom-alert"),
@@ -179,13 +197,21 @@ const AlertApp = {
   title: document.getElementById("alert-title"),
   body: document.getElementById("alert-body"),
   actions: document.getElementById("alert-actions"),
-  btnClose: document.getElementById("alert-btn-close"),
 
+  /**
+   * Inicializa escuchadores globales del elemento <dialog>.
+   */
   init() {
-    if (this.btnClose) {
-      this.btnClose.addEventListener("click", () => this.dialog.close());
-    }
+    if (!this.dialog) return;
+
+    this.dialog.addEventListener("cancel", () => {
+      if (typeof this._onCancelCallback === "function") {
+        this._onCancelCallback();
+      }
+    });
   },
+
+  _onCancelCallback: null,
 
   /**
    * Muestra la alerta o modal dinámico.
@@ -193,31 +219,44 @@ const AlertApp = {
    * @param {string} titulo - Título de la cabecera.
    * @param {string|HTMLElement} contenido - Mensaje, String HTML o Nodo DOM.
    * @param {string} tipo - 'success', 'error', 'warning', 'info', 'none'.
-   * @param {Function|string|null} accion - Callback al confirmar o URL de redirección.
-   * @param {Object} opciones - Configuración avanzada del modal y botón.
+   * @param {Function|string|null} accion - Callback de confirmación o URL.
+   * @param {Object} opciones - Configuración avanzada del modal y botones.
+   * @param {boolean} [opciones.mostrarCancelar=false] - Mostrar u ocultar botón cancelar.
+   * @param {string} [opciones.btnTexto="Aceptar"] - Texto del botón de confirmación.
+   * @param {string} [opciones.btnClase="btn-primary"] - Clase CSS para el botón de confirmación.
+   * @param {string} [opciones.btnCancelarTexto="Cancelar"] - Texto del botón cancelar.
+   * @param {string} [opciones.btnCancelarClase="btn-cancel"] - Clase CSS para el botón cancelar.
+   * @param {Function|null} [opciones.onCancelar=null] - Callback al cancelar.
    */
   show(titulo, contenido, tipo = "info", accion = null, opciones = {}) {
     if (!this.dialog) return;
 
-    // Configuración con valores por defecto
     const config = {
       btnTexto: opciones.btnTexto || "Aceptar",
-      btnIcono: opciones.btnIcono || "", // String con etiqueta SVG o <use>
-      btnClase: opciones.btnClase || "", // Ej: 'btn-ghost-danger'
+      btnIcono: opciones.btnIcono || "",
+      btnClase: opciones.btnClase || "btn-primary",
       ocultarHeader: opciones.ocultarHeader || false,
-      claseExtra: opciones.claseExtra || "", // Ej: 'modal-formulario-expandido'
+      claseExtra: opciones.claseExtra || "",
+      mostrarCancelar: opciones.mostrarCancelar || false,
+      btnCancelarTexto: opciones.btnCancelarTexto || "Cancelar",
+      btnCancelarClase: opciones.btnCancelarClase || "btn-cancel",
+      onCancelar: opciones.onCancelar || null,
     };
 
-    // 1. Limpieza y asignación de clases al diálogo principal
+    this._onCancelCallback = config.onCancelar;
+
+    // 1. Clases de la ventana principal
     this.dialog.className = `custom-alert ${tipo} ${config.claseExtra}`.trim();
 
-    // 2. Manejo de la cabecera (Título e Icono principal)
+    // 2. Cabecera (Título e Icono)
     if (config.ocultarHeader) {
-      this.title.style.display = "none";
-      this.icon.style.display = "none";
+      if (this.title) this.title.style.display = "none";
+      if (this.icon) this.icon.style.display = "none";
     } else {
-      this.title.style.display = "block";
-      this.title.textContent = titulo;
+      if (this.title) {
+        this.title.style.display = "block";
+        this.title.textContent = titulo;
+      }
 
       const iconos = {
         success: `<svg class="svg-icon successAlert" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#16a34a" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`,
@@ -226,43 +265,64 @@ const AlertApp = {
         info: `<svg class="svg-icon info" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#0284c7" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`,
       };
 
-      this.icon.innerHTML = iconos[tipo] || "";
-      this.icon.style.display =
-        tipo === "none" || !iconos[tipo] ? "none" : "block";
-    }
-
-    // 3. Inyección de contenido en el cuerpo del modal
-    this.body.innerHTML = "";
-    if (contenido instanceof HTMLElement) {
-      this.body.appendChild(contenido);
-    } else {
-      this.body.innerHTML = contenido;
-    }
-
-    // 4. Reemplazo del Botón con Estilos e Iconos Personalizados
-    const nuevoBoton = this.btnClose.cloneNode(true);
-
-    // Aplicamos las clases base + la clase personalizada (ej: btn-ghost-danger)
-    nuevoBoton.className = `alert-btn ${config.btnClase}`.trim();
-
-    // Insertamos el SVG opcional junto al texto
-    nuevoBoton.innerHTML =
-      `${config.btnIcono} <span>${config.btnTexto}</span>`.trim();
-
-    this.actions.replaceChild(nuevoBoton, this.btnClose);
-    this.btnClose = nuevoBoton;
-
-    // 5. Escuchador de clic para cerrar o ejecutar la acción
-    this.btnClose.addEventListener("click", () => {
-      this.dialog.close();
-      if (typeof accion === "function") {
-        accion();
-      } else if (typeof accion === "string" && accion.trim() !== "") {
-        window.location.href = accion;
+      if (this.icon) {
+        this.icon.innerHTML = iconos[tipo] || "";
+        this.icon.style.display =
+          tipo === "none" || !iconos[tipo] ? "none" : "block";
       }
-    });
+    }
 
-    // 6. Desplegar diálogo nativo
+    // 3. Contenido
+    if (this.body) {
+      this.body.innerHTML = "";
+      if (contenido instanceof HTMLElement) {
+        this.body.appendChild(contenido);
+      } else {
+        this.body.innerHTML = contenido;
+      }
+    }
+
+    // 4. Construcción dinámica de la botonera
+    if (this.actions) {
+      this.actions.innerHTML = "";
+
+      // Botón Cancelar (Secundario)
+      if (config.mostrarCancelar) {
+        const btnCancel = document.createElement("button");
+        btnCancel.type = "button";
+        btnCancel.className = `alert-btn ${config.btnCancelarClase}`.trim();
+        btnCancel.textContent = config.btnCancelarTexto;
+
+        btnCancel.addEventListener("click", () => {
+          this.dialog.close();
+          if (typeof config.onCancelar === "function") {
+            config.onCancelar();
+          }
+        });
+
+        this.actions.appendChild(btnCancel);
+      }
+
+      // Botón Aceptar (Principal)
+      const btnConfirm = document.createElement("button");
+      btnConfirm.type = "button";
+      btnConfirm.className = `alert-btn ${config.btnClase}`.trim();
+      btnConfirm.innerHTML =
+        `${config.btnIcono} <span>${config.btnTexto}</span>`.trim();
+
+      btnConfirm.addEventListener("click", () => {
+        this.dialog.close();
+        if (typeof accion === "function") {
+          accion();
+        } else if (typeof accion === "string" && accion.trim() !== "") {
+          window.location.href = accion;
+        }
+      });
+
+      this.actions.appendChild(btnConfirm);
+    }
+
+    // 5. Apertura del diálogo
     this.dialog.showModal();
   },
 };
@@ -356,7 +416,7 @@ async function consultarServidor(
     });
   }
 
-  // 1. ACTIVAR ESTADO DE CARGA (Si se proporcionó un ID de loader)
+  // 1. ACTIVAR ESTADO DE CARGA
   const elementoLoader = idLoader ? document.getElementById(idLoader) : null;
   if (elementoLoader) {
     elementoLoader.classList.remove("cargando-oculto");
@@ -364,19 +424,22 @@ async function consultarServidor(
   }
 
   try {
+    TableCargando();
+
     const respuesta = await realizarPeticion(urlDestino, "POST", datosAEnviar);
 
     if (respuesta.status === "success") {
       if (typeof callbackExito === "function") {
-        callbackExito(respuesta.data || respuesta.datos || respuesta);
+        // CORRECCIÓN AQUÍ: Pasamos el objeto de respuesta completo
+        // para conservar la propiedad "total" de la paginación.
+        callbackExito(respuesta);
       }
     } else {
       console.warn("[Consulta SVPMPH]:", respuesta.message || "Sin datos.");
-      if (typeof callbackExito === "function") callbackExito([]);
+      if (typeof callbackExito === "function")
+        callbackExito({ data: [], total: 0 });
     }
   } catch (error) {
-    loader();
-
     console.error("[Error en Consulta]:", error);
     if (typeof AlertApp !== "undefined") {
       AlertApp.show(
@@ -386,7 +449,7 @@ async function consultarServidor(
       );
     }
   } finally {
-    // 2. DESACTIVAR ESTADO DE CARGA (Garantizado aunque haya error)
+    // 2. DESACTIVAR ESTADO DE CARGA
     if (elementoLoader) {
       elementoLoader.classList.remove("cargando-visible");
       elementoLoader.classList.add("cargando-oculto");
@@ -394,6 +457,46 @@ async function consultarServidor(
   }
 }
 
+/**
+ * Realiza una búsqueda rápida hacia el servidor pasando directamente un valor.
+ *
+ * @param {string|number} valor Valor a buscar o enviar al servidor.
+ * @param {string} urlDestino URL del endpoint a consultar.
+ * @param {Function} callbackProcesar Función que procesará la respuesta del servidor.
+ * @param {Object} [opciones={}] Opciones de configuración (nombreParametro, tiempoDebounce).
+ */
+function busquedaRapida(valor, urlDestino, callbackProcesar, opciones = {}) {
+  // Configuraciones por defecto
+  const tiempoDebounce = opciones.tiempoDebounce || 0; // 0 para ejecución inmediata por defecto
+  const nombreParametro = opciones.nombreParametro || "buscar";
+
+  // Formateamos el valor ingresado
+  const valorLimpio = String(valor ?? "").trim();
+
+  const payload = {};
+  payload[nombreParametro] = valorLimpio;
+
+  const ejecutarConsulta = () => {
+    consultarServidor(urlDestino, payload, (datos) => {
+      if (typeof callbackProcesar === "function") {
+        callbackProcesar(datos, valorLimpio);
+      }
+    });
+  };
+
+  // Si se especifica un debounce se retarda la petición, de lo contrario dispara inmediatamente
+  if (tiempoDebounce > 0) {
+    if (window._temporizadorBusquedaRapida) {
+      clearTimeout(window._temporizadorBusquedaRapida);
+    }
+    window._temporizadorBusquedaRapida = setTimeout(
+      ejecutarConsulta,
+      tiempoDebounce,
+    );
+  } else {
+    ejecutarConsulta();
+  }
+}
 /**
  * Vincula un input o select a una consulta en tiempo real con control de rebote (debounce).
  *
@@ -409,18 +512,11 @@ function configurarBusquedaTiempoReal(
   opciones = {},
 ) {
   const elemento = document.getElementById(idElemento);
-  const token = document.getElementById("csrf_token");
-  const elementoLoader = document.getElementById("loader");
 
   if (!elemento) {
     console.error(
       `[Arquitectura SVPMPH]: El elemento ID "${idElemento}" no existe.`,
     );
-    return;
-  }
-
-  if (!token) {
-    console.error(`[Arquitectura SVPMPH]: El token   no existe.`);
     return;
   }
 
@@ -439,11 +535,9 @@ function configurarBusquedaTiempoReal(
 
     temporizador = setTimeout(() => {
       const valor = elemento.value.trim();
-      const valorToken = token.value.trim();
 
       const payload = {};
       payload[nombreParametro] = valor;
-      payload["csrf_token"] = valorToken;
 
       // Invocamos la consulta silenciosa pasándole el callback
       consultarServidor(urlDestino, payload, (datos) => {
@@ -461,4 +555,82 @@ function loader() {
   const prueva = document.getElementById("loader");
 
   prueva.classList.toggle("cargando-visible");
+}
+/**
+ * Vincula un grupo de controles a una consulta en tiempo real y ejecuta la carga inicial.
+ *
+ * @param {Array<string>} idsControles - Arreglo de IDs de los elementos HTML.
+ * @param {string} urlDestino - Ruta del controlador PHP.
+ * @param {Function} callbackProcesar - Callback que recibe los datos para actualizar la tabla.
+ * @param {Object} [opciones={}] - Opciones adicionales (tiempoDebounce, ejecutarAlInicio).
+ */
+function configurarTablaDinamica(
+  idsControles,
+  urlDestino,
+  callbackProcesar,
+  opciones = {},
+) {
+  const controles = [];
+  const tiempoDebounce = opciones.tiempoDebounce || 300;
+  const ejecutarAlInicio = opciones.ejecutarAlInicio !== false; // Por defecto es true
+  let temporizador = null;
+
+  // 1. Validar y recolectar los elementos del DOM
+  idsControles.forEach((id) => {
+    const elemento = document.getElementById(id);
+    if (!elemento) {
+      console.warn(
+        `[Arquitectura SVPMPH]: El control ID "${id}" no existe en la vista.`,
+      );
+    } else {
+      controles.push(elemento);
+    }
+  });
+
+  if (controles.length === 0) {
+    console.error(
+      `[Arquitectura SVPMPH]: No se encontraron controles válidos para la tabla.`,
+    );
+    return;
+  }
+
+  // 2. Función interna que captura el estado actual de TODOS los controles
+  const ejecutarConsulta = () => {
+    const payload = {};
+
+    controles.forEach((el) => {
+      // Usamos el 'name' o en su defecto el 'id'
+      const clave = el.name || el.id;
+      payload[clave] = el.value ? el.value.trim() : "";
+    });
+
+    // 3. Enviar la consulta al backend
+    consultarServidor(urlDestino, payload, (respuesta) => {
+      if (typeof callbackProcesar === "function") {
+        // Garantizamos pasar la respuesta limpia o completa según el contrato de la API
+        callbackProcesar(respuesta, payload);
+      }
+    });
+  };
+
+  // 4. Asignar los eventos de escucha a cada control
+  controles.forEach((el) => {
+    const tipoEvento =
+      el.tagName === "SELECT" || el.type === "number" || el.type === "checkbox"
+        ? "change"
+        : "input";
+
+    el.addEventListener(tipoEvento, function () {
+      clearTimeout(temporizador);
+
+      temporizador = setTimeout(() => {
+        ejecutarConsulta();
+      }, tiempoDebounce);
+    });
+  });
+
+  // 5. CORRECCIÓN CLAVE: Disparar la primera consulta automáticamente al inicializar
+  if (ejecutarAlInicio) {
+    ejecutarConsulta();
+  }
 }

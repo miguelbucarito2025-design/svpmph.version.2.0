@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Models\Abstract\Model;
 use App\Libs\Exceptions\AppException;
+use App\Libs\DataBase;
 
 /**
  * Clase CuentasModel
@@ -376,5 +377,51 @@ class CuentasModel extends Model
                 'correo' => $correo
             ]
         );
+    }
+
+
+    /**
+     * Elimina múltiples registros según la lista de IDs decodificados.
+     * 
+     * @param array $ids Arreglo de enteros con los IDs reales [1, 2, 3...]
+     * @return int Número de filas afectadas/eliminadas
+     */
+    public function eliminarPorIds(array $ids): int
+    {
+        if (empty($ids)) {
+            return 0;
+        }
+
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $sql = "DELETE FROM cuentas WHERE id IN ($placeholders)";
+        $db = DataBase::getConnect();
+        $stmt = $db->prepare($sql);
+
+        $stmt->execute(array_values($ids));
+        return $stmt->rowCount();
+    }
+
+    /**
+     * Selectciona múltiples registros según la lista de IDs decodificados.
+     * solo devuelve las columnas ['flyer'] 
+     * 
+     * @param array $ids Arreglo de enteros con los IDs reales [1, 2, 3...]
+     * @return array Número de filas afectadas/eliminadas
+     */
+    public function selecionarPorIds(array $ids): array
+    {
+        if (empty($ids)) {
+            throw new AppException('No se proporcionaron datos', 400);
+        }
+
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+
+        $sql = "SELECT c.id,d.foto FROM {$this->tabla} c LEFT JOIN datos d ON c.id=d.cuenta_id WHERE c.id IN ($placeholders)";
+        $db = DataBase::getConnect();
+        $stmt = $db->prepare($sql);
+
+        $stmt->execute(array_values($ids));
+
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 }

@@ -1,19 +1,32 @@
-# 1. Evitar que se liste el contenido de los directorios
+# ==============================================================================
+# DOCUMENTACIÓN GENERAL DE CONFIGURACIÓN DEL SERVIDOR (.htaccess)
+# Proyecto: svpmph.version.2.0
+# ==============================================================================
+
+# 1. Seguridad: Desactiva el listado público de contenido en los directorios
 Options -Indexes
 
-# 2. Bloquear cualquier archivo .env o .log
+# 2. Seguridad: Bloquea el acceso a archivos de configuración sensible y registros (.env, .log)
 <FilesMatch "\.(env|log)$">
     Order allow,deny
     Deny from all
 </FilesMatch>
 
-RewriteEngine On
+<IfModule mod_rewrite.c>
+    # Activa el motor de reescritura de Apache
+    RewriteEngine On
 
-# 3. Denegar acceso directo por URL a carpetas sensibles del núcleo
-# Nadie podrá entrar por URL a midominio.com/app/config/.env ni midominio.com/app/
-RewriteRule ^app/(config|class|controllers|model|archivos\ de\ pereza)/ - [F,L]
+    # Establece la base relativa para la subcarpeta de la aplicación
+    RewriteBase /svpmph.version.2.0/
 
-# 4. Front Controller (Enrutador)
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.php?action=$1 [L,QSA]
+    # 3. Seguridad: Bloquea el acceso directo por URL a carpetas internas del sistema
+    # Devuelve un HTTP 403 (Forbidden) si intentan ingresar por la barra de direcciones
+    RewriteRule ^app/(config|class|controllers|model|archivos\ de\ pereza)/ - [F,L]
+
+    # 4. Front Controller (Enrutador centralizado)
+    # Sin redirecciones externas (301/302): Reescribe internamente la URI hacia index.php
+    # Preserva los métodos POST, PUT, DELETE y peticiones fetch() intactas
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php?action=$1 [L,QSA]
+</IfModule>

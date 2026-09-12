@@ -28,7 +28,7 @@ class  CargosModel extends Model
 
     public function obtenerPorInstitucion(int $id): array| null
     {
-        $sql = 'SELECT * FROM ' . $this->tabla . ' WHERE institucion_id=? ';
+        $sql = 'SELECT cargo,id FROM ' . $this->tabla . ' WHERE institucion_id=? ';
         return $this->db->select($sql, [$id], 'row');
     }
 }

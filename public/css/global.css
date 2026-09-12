@@ -273,6 +273,52 @@ dialog.custom-alert::backdrop {
   gap: 12px;
 }
 
+.ventana-modal .alert-content {
+  padding: 0;
+  border: 1px solid;
+  gap: 0;
+}
+.ventana-modal .grid-form {
+  padding: 50px !important;
+}
+.ventana-modal h2 {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+  align-items: center;
+  color: var(--color-blanco);
+  height: 60px;
+  line-height: 60px;
+}
+
+.contenedor-preview {
+  border: 1px solid var(--body-primary-from---);
+  border-radius: 10px;
+  max-width: 40%;
+  min-width: 280px;
+  min-height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.contaniner-img-muestras {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 30px;
+  margin: 30px 50px;
+}
+
+.contenedor-preview img {
+  max-width: 90%;
+  margin: 10px auto;
+  height: auto;
+}
+.ventana-modal .btn-ghost-danger {
+  margin: 20px;
+}
+
 /* 4. Icono representativo */
 .alert-icon {
   font-size: 38px;
@@ -308,7 +354,7 @@ dialog.custom-alert::backdrop {
 
 /* 8. Botón base de acción */
 .alert-btn {
-  background-color: #0f172a;
+  background-color: var(--color-success);
   color: white;
   border: none;
   border-radius: 8px;
@@ -323,7 +369,7 @@ dialog.custom-alert::backdrop {
 }
 
 .alert-btn:hover {
-  background-color: #1e293b;
+  background-color: #069528;
 }
 
 .alert-btn:active {
@@ -378,6 +424,10 @@ dialog.custom-alert .alert-icon svg {
   animation: popInVector 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
 }
 
+.icono-girando-alerta {
+  animation: popInVector 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
 .disable {
   display: none !important;
 }
@@ -402,7 +452,21 @@ dialog.custom-alert .alert-icon svg {
 .cargando-oculto {
   display: none !important;
 }
+.enviando-alerta {
+  display: inline-flex !important;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #475569;
+  svg {
+    width: 50px;
+  }
+}
 
+.none {
+  display: none;
+}
 .cargando-visible {
   display: inline-flex !important;
   align-items: center;
@@ -452,4 +516,30 @@ dialog.custom-alert .alert-icon svg {
   stroke: currentColor; /* El SVG hereda el color rojo del texto automáticamente */
   width: 18px;
   height: 18px;
+}
+
+/* Contenedor Flexbox para alinear botones */
+#alert-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+/* Variación 3: Botón de Acción Peligrosa */
+.alert-btn.btn-danger-red {
+  background-color: var(--color-danger) !important;
+  color: #ffffff;
+}
+.alert-btn.btn-danger-red:hover {
+  background-color: var(--color-danger--hover--) !important;
+}
+
+.btn-cancel {
+  background-color: var(--color-success) !important;
+}
+
+.btn-confirm {
+  background-color: var(--color-success) !important;
+  color: var(--color-blanco);
 }

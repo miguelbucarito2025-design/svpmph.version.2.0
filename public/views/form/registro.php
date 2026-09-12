@@ -68,7 +68,6 @@
                 required />
             <label for="terminos">He leído y acepto los términos y condiciones</label>
         </div>
-        <input type="hidden" name="csrf_token" value="<?= $token ?? '' ?>">
 
         <button class="btn-summit" type="submit">
             <svg class="icon-sistema-rellen">

@@ -24,7 +24,7 @@
                         value="<?= htmlspecialchars($cuenta['usuario'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
                         required />
                 </div>
-                <input type="hidden" value="<?= $token ?? '' ?>" name="csrf_token">
+
             </div>
         </form>
         <hr />
@@ -69,7 +69,7 @@
                         placeholder="ejemplo@correo.com"
                         required />
                 </div>
-                <input type="hidden" value="<?= $token ?? '' ?>" name="csrf_token">
+
             </div>
         </form>
 
@@ -88,7 +88,7 @@
                             placeholder="Ingrese código de 6 dígitos"
                             required />
                     </div>
-                    <input type="hidden" value="<?= $token ?? '' ?>" name="csrf_token">
+
                 </div>
             </form>
         <?php endif; ?>
@@ -141,7 +141,7 @@
                         id="nueva_contrasena"
                         required />
                 </div>
-                <input type="hidden" value="<?= $token ?? '' ?>" name="csrf_token">
+
             </div>
         </form>
         <hr />

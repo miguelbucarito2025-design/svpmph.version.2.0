@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Libs;
 
 use Exception;
-use App\Helpers\EnvLoader;
 use App\Libs\Seguridad;
 use App\Libs\Session;
 
@@ -57,7 +56,6 @@ class Enrutador
      */
     public static function despachar(): void
     {
-        EnvLoader::load('app/Config/.env');
         Seguridad::detectorDeBots();
 
         $session = new Session();
@@ -74,13 +72,14 @@ class Enrutador
         }
 
         $uriPeticion = trim($rawUri, '/');
+
         $partesUri = array_values(array_filter(explode('/', $uriPeticion)));
 
         $baseRuta = !empty($partesUri) ? implode('/', array_slice($partesUri, 0, 2)) : '';
         $tokenSegmento = $partesUri[2] ?? '';
 
         $rutaEncontrada = false;
-
+        $rutaNoEncontrada = $uriPeticion;
         // 2. Búsqueda de coincidencia
         foreach (self::$rutas as $ruta) {
             $patternRegistrado = trim($ruta['pattern'], '/');
@@ -135,7 +134,7 @@ class Enrutador
         }
 
         // La ruta no existe en absoluto
-        throw new Exception("Ruta no encontrada.", 404);
+        throw new Exception("Ruta no encontrada. " . $rutaNoEncontrada, 404);
     }
 
     private static function validarAccesoRol(Session $session, array $rolesPermitidos): bool

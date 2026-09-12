@@ -12,7 +12,6 @@ use App\Models\TerminosModel;
 class TerminosController extends Controller
 {
 
-
     /**
      * muestra los termnios y condiciones en una vista para los usuarios 
      * q se van a registrar por primera vez
@@ -24,5 +23,32 @@ class TerminosController extends Controller
         $model = new TerminosModel;
         $result = $model->selecRolTermminostId(1);
         $this->vista->render('form/login', ['contenido' => $result['contenido']], 'terminos');
+    }
+
+
+    public function vincular(): void
+    {
+
+        $this->requerirAutenticacion();
+        $this->verificarCSRF();
+
+
+        $datos = $this->filtrarDatos([
+            'titulo' => 'esTexto',
+            'version' => 'esDecimal',
+            'contenido' => 'esHTML',
+            'rol_id' => 'esDesencriptarId'
+        ]);
+
+        $model = new TerminosModel;
+
+        $model->vincular($datos);
+
+        $this->respuesta->json(
+            null,
+            201,
+            'Exito Total'
+
+        );
     }
 }

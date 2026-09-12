@@ -19,7 +19,7 @@
                     <input type="text" id="nombre" name="nombre" value="<?= htmlspecialchars($datos['datos']['nombre'] ?? '') ?>" required>
                 </div>
 
-                <input type="hidden" value="<?= $token ?? '' ?>" name="csrf_token">
+
 
                 <div class="campo-grupo">
 

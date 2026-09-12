@@ -139,6 +139,9 @@ class Validar
         return null;
     }
 
+
+
+
     /**
      * Valida documentos de identidad (solo dígitos entre 7 y 9 caracteres).
      *
@@ -302,6 +305,117 @@ class Validar
         $id = Seguridad::desencriptarID($id);
         return (int)self::esEntero($id);
     }
+
+
+
+    /**
+     * Sanitiza y valida la estructura HTML.
+     * * @param string $htmlCadena Código HTML recibido del cliente.
+     * @return string|null Retorna el HTML limpio o null si es inválido.
+     */
+    public static function esHTML(string $htmlCadena): ?string
+    {
+        $htmlCadena = trim($htmlCadena);
+
+        // 1. Longitud mínima básica
+        if (empty($htmlCadena) || strlen($htmlCadena) < 100) {
+            return null;
+        }
+
+        // 2. Listas blancas de seguridad
+        $etiquetasPermitidas = [
+            'body',
+            'div',
+            'h1',
+            'h2',
+            'h3',
+            'p',
+            'span',
+            'b',
+            'i',
+            'hr',
+            'ul',
+            'li',
+            'a',
+            'script'
+        ];
+
+        $atributosPermitidos = [
+            'div'    => ['class'],
+            'ul'     => ['class'],
+            'h2'     => ['id'],
+            'a'      => ['href'],
+            'script' => [] // Sin src externo
+        ];
+
+        // 3. Cargar el HTML en DOMDocument
+        libxml_use_internal_errors(true);
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+
+        $cargado = $dom->loadHTML(
+            mb_convert_encoding($htmlCadena, 'HTML-ENTITIES', 'UTF-8'),
+            LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+        );
+
+        if (!$cargado) {
+            libxml_clear_errors();
+            return null;
+        }
+
+        // 4. Recorrer y sanitizar nodos
+        $elementos = $dom->getElementsByTagName('*');
+        $nodosAEliminar = [];
+
+        foreach ($elementos as $elemento) {
+            $nombreEtiqueta = strtolower($elemento->nodeName);
+
+            // Validar etiqueta
+            if (!in_array($nombreEtiqueta, $etiquetasPermitidas)) {
+                $nodosAEliminar[] = $elemento;
+                continue;
+            }
+
+            // Validar y limpiar atributos
+            if ($elemento->hasAttributes()) {
+                $atributosToClean = [];
+                foreach ($elemento->attributes as $atributo) {
+                    $nombreAttr = strtolower($atributo->nodeName);
+
+                    if (
+                        !isset($atributosPermitidos[$nombreEtiqueta]) ||
+                        !in_array($nombreAttr, $atributosPermitidos[$nombreEtiqueta])
+                    ) {
+                        $atributosToClean[] = $nombreAttr;
+                    }
+
+                    // Sanitización de enlaces href
+                    if ($nombreAttr === 'href') {
+                        $valorHref = $atributo->nodeValue;
+                        if (!str_starts_with($valorHref, '#') && !filter_var($valorHref, FILTER_VALIDATE_URL)) {
+                            $atributosToClean[] = $nombreAttr;
+                        }
+                    }
+                }
+
+                foreach ($atributosToClean as $attr) {
+                    $elemento->removeAttribute($attr);
+                }
+            }
+        }
+
+        // Eliminar etiquetas no autorizadas
+        foreach ($nodosAEliminar as $nodo) {
+            $nodo->parentNode->removeChild($nodo);
+        }
+
+        libxml_clear_errors();
+
+        // 5. Extraer y retornar la cadena limpia
+        $htmlSanitizado = trim($dom->saveHTML());
+
+        return !empty($htmlSanitizado) ? $htmlSanitizado : null;
+    }
+
 
     /**
      * Valida y parsea valores numéricos decimales.

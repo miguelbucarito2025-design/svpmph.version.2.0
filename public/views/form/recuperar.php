@@ -25,7 +25,6 @@
             <label for="correo" class="reg-label">Correo Electrónico de recuperacion</label>
         </div>
 
-        <input type="hidden" name="csrf_token" value="<?= $token ?? '' ?>">
 
         <button class="btn-summit" type="submit">
             <svg class="icono-outline">

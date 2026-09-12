@@ -21,6 +21,7 @@ class Response
      * Limpia cualquier búfer previo en memoria para prevenir corrupción en la salida JSON.
      *
      * @param mixed $data Payload de datos a retornar dentro del objeto de respuesta.
+     * @param int $total Código de estado HTTP de la respuesta (ej. 200, 201, 400, 401, 403, 500).
      * @param int $codigo Código de estado HTTP de la respuesta (ej. 200, 201, 400, 401, 403, 500).
      * @param string $mensaje Mensaje descriptivo. Si se envía vacío, se asigna automáticamente según el código HTTP.
      * @param array<string, string|array> $errores Listado de errores de validación opcionales para la respuesta.
@@ -30,7 +31,8 @@ class Response
         mixed $data = null,
         int $codigo = 200,
         string $mensaje = '',
-        array $errores = []
+        array $errores = [],
+        ?int $total = null
     ): void {
         if (ob_get_length()) {
             ob_clean();
@@ -63,7 +65,8 @@ class Response
             'status'  => $exito ? 'success' : 'error',
             'code'    => $codigo,
             'message' => $mensaje,
-            'data'    => $data
+            'data'    => $data,
+            'total'    => $total
         ];
 
         if (!$exito && !empty($errores)) {

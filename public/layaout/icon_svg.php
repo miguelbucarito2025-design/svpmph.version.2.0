@@ -107,6 +107,25 @@
 
         </symbol>
 
+        <!-- Icono de Logs / Registros del Sistema -->
+        <symbol id="icono-logs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+            <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+            <path d="M9 14l2 2l4 -4" />
+        </symbol>
+        <!-- Icono de Facilitadores / Docente con grupo -->
+        <symbol id="icono-facilitadores" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <!-- Facilitador (Docente al centro) -->
+            <path d="M9 7m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+            <path d="M3 15c0 -2.21 2.686 -4 6 -4c3.314 0 6 1.79 6 4" />
+            <!-- Pizarrón / Pantalla de clase -->
+            <path d="M15 5h6" />
+            <path d="M18 3v4" />
+            <path d="M15 11l6 0" />
+            <path d="M15 15l4 0" />
+        </symbol>
 
         <!-- 
   Símbolo SVG: Icono de Imagen / Fotografía
@@ -152,6 +171,83 @@
         <symbol id="icon-limpiar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
             <path d="M3 3v5h5"></path>
+        </symbol>
+
+
+        <symbol id="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line class="linea-1" x1="4" y1="6" x2="20" y2="6"></line>
+            <line class="linea-2" x1="4" y1="12" x2="20" y2="12"></line>
+            <line class="linea-3" x1="4" y1="18" x2="20" y2="18"></line>
+        </symbol>
+        <!-- Ícono para el grupo: Administración (Escudo / Engranaje de Control) -->
+        <symbol id="icono-administracion">
+            <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+        </symbol>
+
+        <!-- Ícono: Programas (Capelo Académico / Titulación) -->
+        <symbol id="icono-programas">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+            <path d="M6 12v5c3 3 9 3 12 0v-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+        </symbol>
+
+        <!-- Ícono: Asignaturas (Libro / Cuaderno de Estudio) -->
+        <symbol id="icono-asignaturas">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+        </symbol>
+
+        <!-- Ícono: Núcleos (Estructura de Edificios / Sede Central) -->
+        <symbol id="icono-nucleos">
+            <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+            <path d="M6 12H4a2 2 0 0 0-2 2v8h4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+            <path d="M18 9h2a2 2 0 0 1 2 2v11h-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+            <path d="M10 6h4M10 10h4M10 14h4M10 18h4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+        </symbol>
+
+        <!-- Ícono: Ofertas (Maletín / Oferta Académica u Ocupacional) -->
+        <symbol id="icono-ofertas">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+        </symbol>
+        <symbol id="icono-buscar" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+        </symbol>
+        <!-- Ícono de Agregar / Crear (+) -->
+        <symbol id="icono-agregar" viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+            <line x1="5" y1="12" x2="19" y2="12" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+        </symbol>
+        <symbol viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <line x1="8" y1="13" x2="16" y2="13" />
+            <line x1="8" y1="17" x2="12" y2="17" />
+            <path d="M15 16l1.5 1.5 3.5-3.5" />
+        </symbol>
+
+        <symbol id="icono-usuario-llave" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <circle cx="17" cy="6" r="2" />
+            <path d="M19 8l2.5 2.5" />
+            <path d="M20 10.5l1 1" />
+            <path d="M18.5 12l1 1" />
+        </symbol>
+
+        <symbol id="icono-usuario-escudo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+            <path d="M16 3l2.5 1.5L21 3v3.5c0 2-1.5 3.5-2.5 4-1-.5-2.5-2-2.5-4V3z" fill="currentColor" opacity="0.2" />
+            <path d="M16 3l2.5 1.5L21 3v3.5c0 2-1.5 3.5-2.5 4-1-.5-2.5-2-2.5-4V3z" />
+        </symbol>
+        <!-- Ícono de Eliminar / Papelera -->
+        <symbol id="icono-eliminar" viewBox="0 0 24 24">
+            <polyline points="3 6 5 6 21 6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+            <line x1="10" y1="11" x2="10" y2="17" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+            <line x1="14" y1="11" x2="14" y2="17" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
         </symbol>
     </defs>
 </svg>

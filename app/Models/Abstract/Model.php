@@ -7,9 +7,13 @@ namespace App\Models\Abstract;
 use App\Libs\BuilderQuery;
 use App\Libs\Exceptions\AppException;
 use App\Helpers\Validar;
+use App\Traits\CifrarTrait;
 
 abstract class Model
 {
+    use CifrarTrait;
+
+
     protected string $tabla;
     protected array $campos = [];
     protected array $camposMinimos = [];
@@ -17,6 +21,7 @@ abstract class Model
 
     // Propiedad protegida para acceso directo en consultas personalizadas de los modelos hijos
     protected BuilderQuery $db;
+
 
     public function __construct()
     {
@@ -52,7 +57,10 @@ abstract class Model
                 $datosLimpios[$columna] = null;
                 continue;
             }
-
+            if (!$esInsercion && is_bool($valor)) {
+                $datosLimpios[$columna] = (int)$valor;
+                continue;
+            }
             $valorTexto = trim((string)$valor);
 
             if (!$esInsercion && $valorTexto === '') {

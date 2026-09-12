@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Libs;
 
+use App\Controllers\ErrrorController;
 use Throwable;
 use ErrorException;
 use App\Helpers\Logger;
@@ -167,11 +168,14 @@ class ManejadorExcepciones
             exit;
         }
 
-        // Salida HTML plana únicamente para peticiones de navegación web directa
+        /*    // Salida HTML plana únicamente para peticiones de navegación web directa
         echo "<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'><title>Error {$codigoHttp}</title></head><body>";
         echo "<h1>Error {$codigoHttp}</h1>";
         echo "<p><strong>Mensaje:</strong> " . htmlspecialchars($mensaje, ENT_QUOTES, 'UTF-8') . "</p>";
-        echo "</body></html>";
+        echo "</body></html>"; */
+
+        $error = new ErrrorController();
+        $error->index($codigoHttp, $mensaje);
         exit;
     }
 
