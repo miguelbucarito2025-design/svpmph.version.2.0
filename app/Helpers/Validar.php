@@ -96,6 +96,32 @@ class Validar
     }
 
     /**
+     * Valida si una cadena representa un enlace de grupo o invitación de WhatsApp válido.
+     *
+     * @param string $url Enlace a evaluar
+     * @return bool Retorna true si es un enlace de WhatsApp válido; false en caso contrario.
+     */
+    public static function esGrupoWhatsapp(string $url): bool|string
+    {
+        $url = trim($url);
+
+        // 1. Validaciones básicas de longitud
+        if (empty($url) || strlen($url) > 255) {
+            return false;
+        }
+
+        // 2. Validar sintaxis global de URL
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            return false;
+        }
+
+        // 3. Expresión regular flexible para enlaces oficiales de WhatsApp (chat.whatsapp.com, wa.me, etc.)
+        $patron = '/^https?:\/\/(?:www\.)?(?:chat\.whatsapp\.com|wa\.me)\/[A-Za-z0-9_-]+\/?$/i';
+
+        return preg_match($patron, $url) === 1 ? $url : false;
+    }
+
+    /**
      * Valida si un valor representa un booleano válido.
      *
      * @param mixed $valor Entrada a evaluar.
@@ -303,7 +329,7 @@ class Validar
             return null;
         }
         $id = Seguridad::desencriptarID($id);
-        return (int)self::esEntero($id);
+        return self::esEntero($id);
     }
 
 

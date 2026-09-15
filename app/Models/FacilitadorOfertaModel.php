@@ -163,6 +163,14 @@ class FacilitadorOfertaModel  extends Model
         return $result;
     }
 
+    public function traerNucleo(int $id): array
+    {
+        $sql = 'SELECT n.id ,n.nucleo FROM facilitador_oferta f LEFT JOIN ofertas o ON f.oferta_id=o.id LEFT JOIN nucleo n ON o.nucleo_id=n.id WHERE f.cuenta_id=?';
+        $datos = $this->db->select($sql, [$id]);
+        $result = $this->cifrarDatos($datos, ['id']);
+        return $result;
+    }
+
 
 
 

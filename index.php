@@ -26,6 +26,7 @@ use App\Controllers\OfertasController;
 use App\Controllers\ProgramasController;
 use App\Controllers\RegistroController;
 use App\Controllers\RolesController;
+use App\Controllers\SeccionController;
 use App\Controllers\TerminosController;
 use App\Controllers\UsuariosController;
 use App\Libs\Enrutador;
@@ -126,5 +127,14 @@ Enrutador::post('facilitador/eliminar', [FacilitadorController::class, 'delete']
 Enrutador::get('logs', [ErrrorController::class, 'verErrores'], [5]);
 Enrutador::get('errror/obtenerLogs', [ErrrorController::class, 'obtenerLogs'], [5]);
 Enrutador::post('errror/limpiarLogs', [ErrrorController::class, 'limpiarLogs'], [5]);
+
+
+Enrutador::get('secciones', [SeccionController::class, 'index'], [5, 4, 3]);
+Enrutador::post('seccion/paginar', [SeccionController::class, 'paginar'], [5, 4, 3]);
+Enrutador::post('seccion/guardar', [SeccionController::class, 'save'], [5, 4, 3]);
+Enrutador::post('seccion/actualizar', [SeccionController::class, 'update'], [5, 4, 3]);
+Enrutador::post('seccion/eliminar', [SeccionController::class, 'delete'], [5, 4, 3]);
+
+
 
 Enrutador::despachar();

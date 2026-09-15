@@ -801,6 +801,7 @@ fieldset:hover {
   cursor: pointer;
   position: relative;
   min-width: 290px;
+  max-width: 295px;
 }
 
 .card-rol {

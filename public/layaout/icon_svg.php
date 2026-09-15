@@ -126,7 +126,22 @@
             <path d="M15 11l6 0" />
             <path d="M15 15l4 0" />
         </symbol>
+        <symbol id="icono-secciones-academicas" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Estructura del marco / aula de clase general -->
+            <path d="M4 4h16v16H4z" />
+            <path d="M4 9h16" />
 
+            <!-- División vertical que representa la separación en secciones (Sección A / Sección B) -->
+            <path d="M12 9v11" />
+
+            <!-- Letra 'A' estilizada vectorialmente en la sección izquierda -->
+            <path d="M7 17l1.5 -4l1.5 4" />
+            <path d="M7.5 15.5h2" />
+
+            <!-- Letra 'B' estilizada vectorialmente en la sección derecha -->
+            <path d="M15 13h1.5a1.5 1.5 0 0 1 0 3h-1.5v-3z" />
+            <path d="M15 16h1.5a1.5 1.5 0 0 1 0 3h-1.5v-3z" />
+        </symbol>
         <!-- 
   Símbolo SVG: Icono de Imagen / Fotografía
   ID: icono-foto

@@ -118,23 +118,12 @@
 
           <!-- Lista simple de enlaces (Sin anidaciones raras) -->
           <ul class="grupo-lista">
-            <li onclick="redirec('perfil')" class=" <?= (($pag ?? '')  === 'datosPersonales') ? 'linkactivo' : ''; ?> ">
+            <li onclick="redirec('secciones')" class=" <?= (($pag ?? '')  === 'secciones') ? 'linkactivo' : ''; ?> ">
               <svg class="icono-outline">
-                <use href="#icono-usuario" />
-              </svg>Datos Personales
+                <use href="#icono-secciones-academicas" />
+              </svg>Gestionar Secciones
             </li>
-            <li onclick="redirec('laboral')" class="<?= (($pag ?? '')  === 'datosLaborales') ? 'linkactivo' : ''; ?>  ">
-              <svg class="icono-outline">
-                <use href="#icono-trabajo" />
-              </svg>
-              Datos Laborales
-            </li>
-            <li onclick="redirec('cuenta')" class="<?= (($pag ?? '')  === 'cuenta') ? 'linkactivo' : ''; ?>  ">
-              <svg class="icono-outline">
-                <use href="#icono-configuracion" />
-              </svg>
-              Cuenta de Usuario
-            </li>
+
             <li onclick="redirec('facilitadores')" class="<?= (($pag ?? '')  === 'facilitador') ? 'linkactivo' : ''; ?>  ">
               <svg class="icono-outline">
                 <use href="#icono-facilitadores" />

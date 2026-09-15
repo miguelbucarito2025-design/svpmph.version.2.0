@@ -1,29 +1,44 @@
 /**
- * Función global para realizar peticiones HTTP (AJAX) de forma flexible
- * @param {string} url - La ruta del archivo PHP (ej: 'controllers/usuario.php')
- * @param {string} metodo - 'GET', 'POST', 'PUT', 'DELETE'
- * @param {object|null} datos - El objeto con los datos que quieres enviar (para POST/PUT)
- * @returns {Promise<object>} - Devuelve la respuesta del servidor convertida en JSON
+ * Función centralizada y reutilizable para peticiones AJAX (Soporta FormData, Objetos y JSON)
+ * @param {string} url Ruta del endpoint
+ * @param {string} [metodo="GET"] Método HTTP (GET, POST, PUT, DELETE, etc.)
+ * @param {Object|FormData|null} [datos=null] Datos a enviar
+ * @param {boolean} [enviarComoJson=false] Si es true, envía el cuerpo como application/json
  */
-async function realizarPeticion(url, metodo = "GET", datos = null) {
-  const tokenCSRF = document
-    .querySelector('meta[name="csrf-token"]')
-    .getAttribute("content");
+async function realizarPeticion(
+  url,
+  metodo = "GET",
+  datos = null,
+  enviarComoJson = false,
+) {
+  const tokenCSRF =
+    document
+      .querySelector('meta[name="csrf-token"]')
+      ?.getAttribute("content") || "";
+
   const opciones = {
     method: metodo.toUpperCase(),
     headers: {
       "X-Requested-With": "XMLHttpRequest",
       "X-CSRF-TOKEN": tokenCSRF,
-      // 💡 Quitamos el 'Content-Type: application/json' para que actúe como un formulario normal
     },
   };
 
-  if ((opciones.method === "POST" || opciones.method === "PUT") && datos) {
-    // Si ya es un FormData (por ejemplo, si envías un formulario HTML entero), lo dejamos igual
-    if (datos instanceof FormData) {
+  if (
+    (opciones.method === "POST" ||
+      opciones.method === "PUT" ||
+      opciones.method === "DELETE") &&
+    datos
+  ) {
+    if (enviarComoJson) {
+      // 💡 Si se requiere explícitamente JSON (ideal para IDs sueltos o payloads complejos)
+      opciones.headers["Content-Type"] = "application/json";
+      opciones.body = JSON.stringify(datos);
+    } else if (datos instanceof FormData) {
+      // Si ya es un FormData (formularios HTML enteros)
       opciones.body = datos;
     } else {
-      // 💡 Si es un objeto común de JS, lo convertimos automáticamente a formato de formulario ($_POST)
+      // Si es un objeto común de JS, lo convertimos automáticamente a FormData ($_POST tradicional)
       const formularioVirtual = new FormData();
       for (const llave in datos) {
         formularioVirtual.append(llave, datos[llave]);
@@ -35,18 +50,16 @@ async function realizarPeticion(url, metodo = "GET", datos = null) {
   try {
     const respuesta = await fetch(url, opciones);
 
-    // 💡 Si el estatus HTTP no es un éxito (200-299)
+    // Si el estatus HTTP no es un éxito (200-299)
     if (!respuesta.ok) {
       try {
         const errorJson = await respuesta.json();
-
-        // 💡 Creamos un objeto de error personalizado para JS
-        const miError = new Error(errorJson.message || "Error en el proceso.");
-        miError.status = respuesta.status; // Guardamos el 400, 403, 500, etc.
-
-        throw miError; // Lo mandamos al formulario
+        const miError = new Error(
+          errorJson.message || errorJson.mensaje || "Error en el proceso.",
+        );
+        miError.status = respuesta.status;
+        throw miError;
       } catch (jsonError) {
-        // Por si el servidor escupe un error fatal HTML (Sintaxis PHP rota)
         if (jsonError instanceof SyntaxError) {
           const errorCritico = new Error(
             `Error crítico en el backend (Código ${respuesta.status})`,
@@ -54,20 +67,16 @@ async function realizarPeticion(url, metodo = "GET", datos = null) {
           errorCritico.status = respuesta.status;
           throw errorCritico;
         }
-        throw jsonError; // Propaga el error estructurado si ya se armó arriba
+        throw jsonError;
       }
     }
 
-    // Si todo salió excelente (HTTP 200), parseamos y devolvemos la data limpia
     return await respuesta.json();
   } catch (error) {
-    // Registramos en la consola de CodeLink para depuración interna
-    //console.error("Error en la petición AJAX:", error);
-    // Re-lanzamos el error para que llegue vivo al catch de formEnv()
+    // Re-lanzamos el error para que llegue vivo al catch del componente que lo llame
     throw error;
   }
 }
-
 function AlertCargando() {
   const cargando = document.createElement("div");
   cargando.innerHTML = `<span id="loader" class="enviando-alerta"><svg class="icono-girando icono-girando-alerta"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" /></svg>Enviando por favor espere.....</span>`;
