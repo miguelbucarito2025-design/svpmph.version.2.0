@@ -142,6 +142,42 @@
             <path d="M15 13h1.5a1.5 1.5 0 0 1 0 3h-1.5v-3z" />
             <path d="M15 16h1.5a1.5 1.5 0 0 1 0 3h-1.5v-3z" />
         </symbol>
+        <symbol id="icono-gremio" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Escudo base / Protección gremial -->
+            <path d="M12 3 a 12 12 0 0 0 8 2 v9 c0 5.5 -3.8 10 -8 11.5 c-4.2 -1.5 -8 -6 -8 -11.5 V5 z" />
+            <path d="M12 3 a 12 12 0 0 0 -8 2 v9 c0 5.5 3.8 10 8 11.5" />
+            <path d="M12 3 a 12 12 0 0 1 8 2 v9 c0 5.5 -3.8 10 -8 11.5" />
+
+            <!-- Silueta central: Unión de profesionales (Gremio) -->
+            <path d="M12 11 a 2 2 0 1 0 0 -4 a 2 2 0 0 0 0 4 z" />
+            <path d="M9 17 c0 -2 1.5 -3.5 3 -3.5 s3 1.5 3 3.5" />
+            <path d="M7 11 a 1.5 1.5 0 1 0 0 -3 a 1.5 1.5 0 0 0 0 3 z" />
+            <path d="M5 16.5 c0 -1.5 1 -2.5 2 -2.5" />
+            <path d="M17 11 a 1.5 1.5 0 1 0 0 -3 a 1.5 1.5 0 0 0 0 3 z" />
+            <path d="M19 16.5 c0 -1.5 -1 -2.5 -2 -2.5" />
+        </symbol>
+        <symbol id="icono-promociones" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Birrete / Gorro de graduación superior -->
+            <path d="M12 3 l10 5 l-10 5 l-10 -5 z" />
+            <path d="M6 10 v6 c0 1.657 2.686 3 6 3 s6 -1.343 6 -3 v-6" />
+            <path d="M22 8 v6" />
+
+            <!-- Cinta / Listón de acreditación de la cohorte o promoción -->
+            <path d="M12 14 v4" />
+            <path d="M10 21 l2 -3 l2 3 v-5 h-4 z" />
+        </symbol>
+        <symbol id="icono-carreras-menciones" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Birrete / Gorro académico central -->
+            <path d="M12 3l10 5l-10 5l-10-5z" />
+            <path d="M6 10v6c0 1.657 2.686 3 6 3s6-1.343 6-3v-6" />
+            <path d="M22 8v6" />
+
+            <!-- Ramificaciones / Menciones y especialidades -->
+            <path d="M12 19v3" />
+            <path d="M5 22h14" />
+            <path d="M5 22v-2" />
+            <path d="M19 22v-2" />
+        </symbol>
         <!-- 
   Símbolo SVG: Icono de Imagen / Fotografía
   ID: icono-foto

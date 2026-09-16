@@ -19,7 +19,7 @@ class FacilitadorController extends Controller
 
 
         $r2Service = new R2Service();
-        $foto = $datos['foto'] ?? 'perfiles/user.png';
+        $foto = $this->session->get('foto_perfil');
         $urlPublica = $r2Service->obtenerUrlPublica($foto);
 
         $this->vista->render(

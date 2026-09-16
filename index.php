@@ -16,6 +16,7 @@ require_once 'vendor/autoload.php';
 
 use App\Controllers\AsignaturasController;
 use App\Controllers\AuthController;
+use App\Controllers\CarrerasController;
 use App\Controllers\CuentaController;
 use App\Controllers\DashboardController;
 use App\Controllers\ErrrorController;
@@ -29,6 +30,7 @@ use App\Controllers\RolesController;
 use App\Controllers\SeccionController;
 use App\Controllers\TerminosController;
 use App\Controllers\UsuariosController;
+use App\Controllers\PromocionController;
 use App\Libs\Enrutador;
 use App\Libs\ManejadorExcepciones;
 use App\Helpers\EnvLoader;
@@ -102,6 +104,20 @@ Enrutador::post('roles/guardar', [RolesController::class, 'guardar'], [5]);
 Enrutador::post('roles/actualizar', [RolesController::class, 'actualizar'], [5]);
 Enrutador::post('roles/eliminacionMultiple', [RolesController::class, 'eliminarMasivo'], [5]);
 Enrutador::post('rol/cambiar', [RolesController::class, 'cambiar'], [5]);
+
+Enrutador::get('carreras', [CarrerasController::class, 'index'], [5]);
+Enrutador::post('carreras/paginar', [CarrerasController::class, 'buscar'], [5]);
+Enrutador::post('carreras/guardar', [CarrerasController::class, 'guardar'], [5]);
+Enrutador::post('carreras/actualizar', [CarrerasController::class, 'actualizar'], [5]);
+Enrutador::post('carreras/eliminacionMultiple', [CarrerasController::class, 'eliminarMasivo'], [5]);
+Enrutador::post('carreras/cambiar', [CarrerasController::class, 'cambiar'], [5]);
+
+Enrutador::get('promocion', [PromocionController::class, 'index'], [5]);
+Enrutador::post('promocion/paginar', [PromocionController::class, 'buscar'], [5]);
+Enrutador::post('promocion/guardar', [PromocionController::class, 'guardar'], [5]);
+Enrutador::post('promocion/actualizar', [PromocionController::class, 'actualizar'], [5]);
+Enrutador::post('promocion/eliminacionMultiple', [PromocionController::class, 'eliminarMasivo'], [5]);
+Enrutador::post('promocion/cambiar', [PromocionController::class, 'cambiar'], [5]);
 
 
 Enrutador::get('perfil', [UsuariosController::class, 'perfil'], [1, 2, 3, 4, 5]);

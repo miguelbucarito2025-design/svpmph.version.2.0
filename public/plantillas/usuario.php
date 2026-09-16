@@ -102,8 +102,37 @@
 
         </section>
 
+        <section class="menu-grupo <?= ($seccionActiva === 'gremio') ? 'abierto' : ''; ?>">
 
+          <button type="button" class="grupo-titulo">
+            <div class="link-content">
+              <svg class="icono-outline">
+                <use href="#icono-gremio" />
+              </svg>
+              <span>Gremio</span>
+              <span class="flecha">▾</span>
+            </div>
+          </button>
 
+          <!-- Lista simple de enlaces (Sin anidaciones raras) -->
+          <ul class="grupo-lista">
+            <?php if ($_SESSION['usuario_rol'] >= 4) { ?>
+              <li onclick="redirec('promocion')" class=" <?= (($pag ?? '')  === 'promociones') ? 'linkactivo' : ''; ?> ">
+                <svg class="icono-outline">
+                  <use href="#icono-promociones" />
+                </svg>Promociones
+              </li>
+
+              <li onclick="redirec('carreras')" class=" <?= (($pag ?? '')  === 'carreras') ? 'linkactivo' : ''; ?> ">
+                <svg class="icono-outline">
+                  <use href="#icono-carreras-menciones" />
+                </svg>Carreras y Grados
+              </li>
+            <?php } ?>
+
+          </ul>
+
+        </section>
         <section class="menu-grupo <?= ($seccionActiva === 'academico') ? 'abierto' : ''; ?>">
 
           <button type="button" class="grupo-titulo">
@@ -118,22 +147,25 @@
 
           <!-- Lista simple de enlaces (Sin anidaciones raras) -->
           <ul class="grupo-lista">
-            <li onclick="redirec('secciones')" class=" <?= (($pag ?? '')  === 'secciones') ? 'linkactivo' : ''; ?> ">
-              <svg class="icono-outline">
-                <use href="#icono-secciones-academicas" />
-              </svg>Gestionar Secciones
-            </li>
+            <?php if ($_SESSION['usuario_rol'] >= 3) { ?>
 
-            <li onclick="redirec('facilitadores')" class="<?= (($pag ?? '')  === 'facilitador') ? 'linkactivo' : ''; ?>  ">
-              <svg class="icono-outline">
-                <use href="#icono-facilitadores" />
-              </svg>
-              Facilitadores
-            </li>
+              <li onclick="redirec('secciones')" class=" <?= (($pag ?? '')  === 'secciones') ? 'linkactivo' : ''; ?> ">
+                <svg class="icono-outline">
+                  <use href="#icono-secciones-academicas" />
+                </svg>Gestionar Secciones
+              </li>
+
+              <li onclick="redirec('facilitadores')" class="<?= (($pag ?? '')  === 'facilitador') ? 'linkactivo' : ''; ?>  ">
+                <svg class="icono-outline">
+                  <use href="#icono-facilitadores" />
+                </svg>
+                Facilitadores
+              </li>
+            <?php } ?>
+
           </ul>
 
         </section>
-
         <?php if ($_SESSION['usuario_rol'] === 5) {
         ?>
           <section class="menu-grupo <?= ($seccionActiva === 'administracion') ? 'abierto' : ''; ?>">

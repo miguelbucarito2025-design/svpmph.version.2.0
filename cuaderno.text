@@ -5,7 +5,7 @@ git commit -m "Explicación breve de lo que hiciste"
 git push
 
 }
-git config --global core.autocrlf true desactiva el warning: in the working copy of 'public/plantillas/usuario.php', LF will be replaced by CRLF the next time Git touches it
+git config --global core.autocrlf true              |||| desactiva el warning: in the working copy of 'public/plantillas/usuario.php', LF will be replaced by CRLF the next time Git touches it
 
 
 # 1. Traer y fusionar los últimos cambios que subiste a GitHub
