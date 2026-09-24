@@ -22,10 +22,9 @@ class RolesController extends Controller
     public function  index(): void
     {
         $this->requerirAutenticacion();
-        $r2Service = new R2Service();
-        $urlPublica = $r2Service->obtenerUrlPublica($this->session->get('foto_perfil'));
 
-        $r2Service = new R2Service();
+        $urlPublica = $this->obtenerArchivo($this->session->get('foto_perfil'));
+
 
 
         $this->vista->render(
@@ -180,7 +179,7 @@ class RolesController extends Controller
         $roles = $model->paginar($datos);
         $total = $model->select('count');
 
-        $r2Service = new R2Service();
+
         $roles = $this->cifrarDatos($roles, [
             'rol_id',
             'id_rol',
@@ -191,7 +190,7 @@ class RolesController extends Controller
 
             foreach ($roles as &$r) {
 
-                $r['img'] = !empty($r['img']) ? $r2Service->obtenerUrlPublica($r['img']) : null;
+                $r['img'] = !empty($r['img']) ? $this->obtenerArchivo($r['img']) : null;
             }
             unset($o);
         }

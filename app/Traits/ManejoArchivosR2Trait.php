@@ -3,7 +3,12 @@
 namespace App\Traits;
 
 use App\Helpers\R2Service;
+use App\Libs\Seguridad;
+use App\Libs\Session;
 
+/**
+ * Trait para la gestión de archivos y generación de URLs privadas hacia Cloudflare R2.
+ */
 trait ManejoArchivosR2Trait
 {
     /**
@@ -24,8 +29,13 @@ trait ManejoArchivosR2Trait
             ];
         }
 
+        // Sanitización estricta de ruta y nombre de campo
+        $prefijoLimpio = trim(preg_replace('/[^a-zA-Z0-9_\-\/]/', '', $prefijoCarpeta), '/');
+        $campoLimpio   = preg_replace('/[^a-zA-Z0-9_\-]/', '', $nombreCampo);
+        $extension     = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $archivoEstructura['extension']));
+
         $time = time();
-        $keyDestino = "{$prefijoCarpeta}/{$nombreCampo}_{$time}_" . uniqid() . ".{$archivoEstructura['extension']}";
+        $keyDestino = "{$prefijoLimpio}/{$campoLimpio}_{$time}_" . uniqid() . ".{$extension}";
 
         $r2Service = new R2Service();
         $resultado = $r2Service->subirArchivo($archivoEstructura['tmp_name'], $keyDestino, $archivoEstructura['mime']);
@@ -46,26 +56,53 @@ trait ManejoArchivosR2Trait
     }
 
     /**
-     * Elimina una lista de keys de Cloudflare R2 (Usado para Rollback o limpieza)
+     * Elimina una lista de keys de Cloudflare R2.
      * 
-     * @param array $keys Lista de strings con los path en R2
+     * @param array $keys Lista de rutas en R2.
+     * @return void
      */
     protected function eliminarArchivosR2(array $keys): void
     {
-        if (empty($keys)) return;
+        if (empty($keys)) {
+            return;
+        }
 
         $r2Service = new R2Service();
         foreach ($keys as $key) {
-            if (!empty($key) && is_string($key)) {
+            if (is_string($key) && !empty($key) && !str_contains($key, '..')) {
                 $r2Service->eliminarArchivo($key);
             }
         }
     }
 
-    protected function ObtenerArchivo(string $key): string
+    /**
+     * Genera la URL amigable segura del backend para acceder a un archivo.
+     * 
+     * Mantiene la firma original del método para evitar reescribir vistas o bases de datos,
+     * pero empaqueta la $key y la sesión del usuario en un token cifrado.
+     * 
+     * @param string|null $key Clave almacenada en la base de datos (ej: 'logos/empresa_123.jpg').
+     * @param int $minutosExpiracion Minutos de validez del enlace generado (por defecto 60 min).
+     * @return string|null URL amigable completa para el frontend o null si la clave es vacía.
+     */
+    protected function obtenerArchivo(?string $key, int $minutosExpiracion = 5): ?string
     {
-        $r2Service = new R2Service();
+        if (empty($key) || str_contains($key, '..')) {
+            return null;
+        }
 
-        return $r2Service->obtenerUrlPublica($key);
+        $session = new Session();
+        $usuarioId = $session->get('usuario_id');
+        // Empaquetamos la key y la identidad del usuario en el token
+        $token = Seguridad::encriptarParams([
+            'r2_key'     => $key,
+            'usuario_id' => $usuarioId
+        ], $minutosExpiracion);
+
+        if (empty($token)) {
+            return null;
+        }
+        // Construimos la URL amigable apuntando al endpoint de tu enrutador
+        return "archivo/obtener/{$token}";
     }
 }

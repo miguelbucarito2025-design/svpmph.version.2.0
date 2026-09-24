@@ -25,12 +25,12 @@ class OfertasController extends Controller
     {
         $this->requerirAutenticacion();
         $r2Service = new R2Service();
-        $urlPublica = $r2Service->obtenerUrlPublica($this->session->get('foto_perfil'));
+        $urlPublica = $this->obtenerArchivo($this->session->get('foto_perfil'));
 
         $nucleos = new NucleoModel;
         $programas = new ProgramasModel;
         $modos = new ModalidadModel;
-        $r2Service = new R2Service();
+
 
         $programasResult = $this->cifrarDatos($programas->selectAllNombresIdsProgramas(), ['id']);
         $nucleosResult = $this->cifrarDatos($nucleos->selectAllNombresIds(), ['id']);
@@ -208,7 +208,7 @@ class OfertasController extends Controller
         $ofertas = $model->paginar($datos);
         $total = $model->select('count'); // Conteo total de ofertas
 
-        $r2Service = new R2Service();
+
         $ofertas = $this->cifrarDatos($ofertas, [
             'id',
             'modo_cuotas',
@@ -220,7 +220,7 @@ class OfertasController extends Controller
 
             foreach ($ofertas as &$o) {
 
-                $o['flyer'] = !empty($o['flyer']) ? $r2Service->obtenerUrlPublica($o['flyer']) : null;
+                $o['flyer'] = !empty($o['flyer']) ? $this->obtenerArchivo($o['flyer']) : null;
             }
             unset($o);
         }

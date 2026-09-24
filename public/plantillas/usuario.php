@@ -10,7 +10,7 @@
   <meta name="csrf-token" content="<?= $_SESSION['csrf_token'] ?? '' ?>">
   <base href="/<?= HOST ?>/">
 
-  <title><?= $titlePag ?? '' ?> -SVPMPH</title>
+  <title><?= $titlePag ?? '' ?>-SVPMPH</title>
 </head>
 
 <body>
@@ -102,21 +102,53 @@
 
         </section>
 
-        <section class="menu-grupo <?= ($seccionActiva === 'gremio') ? 'abierto' : ''; ?>">
 
-          <button type="button" class="grupo-titulo">
-            <div class="link-content">
-              <svg class="icono-outline">
-                <use href="#icono-gremio" />
-              </svg>
-              <span>Gremio</span>
-              <span class="flecha">▾</span>
-            </div>
-          </button>
 
-          <!-- Lista simple de enlaces (Sin anidaciones raras) -->
-          <ul class="grupo-lista">
-            <?php if ($_SESSION['usuario_rol'] >= 4) { ?>
+        <?php if ($_SESSION['usuario_rol'] < 3) { ?>
+          <br>
+          <a href="gremio/estatus" class="menu-link  <?= (($pag ?? '')  === 'gremioEstatus') ? 'linkactivo' : ''; ?>">
+            <svg class="menu-icon">
+              <use href="#icono-estatus" />
+            </svg>
+            <span>Estatus del Gremio</span>
+          </a>
+
+        <?php } ?>
+        <?php if ($_SESSION['usuario_rol'] >= 3) { ?>
+
+          <section class="menu-grupo <?= ($seccionActiva === 'gremio') ? 'abierto' : ''; ?>">
+
+            <button type="button" class="grupo-titulo">
+              <div class="link-content">
+                <svg class="icono-outline">
+                  <use href="#icono-gremio" />
+                </svg>
+                <span>Gremio</span>
+                <span class="flecha">▾</span>
+              </div>
+            </button>
+
+            <!-- Lista simple de enlaces (Sin anidaciones raras) -->
+            <ul class="grupo-lista">
+
+              <?php if ($_SESSION['usuario_rol'] <= 3) { ?>
+                <br>
+                <a href="gremio/estatus" class="menu-link  <?= (($pag ?? '')  === 'gremioEstatus') ? 'linkactivo' : ''; ?>">
+                  <svg class="menu-icon">
+                    <use href="#icono-estatus" />
+                  </svg>
+                  <span>Estatus del Gremio</span>
+                </a>
+
+              <?php } ?>
+
+              <li onclick="redirec('agremiados')" class=" <?= (($pag ?? '')  === 'agremiados') ? 'linkactivo' : ''; ?> ">
+                <svg class="icon-sistema-rellen">
+                  <use href="#icono-agremiados" />
+                </svg>Agremiados
+              </li>
+
+
               <li onclick="redirec('promocion')" class=" <?= (($pag ?? '')  === 'promociones') ? 'linkactivo' : ''; ?> ">
                 <svg class="icono-outline">
                   <use href="#icono-promociones" />
@@ -128,11 +160,12 @@
                   <use href="#icono-carreras-menciones" />
                 </svg>Carreras y Grados
               </li>
-            <?php } ?>
 
-          </ul>
+            </ul>
 
-        </section>
+          </section>
+        <?php } ?>
+
         <section class="menu-grupo <?= ($seccionActiva === 'academico') ? 'abierto' : ''; ?>">
 
           <button type="button" class="grupo-titulo">
@@ -237,6 +270,13 @@
         <?php
         }
         ?>
+        <br>
+        <a href="archivos" class="menu-link <?= ($seccionActiva === 'documentos') ? 'linkactivo' : ''; ?>">
+          <svg class="menu-icon">
+            <use href="#icono-documentos" />
+          </svg>
+          <span>Documentos</span>
+        </a>
 
 
         <!-- Enlace Suelto (Sin Grupo) -->

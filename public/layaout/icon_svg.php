@@ -43,6 +43,63 @@
             <path d="M21 12h-13l3 -3" />
             <path d="M11 15l-3 -3" />
         </symbol>
+
+
+        <symbol id="icon-archivo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <line x1="10" y1="9" x2="8" y2="9"></line>
+        </symbol>
+
+        <symbol id="icono-volver" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Flecha hacia la izquierda para la acción de regresar/volver -->
+            <path d="M9 11 l-4 4 l4 4" />
+            <path d="M5 15 h11 a4 4 0 0 0 4 -4 v-1 a4 4 0 0 0 -4 -4 h-2" />
+        </symbol>
+
+
+        <!-- Ícono 2: Verificado / Confirmado (Check dentro de círculo) -->
+        <symbol id="icon-confirmar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </symbol>
+
+        <!-- Ícono 3: Pendiente / En revisión (Reloj de arena o espera) -->
+        <symbol id="icon-pendiente" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+        </symbol>
+
+        <!-- Ícono 4: Ver / Consultar (Ojo) -->
+        <symbol id="icon-ojo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+        </symbol>
+
+        <!-- Ícono 5: Alerta / Sin archivo (Triángulo con signo de exclamación) -->
+        <symbol id="icon-alerta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </symbol>
+        <symbol id="icono-no-verificado" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Círculo exterior -->
+            <path d="M12 2 a 10 10 0 1 0 10 10 A 10 10 0 0 0 12 2 z" />
+
+            <!-- 'X' de estado no verificado / denegado -->
+            <path d="M10 10 l4 4" />
+            <path d="M14 10 l-4 4" />
+        </symbol>
+
+        <symbol id="icono-estatus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Círculo o placa de insignia de estatus -->
+            <path d="M12 2 a 10 10 0 1 0 10 10 A 10 10 0 0 0 12 2 z" />
+
+            <!-- Checkmark de verificación / estado activo o aprobado -->
+            <path d="M9 12 l2 2 l4 -4" />
+        </symbol>
         <!-- Icono de Usuario -->
         <symbol id="icono-usuario" viewBox="0 0 24 24">
             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -126,6 +183,33 @@
             <path d="M15 11l6 0" />
             <path d="M15 15l4 0" />
         </symbol>
+
+        <symbol id="icono-agremiados" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Tarjeta / Credencial de identificación del miembro agremiado -->
+            <path d="M3 6 a 2 2 0 0 1 2 -2 h14 a 2 2 0 0 1 2 2 v12 a 2 2 0 0 1 -2 2 h-14 a 2 2 0 0 1 -2 -2 z" />
+
+            <!-- Silueta del usuario / agremiado en la credencial -->
+            <path d="M9 11 a 2 2 0 1 0 0 -4 a 2 2 0 0 0 0 4 z" />
+            <path d="M6 16 c0 -1.8 1.3 -3 3 -3 s3 1.2 3 3" />
+
+            <!-- Líneas de datos / registro del carnet -->
+            <path d="M14 9 h4" />
+            <path d="M14 13 h3" />
+        </symbol>
+        <symbol id="icono-documentos" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Documento principal -->
+            <path d="M14 3 v4 a1 1 0 0 0 1 1 h4" />
+            <path d="M17 21 h-10 a2 2 0 0 1 -2 -2 v-14 a2 2 0 0 1 2 -2 h7 l5 5 v11 a2 2 0 0 1 -2 2 z" />
+
+            <!-- Líneas de texto del documento -->
+            <path d="M9 9 h1" />
+            <path d="M9 13 h6" />
+            <path d="M9 17 h6" />
+        </symbol>
+        <symbol id="icono-cancelar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </symbol>
         <symbol id="icono-secciones-academicas" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <!-- Estructura del marco / aula de clase general -->
             <path d="M4 4h16v16H4z" />
@@ -198,15 +282,6 @@
             <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
         </symbol>
 
-        <!-- Icono de Documento / Términos y Condiciones -->
-        <symbol id="icono-documento" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-            <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-            <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
-            <path d="M9 9l1 0" />
-            <path d="M9 13l6 0" />
-            <path d="M9 17l6 0" />
-        </symbol>
 
         <!-- Icono de Escudo / Seguridad / Rol Admin -->
         <symbol id="icono-escudo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

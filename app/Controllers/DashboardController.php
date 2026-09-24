@@ -7,10 +7,12 @@ namespace App\Controllers;
 use App\Controllers\Abstract\Controller;
 use App\Models\DatosModel;
 use App\Helpers\R2Service;
+use App\Traits\ManejoArchivosR2Trait;
 
 class DashboardController extends Controller
 {
 
+    use ManejoArchivosR2Trait;
 
     public function index(): void
     {
@@ -38,12 +40,12 @@ class DashboardController extends Controller
         ];
         $r2Service = new R2Service();
         $foto = $datos['foto'] ?? 'perfiles/user.png';
-        $urlPublica = $r2Service->obtenerUrlPublica($foto);
+        $urlPublica = $this->obtenerArchivo($foto);
 
         $this->session->set('foto_perfil', $foto);
 
-        $datosFaltantes = !$this->faltanDatos($reglasUsuario, $datos);
-        $datosLaboralesFaltantes  = !$this->faltanDatos($reglasLaboral, $datos);
+        $datosFaltantes = $this->faltanDatos($reglasUsuario, $datos);
+        $datosLaboralesFaltantes  = $this->faltanDatos($reglasLaboral, $datos);
 
         $this->vista->render(
             'usuario/dashborad',

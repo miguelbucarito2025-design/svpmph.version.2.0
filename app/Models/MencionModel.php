@@ -8,9 +8,12 @@ namespace App\Models;
 use App\Models\Abstract\Model;
 use App\Libs\DataBase;
 use App\Libs\Exceptions\AppException;
+use App\Traits\ManejoArchivosR2Trait;
 
 class MencionModel  extends Model
 {
+
+    use ManejoArchivosR2Trait;
 
     protected string $tabla = 'mencion';
 
@@ -19,7 +22,8 @@ class MencionModel  extends Model
         'mencion' => 'esTexto',
         'requisitos' => 'esTexto',
         'img' => 'esRutaArchivo',
-        'estado' => 'esBooleano'
+        'codigo' => 'esTexto',
+        'estado' => 'esBooleano',
     ];
 
     protected array $camposMinimos = [
@@ -36,7 +40,27 @@ class MencionModel  extends Model
         return $this->db->select($sql, [$id], 'row');;
     }
 
+    public function selectImgNombreId(?int $id)
+    {
+        $param = '';
+        if ($id !== null) {
+            $param = 'WHERE id!=?';
+            $valor[] = $id;
+        }
 
+        $sql = "SELECT id,mencion,img,requisitos FROM mencion " . $param;
+        $result = $this->db->select($sql, $valor ?? [], 'all');
+
+
+        return array_map(function (array $busqueda): array {
+            $busqueda = $this->cifrarDatos($busqueda, [
+                'id'
+            ]);
+            $busqueda['requisitos'] = explode(',', $busqueda['requisitos']);
+            $busqueda['img'] = $this->ObtenerArchivo($busqueda['img']);
+            return $busqueda;
+        }, $result);
+    }
 
 
     public function paginar(array $datos): array
@@ -60,12 +84,14 @@ class MencionModel  extends Model
      * optiene el mencion por el id
      *
      * @param integer $id
-     * @return string devuelve solo el nombre
+     * @return array devuelve solo el nombre
      */
-    public function obtenerPorId(int $id): string
+    public function obtenerRequisitosPorId(int $id): array
     {
-        $sql = 'SELECT mencion,img FROM mencion WHERE id=?';
-        return $this->db->select($sql, [$id], 'row')['mencion'];
+        $sql = 'SELECT mencion,img,codigo,requisitos,id FROM mencion WHERE id=?';
+        $result = $this->db->select($sql, [$id], 'row');
+        $result['requisitos'] = explode(',', $result['requisitos']);
+        return $result;
     }
 
     /**
@@ -120,6 +146,7 @@ class MencionModel  extends Model
         $sql = "SELECT id,mencion FROM {$this->tabla} WHERE id!=5";
         $result = $this->db->select($sql, [], 'all');
         $result = $this->cifrarDatos($result, ['id']);
+
         return $result;
     }
 

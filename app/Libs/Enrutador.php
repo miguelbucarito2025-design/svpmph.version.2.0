@@ -29,8 +29,6 @@ class Enrutador
         self::registrar('GET', $ruta, $handler, $rolesPermitidos);
     }
 
-
-
     public static function post(string $ruta, array $handler, array $rolesPermitidos = []): void
     {
         self::registrar('POST', $ruta, $handler, $rolesPermitidos);
@@ -56,10 +54,11 @@ class Enrutador
      */
     public static function despachar(): void
     {
-        Seguridad::detectorDeBots();
-
         $session = new Session();
         $session->start();
+
+        // Middleware de inspección y rate limiting
+        \App\Middlewares\SeguridadMiddleware::inspeccionarPeticion();
 
         $metodoPeticion = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
@@ -72,35 +71,39 @@ class Enrutador
         }
 
         $uriPeticion = trim($rawUri, '/');
-
         $partesUri = array_values(array_filter(explode('/', $uriPeticion)));
 
-        $baseRuta = !empty($partesUri) ? implode('/', array_slice($partesUri, 0, 2)) : '';
-        $tokenSegmento = $partesUri[2] ?? '';
+        // Extracción dinámica: la base puede ser toda la URI o la URI menos el último segmento (token)
+        $posibleToken = !empty($partesUri) ? end($partesUri) : '';
+        $baseRutaSugerida = count($partesUri) > 1 ? implode('/', array_slice($partesUri, 0, -1)) : $uriPeticion;
 
         $rutaEncontrada = false;
-        $rutaNoEncontrada = $uriPeticion;
+
         // 2. Búsqueda de coincidencia
         foreach (self::$rutas as $ruta) {
             $patternRegistrado = trim($ruta['pattern'], '/');
 
-            if ($patternRegistrado === $uriPeticion || $patternRegistrado === $baseRuta) {
+            // Evaluamos si coincide con la URI completa o con la ruta base omitiendo el parámetro final
+            $esCoincidenciaExacta = ($patternRegistrado === $uriPeticion);
+            $esCoincidenciaConToken = ($patternRegistrado === $baseRutaSugerida && !empty($posibleToken) && $baseRutaSugerida !== $uriPeticion);
+
+            if ($esCoincidenciaExacta || $esCoincidenciaConToken) {
                 $rutaEncontrada = true;
 
-                // Si el método no coincide, ignoramos y seguimos buscando por si hay otro registro válido
+                // Si el método no coincide, continuamos buscando por si existe sobrecarga de ruta en otro verbo
                 if ($ruta['metodo'] !== $metodoPeticion) {
                     continue;
                 }
 
-                // 3. Control de acceso
+                // 3. Control de acceso por Rol
                 if (!empty($ruta['roles']) && !self::validarAccesoRol($session, $ruta['roles'])) {
                     throw new Exception("Acceso denegado: No tienes permisos o tu sesión expiró.", 403);
                 }
 
-                // 4. Parámetros encriptados
+                // 4. Procesamiento de Parámetros Encriptados
                 $parametros = [];
-                if (!empty($tokenSegmento)) {
-                    $resultadoToken = Seguridad::desencriptarParams($tokenSegmento);
+                if ($esCoincidenciaConToken) {
+                    $resultadoToken = Seguridad::desencriptarParams($posibleToken);
                     if ($resultadoToken === null) {
                         throw new Exception("El token de la URL es inválido o ha expirado.", 403);
                     }
@@ -121,22 +124,28 @@ class Enrutador
                     throw new Exception("El método {$metodoControlador} no existe en {$claseControlador}.", 500);
                 }
 
-                // Ejecutamos el controlador y terminamos
+                // Ejecutamos la acción en el controlador pasando los parámetros procesados
                 call_user_func_array([$instancia, $metodoControlador], [$parametros]);
                 return;
             }
         }
 
-        // Si el bucle termina, evaluamos por qué no retornó antes
+        // Si la ruta existía pero el verbo no coincidió
         if ($rutaEncontrada) {
-            // La ruta existe pero nunca coincidió con el verbo HTTP utilizado
             throw new Exception("Método {$metodoPeticion} no permitido para esta ruta.", 405);
         }
 
-        // La ruta no existe en absoluto
-        throw new Exception("Ruta no encontrada. " . $rutaNoEncontrada, 404);
+        // La ruta no existe en el sistema
+        throw new Exception("Ruta no encontrada: {$uriPeticion}", 404);
     }
 
+    /**
+     * Valida la sesión activa y comprueba si el rol del usuario posee permisos sobre la ruta.
+     * 
+     * @param Session $session Instancia de la sesión activa.
+     * @param array<string> $rolesPermitidos Lista de roles autorizados.
+     * @return bool True si tiene acceso, false en caso contrario.
+     */
     private static function validarAccesoRol(Session $session, array $rolesPermitidos): bool
     {
         if (!$session->comprobarInactividad()) {

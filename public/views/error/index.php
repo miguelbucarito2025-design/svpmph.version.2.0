@@ -1,7 +1,7 @@
  <div class="container-error">
      <figure>
          <img
-             src="https://pub-ee0a2e2b71aa456ba391d9d7e17ff2e7.r2.dev/img/poster_2026-09-02-095902.png"
+             src="<?= $img ?? '' ?>"
              alt="logo de la sociedad venezolana de profesionales en medicina prehospitalaria" />
      </figure>
 

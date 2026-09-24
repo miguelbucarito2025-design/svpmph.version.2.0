@@ -15,11 +15,12 @@ use App\Models\InstitucionModel;
 use App\Helpers\R2Service;
 use App\Helpers\Validar;
 use App\Models\RolModel;
+use App\Traits\ManejoArchivosR2Trait;
 
 class UsuariosController extends Controller
 {
     use ManejoFechasTrait;
-
+    use ManejoArchivosR2Trait;
     /**
      * renderiza el perfil del usuario
      *
@@ -34,8 +35,8 @@ class UsuariosController extends Controller
         $datos = $model->datosPersonales(
             $this->session->get('usuario_id')
         );
-        $r2Service = new R2Service();
-        $urlPublica = $r2Service->obtenerUrlPublica($this->session->get('foto_perfil'));
+
+        $urlPublica = $this->obtenerArchivo($this->session->get('foto_perfil'));
 
         $ruta = empty($datos) ? 'perfil/guardar' : 'perfil/actualizar';
 
@@ -181,8 +182,8 @@ class UsuariosController extends Controller
             }
             unset($i);
         }
-        $r2Service = new R2Service();
-        $urlPublica = $r2Service->obtenerUrlPublica($this->session->get('foto_perfil'));
+
+        $urlPublica = $this->obtenerArchivo($this->session->get('foto_perfil'));
 
         $ruta = empty($datos) ? 'laboral/guardar' : 'laboral/actualizar';
 
@@ -302,8 +303,8 @@ class UsuariosController extends Controller
     public function index(): void
     {
         $this->requerirAutenticacion();
-        $r2Service = new R2Service();
-        $urlPublica = $r2Service->obtenerUrlPublica($this->session->get('foto_perfil'));
+
+        $urlPublica = $this->obtenerArchivo($this->session->get('foto_perfil'));
         $model = new RolModel();
         $roles = $model->traerIds();
 

@@ -18,13 +18,9 @@ class NucleoController extends Controller
     use ManejoArchivosR2Trait;
     public function  index(): void
     {
-
-
-
         $this->requerirAutenticacion();
 
-        $r2Service = new R2Service();
-        $urlPublica = $r2Service->obtenerUrlPublica($this->session->get('foto_perfil'));
+        $urlPublica = $this->obtenerArchivo($this->session->get('foto_perfil'));
 
 
         $this->vista->render(
@@ -197,17 +193,17 @@ class NucleoController extends Controller
         $resul = $model->paginar($datos);
         $total = $model->select('count');
 
-        $r2Service = new R2Service();
+
         if (isset($result['id'])) {
             $resul['id'] = Seguridad::encriptarID($result['id']);
-            $resul['logo'] = $r2Service->obtenerUrlPublica($resul['logo']);
-            $resul['img'] = $r2Service->obtenerUrlPublica($resul['img']);
+            $resul['logo'] = $this->obtenerArchivo($resul['logo']);
+            $resul['img'] = $this->obtenerArchivo($resul['img']);
         } else {
             foreach ($resul as &$r) {
                 if (isset($r['id'])) {
                     $r['id'] = Seguridad::encriptarID($r['id']);
-                    $r['logo'] = $r2Service->obtenerUrlPublica($r['logo']);
-                    $r['img'] = $r2Service->obtenerUrlPublica($r['img']);
+                    $r['logo'] = $this->obtenerArchivo($r['logo']);
+                    $r['img'] = $this->obtenerArchivo($r['img']);
                 }
             }
             unset($r);

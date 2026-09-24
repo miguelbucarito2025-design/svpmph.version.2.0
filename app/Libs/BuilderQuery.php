@@ -8,6 +8,7 @@ use App\Libs\Exceptions\DatabaseException;
 use App\Libs\Exceptions\AppException;
 use PDO;
 use PDOException;
+use Throwable;
 
 class BuilderQuery
 {
@@ -229,6 +230,22 @@ class BuilderQuery
             return $stmt->execute($valores);
         } catch (\PDOException $e) {
             throw new DatabaseException("Error al intentar eliminar en la base de datos", $e->getMessage(), 500);
+        }
+    }
+
+    public function consult(string $sql, array $valores = [])
+    {
+        try {
+            $stmt = $this->db->prepare($sql);
+            $ejecutado = $stmt->execute($valores ?? null);
+
+            if (!$ejecutado) {
+                return false;
+            }
+
+            return $ejecutado;
+        } catch (Throwable $e) {
+            throw new DatabaseException($e->getMessage(), $sql, 500);
         }
     }
 }

@@ -28,57 +28,6 @@ const svgTerminos = `
 </svg>
 `;
 
-function formularioTerminos(datos) {
-  const contenedor = document.createElement("div");
-  contenedor.className = "modal-ofertas-container";
-
-  contenedor.innerHTML = `
-    <h2 class="h2-agregar  grey">
-     ${svgTerminos}
-      Vinculación de Terminos y Condiciones
-    </h2>
-
-    <form method="post" class="form-usuario" id="formTerminos" enctype="multipart/form-data">
-    <input type="hidden" name="termino_id" value="${datos.id_terminos}">
-    <input type="hidden" name="rol_id" value="${datos.rol_id}">
-
-      <div class="grid-form">
-          <div class="campo-grupo">
-            <label>Titulo *</label>
-            <input type="text" name="titulo" value="${datos.titulo || "No definido"}"  required>
-          </div>
-          <div class="campo-grupo">
-            <label>Versión *</label>
-            <input type="text"  name="version" value="${datos.version || "No definido"}"  required>
-          </div>
-          <div class="campo-grupo container-textarea">
-            <label>Contenido *</label>
-            <textarea name="contenido" required>${datos.contenido || "No definido"}</textarea>
-          </div>
-        
-      </div>
-   
-    </form>
-
-
-
-    <hr />
-
-    <div class="container-button-anuncion">
-      <button type="submit" class="success button-anuncio" form="formTerminos">
-        <svg class="icono-outline"><use href="#icono-agregar"></use></svg>
-        Guardar 
-      </button>
-      <button type="reset" class="limpiar button-anuncio" form="formTerminos">
-        <svg class="icono-outline"><use href="#icon-limpiar" /></svg>
-        Limpiar
-      </button>
-    </div>
-  `;
-
-  return contenedor;
-}
-
 /**
  * Genera el formulario a 2 Columnas para AGREGAR OFERTA
  */
@@ -93,7 +42,7 @@ function crearFormularioAgregarOferta() {
     </h2>
 
     <form method="post" class="form-usuario" id="formAgregar" enctype="multipart/form-data">
-      <div class="grid-form-2col">
+      <div class="grid-form">
           <div class="campo-grupo">
             <label>Nombre de la Carrera *</label>
             <input type="text" name="mencion"  required>
@@ -102,11 +51,15 @@ function crearFormularioAgregarOferta() {
             <label>Requisitos (separados por ",") *</label>
             <input type="text"  name="requisitos"  required>
           </div>
+          <div class="campo-grupo campo-full">
+            <label>Codigo *</label>
+            <input type="text"  name="codigo"  required>
+          </div>
+          <div class="campo-grupo campo-full">
+                <label>Imagen *</label>
+                <input type="file" required name="img" class="input-preview" data-target="previewFlyerAdd" accept="image/*">
+           </div>
       </div>
-      <div class="campo-grupo input-file-lone ">
-            <label>Imagen *</label>
-            <input type="file" required name="img" class="input-preview" data-target="previewFlyerAdd" accept="image/*">
-       </div>
 
     </form>
 
@@ -149,7 +102,7 @@ function crearFormularioEditar(datos) {
 
     <form method="post" class="form-usuario" id="formEditar" enctype="multipart/form-data">
     <input type="hidden" name="id" value="${datos.id}">
-      <div class="grid-form-2col">
+      <div class="grid-form">
           <div class="campo-grupo">
              <label>Nombre de la Carrera *</label>
              <input type="text" name="mencion" value="${datos.mencion}"  required>
@@ -158,19 +111,22 @@ function crearFormularioEditar(datos) {
              <label>Requisitos *</label>
              <input type="text"  name="requisitos" value="${datos.requisitos}"  required>
           </div>
-      </div>
-      <div class="campo-grupo input-file-lone ">
+        <div class="campo-grupo">
+            <label>Codigo *</label>
+            <input type="text"  name="codigo" value="${datos.codigo}"  required>
+        </div>
+         <div class="campo-grupo ">
           <label>Estado *</label>
-<select name="estado">
-<option value="${datos.estado}">${datos.estado ? "Disponible" : "No Disponible"}</option>
-<option value="${datos.estado == 1 ? 0 : 1}">${datos.estado == 1 ? "No Disponible" : "Disponible"}</option>
-</select>
-      </div>
-      <div class="campo-grupo input-file-lone ">
+          <select name="estado">
+            <option value="${datos.estado}">${datos.estado ? "Disponible" : "No Disponible"}</option>
+            <option value="${datos.estado == 1 ? 0 : 1}">${datos.estado == 1 ? "No Disponible" : "Disponible"}</option>
+          </select>
+        </div>
+      <div class="campo-grupo ">
           <label>Imagen *</label>
-
           <input type="file"  name="img" class="input-preview" data-target="previewFlyerEdit" accept="image/*">
-      </div>
+      </div> 
+    </div>
 
     </form>
 

@@ -12,11 +12,12 @@ use App\Models\FacilitadorOfertaModel;
 use App\Models\NucleoModel;
 use App\Models\SeccionesModel;
 use App\Traits\CifrarTrait;
-use App\Libs\Exceptions\AppException;
+use App\Traits\ManejoArchivosR2Trait;
 
 class SeccionController extends Controller
 {
     use CifrarTrait;
+    use ManejoArchivosR2Trait;
 
     public function index(): void
     {
@@ -33,8 +34,8 @@ class SeccionController extends Controller
             $nucleos = $nucleos->traerNucleo($this->session->get("usuario_id"));
         }
 
-        $r2Service = new R2Service();
-        $urlPublica = $r2Service->obtenerUrlPublica($this->session->get('foto_perfil'));
+
+        $urlPublica = $this->obtenerArchivo($this->session->get('foto_perfil'));
 
         $datosNulos[] = ['id' => Seguridad::encriptarID('Nulo'), 'nucleo' => 'Seleccione'];
 
@@ -94,7 +95,7 @@ class SeccionController extends Controller
 
             foreach ($ofertas as &$o) {
 
-                $o['flyer'] = !empty($o['flyer']) ? $r2Service->obtenerUrlPublica($o['flyer']) : null;
+                $o['flyer'] = !empty($o['flyer']) ? $this->obtenerArchivo($o['flyer']) : null;
             }
             unset($o);
         }

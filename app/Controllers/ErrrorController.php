@@ -6,9 +6,12 @@ namespace App\Controllers;
 
 use App\Controllers\Abstract\Controller;
 use App\Helpers\R2Service;
+use App\Traits\ManejoArchivosR2Trait;
 
 class ErrrorController extends Controller
 {
+
+    use ManejoArchivosR2Trait;
     // Directorio exacto de acuerdo a tu árbol de carpetas (app/Logs/)
     private string $dirLogs;
 
@@ -20,11 +23,14 @@ class ErrrorController extends Controller
 
     public function index(int $codigo, string $mensaje): void
     {
+
+
         $this->vista->render(
             'error/index',
             [
                 'codigo' => $codigo,
-                'mensaje' => $mensaje
+                'mensaje' => $mensaje,
+                'img' => $this->obtenerArchivo('img/poster_2026-09-02-095902.png')
             ],
             'error'
         );
@@ -35,7 +41,7 @@ class ErrrorController extends Controller
         $this->requerirAutenticacion();
         $r2Service = new R2Service();
 
-        $urlPublica = $r2Service->obtenerUrlPublica((string)$this->session->get('foto_perfil'));
+        $urlPublica = $this->obtenerArchivo((string)$this->session->get('foto_perfil'));
 
         $this->vista->render(
             'usuario/logs',

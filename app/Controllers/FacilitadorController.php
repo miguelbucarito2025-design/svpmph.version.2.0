@@ -8,10 +8,12 @@ use App\Controllers\Abstract\Controller;
 use App\Helpers\R2Service;
 use App\Helpers\Validar;
 use App\Models\FacilitadorOfertaModel;
+use App\Traits\ManejoArchivosR2Trait;
 
 class FacilitadorController extends Controller
 {
 
+    use ManejoArchivosR2Trait;
 
     public function index(): void
     {
@@ -20,7 +22,7 @@ class FacilitadorController extends Controller
 
         $r2Service = new R2Service();
         $foto = $this->session->get('foto_perfil');
-        $urlPublica = $r2Service->obtenerUrlPublica($foto);
+        $urlPublica = $this->obtenerArchivo($foto);
 
         $this->vista->render(
             'usuario/facilitador',

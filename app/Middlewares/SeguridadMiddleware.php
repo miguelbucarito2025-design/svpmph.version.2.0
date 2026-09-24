@@ -1,16 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Middlewares;
 
 use App\Libs\Response;
 
+/**
+ * Middleware de Inspección de Seguridad, Control de Tasa de Peticiones (Rate Limiting)
+ * y Freno de Emergencia por Sobrecarga Global del Servidor.
+ */
 class SeguridadMiddleware
 {
     private const LOG_DIR = 'app/Logs/';
-    private const TIEMPO_BLOQUEO_SEGUNDOS = 1; // Ventana de tiempo a evaluar
-    private const MAX_PETICIONES = 5;          // Máximo de peticiones permitidas en esa ventana
+    private const TIEMPO_BLOQUEO_SEGUNDOS = 5; // Ventana de evaluación en segundos por IP
+    private const MAX_PETICIONES = 30;         // Máximo de peticiones HTTP permitidas por IP en la ventana
 
-    // Lista negra ampliada de herramientas automáticas y escáneres
+    // --- PROTECCIÓN DE SOBRECARGA GLOBAL ---
+    private const MAX_PETICIONES_GLOBALES_SEGUNDO = 150; // Límite máximo que soporta el servidor por segundo
+
+    /**
+     * Herramientas conocidas de escaneo de vulnerabilidades y bots maliciosos.
+     */
     private const BOTS_PROHIBIDOS = [
         'python',
         'curl',
@@ -25,17 +36,22 @@ class SeguridadMiddleware
     ];
 
     /**
-     * Evalúa la petición entrante. Si detecta comportamiento anómalo o herramientas
-     * no autorizadas, registra el evento y aborta la ejecución de inmediato.
+     * Evalúa la petición entrante analizando la identidad del cliente, la frecuencia individual
+     * y la carga general del servidor.
      *
      * @return void
      */
     public static function inspeccionarPeticion(): void
     {
+        // 1. CAPA DE EMERGENCIA: Freno por Sobrecarga Global del Servidor
+        if (self::excedeCargaGlobalServidor()) {
+            self::registrarYAbortar("Servidor saturado por alto volumen de tráfico. Intente de nuevo.", 503, self::obtenerIpReal());
+        }
+
         $ip = self::obtenerIpReal();
         $userAgent = trim($_SERVER['HTTP_USER_AGENT'] ?? '');
 
-        // 1. REGLA 1: Exigir User-Agent y bloquear herramientas de escaneo conocidas
+        // 2. REGLA 1: Exigir User-Agent y bloquear herramientas de escaneo conocidas
         if (empty($userAgent)) {
             self::registrarYAbortar("Acceso denegado: Petición sin User-Agent.", 403, $ip);
         }
@@ -46,57 +62,133 @@ class SeguridadMiddleware
             }
         }
 
-        // 2. REGLA 2: Rate Limiting por IP (No por sesión)
+        // 3. REGLA 2: Rate Limiting individual por IP usando bloqueo atómico
         if (self::excedeLimitePeticiones($ip)) {
             self::registrarYAbortar("Demasiadas peticiones consecutivas (Rate Limit Exceeded).", 429, $ip);
         }
     }
 
     /**
-     * Determina si una IP específica está realizando ráfagas de peticiones sospechosas
-     * guardando la marca de tiempo en el sistema de archivos temporal del servidor.
+     * Revisa la suma global de peticiones que recibe el servidor por segundo.
+     * Si un ataque distribuido de miles de IPs intenta colapsar PHP/Web, responde HTTP 503.
+     * 
+     * @return bool True si el servidor superó la capacidad máxima por segundo.
+     */
+    private static function excedeCargaGlobalServidor(): bool
+    {
+        $segundoActual = time();
+        $archivoGlobal = sys_get_temp_dir() . '/rate_global_server.json';
+
+        $fp = @fopen($archivoGlobal, 'c+');
+        if (!$fp) {
+            return false;
+        }
+
+        $sobrecargado = false;
+
+        if (flock($fp, LOCK_EX)) {
+            $contenido = stream_get_contents($fp);
+            $datos = ['segundo' => $segundoActual, 'total' => 0];
+
+            if (!empty($contenido)) {
+                $decodificado = json_decode($contenido, true);
+                if (is_array($decodificado)) {
+                    $datos = $decodificado;
+                }
+            }
+
+            // Si cambiamos de segundo, reiniciamos el contador global
+            if ($datos['segundo'] !== $segundoActual) {
+                $datos['segundo'] = $segundoActual;
+                $datos['total'] = 1;
+            } else {
+                $datos['total']++;
+            }
+
+            if ($datos['total'] > self::MAX_PETICIONES_GLOBALES_SEGUNDO) {
+                $sobrecargado = true;
+            }
+
+            // Guardar estado global
+            ftruncate($fp, 0);
+            rewind($fp);
+            fwrite($fp, json_encode($datos));
+            fflush($fp);
+            flock($fp, LOCK_UN);
+        }
+
+        fclose($fp);
+        return $sobrecargado;
+    }
+
+    /**
+     * Determina si una IP supera la tasa máxima de peticiones permitidas.
+     * Utiliza apertura y bloqueo exclusivo (flock) para evitar condiciones de carrera.
+     * 
+     * @param string $ip Dirección IP del cliente.
+     * @return bool True si la IP ha superado el límite.
      */
     private static function excedeLimitePeticiones(string $ip): bool
     {
         $ahora = microtime(true);
-        // Creamos un archivo temporal único por IP dentro del directorio del sistema
         $archivoIp = sys_get_temp_dir() . '/rate_' . md5($ip) . '.json';
 
-        $datos = ['inicio' => $ahora, 'peticiones' => 0];
+        $fp = fopen($archivoIp, 'c+');
+        if (!$fp) {
+            return false; // Ante fallo del sistema de archivos, se permite la petición por resguardo
+        }
 
-        if (file_exists($archivoIp)) {
-            $contenido = json_decode(file_get_contents($archivoIp), true);
-            if (is_array($contenido)) {
-                $datos = $contenido;
+        $excedido = false;
+
+        if (flock($fp, LOCK_EX)) {
+            $contenido = stream_get_contents($fp);
+            $datos = ['inicio' => $ahora, 'peticiones' => 0];
+
+            if (!empty($contenido)) {
+                $decodificado = json_decode($contenido, true);
+                if (is_array($decodificado)) {
+                    $datos = $decodificado;
+                }
             }
+
+            // Si expiró la ventana de tiempo, reiniciamos el contador
+            if (($ahora - $datos['inicio']) > self::TIEMPO_BLOQUEO_SEGUNDOS) {
+                $datos['inicio'] = $ahora;
+                $datos['peticiones'] = 1;
+            } else {
+                $datos['peticiones']++;
+            }
+
+            if ($datos['peticiones'] > self::MAX_PETICIONES) {
+                $excedido = true;
+            }
+
+            // Guardar cambios
+            ftruncate($fp, 0);
+            rewind($fp);
+            fwrite($fp, json_encode($datos));
+            fflush($fp);
+            flock($fp, LOCK_UN);
         }
 
-        // Si ha transcurrido más tiempo del límite, reiniciamos el contador
-        if (($ahora - $datos['inicio']) > self::TIEMPO_BLOQUEO_SEGUNDOS) {
-            $datos['inicio'] = $ahora;
-            $datos['peticiones'] = 1;
-        } else {
-            $datos['peticiones']++;
-        }
-
-        // Guardamos el nuevo estado de la IP
-        file_put_contents($archivoIp, json_encode($datos), LOCK_EX);
-
-        return $datos['peticiones'] > self::MAX_PETICIONES;
+        fclose($fp);
+        return $excedido;
     }
 
     /**
-     * Extrae la IP real del cliente evaluando cabeceras de proxy o Cloudflare.
+     * Extrae la IP real del cliente evaluando proxies y Cloudflare.
+     * 
+     * @return string
      */
     private static function obtenerIpReal(): string
     {
         if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
-            return $_SERVER['HTTP_CF_CONNECTING_IP']; // Cloudflare
+            return $_SERVER['HTTP_CF_CONNECTING_IP'];
         }
 
         if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
-            return trim($ips[0]); // La primera IP es la del cliente original
+            return trim($ips[0]);
         }
 
         return $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
@@ -104,6 +196,11 @@ class SeguridadMiddleware
 
     /**
      * Escribe la anomalía en el archivo de logs y detiene la ejecución enviando un JSON.
+     * 
+     * @param string $detalle Razón del bloqueo.
+     * @param int $codigoHttp Código HTTP de respuesta.
+     * @param string $ip IP del cliente.
+     * @return void
      */
     private static function registrarYAbortar(string $detalle, int $codigoHttp, string $ip): void
     {
@@ -118,6 +215,6 @@ class SeguridadMiddleware
         file_put_contents(self::LOG_DIR . 'seguridad.log', $mensaje, FILE_APPEND);
 
         Response::json(null, $codigoHttp, $detalle);
-        exit; // Detención absoluta del proceso
+        exit;
     }
 }

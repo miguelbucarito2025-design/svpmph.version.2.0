@@ -11,6 +11,7 @@ use App\Traits\MensageTrait;
 use App\Helpers\R2Service;
 use App\Helpers\Validar;
 use App\Models\DatosModel;
+use App\Traits\ManejoArchivosR2Trait;
 
 /**
  * Clase CuentaController
@@ -23,7 +24,7 @@ use App\Models\DatosModel;
 class CuentaController extends Controller
 {
     use MensageTrait;
-
+    use ManejoArchivosR2Trait;
     /**
      * Renderiza la vista principal del perfil con los datos actuales del usuario.
      *
@@ -41,7 +42,7 @@ class CuentaController extends Controller
             throw new AppException('No se encontraron los datos de la cuenta.', 404);
         }
         $r2Service = new R2Service();
-        $urlPublica = $r2Service->obtenerUrlPublica($this->session->get('foto_perfil'));
+        $urlPublica = $this->obtenerArchivo($this->session->get('foto_perfil'));
 
         // Retiramos la contraseña del arreglo por seguridad antes de pasar a la vista
         unset($datosCuenta['contrasena']);
@@ -68,7 +69,7 @@ class CuentaController extends Controller
         $this->requerirAutenticacion();
 
         $r2Service = new R2Service();
-        $urlPublica = $r2Service->obtenerUrlPublica($this->session->get('foto_perfil'));
+        $urlPublica = $this->obtenerArchivo($this->session->get('foto_perfil'));
 
 
         $this->vista->render(
@@ -329,7 +330,7 @@ class CuentaController extends Controller
 
 
 
-        $urlPublica = $r2Service->obtenerUrlPublica($keyDestino);
+        $urlPublica = $this->obtenerArchivo($keyDestino);
 
         $this->session->set('foto_perfil', $keyDestino);
 

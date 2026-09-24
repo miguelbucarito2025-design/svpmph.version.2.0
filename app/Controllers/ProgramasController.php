@@ -40,8 +40,8 @@ class ProgramasController extends Controller
         $this->requerirAutenticacion();
 
 
-        $r2Service = new R2Service();
-        $urlPublica = $r2Service->obtenerUrlPublica($this->session->get('foto_perfil'));
+
+        $urlPublica = $this->obtenerArchivo($this->session->get('foto_perfil'));
         $tipo = new TipoProgramaModel;
         $model = $tipo->select('all');
         if (isset($model['id'])) {
@@ -273,19 +273,18 @@ class ProgramasController extends Controller
         $resul = $this->programa->paginar($datos);
         $total = $this->programa->select('count');
 
-        $r2Service = new R2Service();
         if (isset($result['id'])) {
             $resul['id'] = Seguridad::encriptarID($result['id']);
             $resul['tipo_programa'] = Seguridad::encriptarID($resul['tipo_programa']);
-            $resul['logo'] = $r2Service->obtenerUrlPublica($resul['logo']);
-            $resul['certificado'] = $r2Service->obtenerUrlPublica($resul['certificado']);
+            $resul['logo'] = $this->obtenerArchivo($resul['logo']);
+            $resul['certificado'] = $this->obtenerArchivo($resul['certificado']);
         } else {
             foreach ($resul as &$r) {
                 if (isset($r['id'])) {
                     $r['id'] = Seguridad::encriptarID($r['id']);
                     $r['tipo_programa'] = Seguridad::encriptarID($r['tipo_programa']);
-                    $r['logo'] = $r2Service->obtenerUrlPublica($r['logo'] ?? '');
-                    $r['certificado'] = $r2Service->obtenerUrlPublica($r['certificado'] ?? '');
+                    $r['logo'] = $this->obtenerArchivo($r['logo'] ?? '');
+                    $r['certificado'] = $this->obtenerArchivo($r['certificado'] ?? '');
                 }
             }
             unset($r);

@@ -22,7 +22,7 @@ class CarrerasController extends Controller
     {
         $this->requerirAutenticacion();
         $r2Service = new R2Service();
-        $urlPublica = $r2Service->obtenerUrlPublica($this->session->get('foto_perfil'));
+        $urlPublica = $this->obtenerArchivo($this->session->get('foto_perfil'));
 
         $r2Service = new R2Service();
 
@@ -59,6 +59,7 @@ class CarrerasController extends Controller
         $datos = $this->filtrarDatos([
             'mencion' => 'esTexto',
             'requisitos' => 'esTexto',
+            'codigo' => 'esTexto',
 
         ]);
         $reglasImagen = [['jpg', 'jpeg', 'png', 'webp'], 2];
@@ -103,6 +104,8 @@ class CarrerasController extends Controller
             'mencion' => 'esTexto',
             'requisitos' => 'esTexto',
             'estado' => 'esBooleano',
+            'codigo' => 'esTexto',
+
         ]);
 
         $id = $datos['id'];
@@ -190,7 +193,7 @@ class CarrerasController extends Controller
 
             foreach ($roles as &$r) {
 
-                $r['img'] = !empty($r['img']) ? $r2Service->obtenerUrlPublica($r['img']) : null;
+                $r['img'] = !empty($r['img']) ? $this->obtenerArchivo($r['img']) : null;
             }
             unset($o);
         }

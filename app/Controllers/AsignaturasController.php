@@ -11,10 +11,11 @@ use App\Libs\Seguridad;
 use App\Helpers\R2Service;
 use App\Models\ProgramasModel;
 use App\Helpers\Validar;
+use App\Traits\ManejoArchivosR2Trait;
 
 class AsignaturasController extends Controller
 {
-
+    use ManejoArchivosR2Trait;
 
     public function  index(): void
     {
@@ -24,7 +25,7 @@ class AsignaturasController extends Controller
         $this->requerirAutenticacion();
 
         $r2Service = new R2Service();
-        $urlPublica = $r2Service->obtenerUrlPublica($this->session->get('foto_perfil'));
+        $urlPublica = $this->obtenerArchivo($this->session->get('foto_perfil'));
 
         $progarmas = new ProgramasModel;
         $model = $progarmas->selectAllNombresIdsProgramas();

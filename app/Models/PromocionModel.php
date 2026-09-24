@@ -8,9 +8,13 @@ namespace App\Models;
 use App\Models\Abstract\Model;
 use App\Libs\DataBase;
 use App\Libs\Exceptions\AppException;
+use App\Traits\ManejoArchivosR2Trait;
 
 class PromocionModel  extends Model
 {
+    use ManejoArchivosR2Trait;
+
+
 
     protected string $tabla = 'promocion';
 
@@ -129,5 +133,28 @@ class PromocionModel  extends Model
 
         $result = $this->cifrarDatos($result, ['id']);
         return $result;
+    }
+
+    public function selectImgNombreId(?int $id)
+    {
+
+        $param = '';
+        if ($id !== null) {
+            $param = 'WHERE id!=?';
+            $valor[] = $id;
+        }
+        $sql = "SELECT id,promocion,img,periodo FROM promocion  " . $param;
+        $result = $this->db->select($sql, $valor ?? [], 'all');
+
+
+        return array_map(function (array $busqueda): array {
+            $busqueda = $this->cifrarDatos($busqueda, [
+                'id'
+            ]);
+
+            $busqueda['promocion'] .= ' ' . $busqueda['periodo'];
+            $busqueda['img'] = $this->ObtenerArchivo($busqueda['img']);
+            return $busqueda;
+        }, $result);
     }
 }

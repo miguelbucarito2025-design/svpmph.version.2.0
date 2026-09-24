@@ -9,10 +9,15 @@ use App\Libs\Exceptions\AppException;
 use App\Helpers\Validar;
 use App\Traits\CifrarTrait;
 
+/**
+ * Modelo Base Abstracto
+ * ---------------------
+ * Proporciona la infraestructura de persistencia, validación estricta y sanitización
+ * de atributos para los modelos concretos de la aplicación.
+ */
 abstract class Model
 {
     use CifrarTrait;
-
 
     protected string $tabla;
     protected array $campos = [];
@@ -21,7 +26,6 @@ abstract class Model
 
     // Propiedad protegida para acceso directo en consultas personalizadas de los modelos hijos
     protected BuilderQuery $db;
-
 
     public function __construct()
     {
@@ -32,14 +36,20 @@ abstract class Model
         $this->db = new BuilderQuery();
     }
 
-
-
-
+    /**
+     * Valida, sanitiza y mapea los datos de entrada según las reglas del modelo.
+     *
+     * @param array $datos Arreglo de pares columna => valor.
+     * @param bool $esInsercion Flag para definir si aplica validación de campos mínimos obligatorios.
+     * @return array Arreglo de datos limpios y mapeados para la consulta SQL.
+     * @throws AppException Si falta un campo obligatorio o falla la regla de validación.
+     */
     protected function validarCampos(array $datos, bool $esInsercion = true): array
     {
         if ($esInsercion) {
             foreach ($this->camposMinimos as $campoObligatorio) {
-                if (!isset($datos[$campoObligatorio]) || trim((string)$datos[$campoObligatorio]) === '') {
+                // Modificado: Se permite '0' y 'false' como valores válidos en campos obligatorios
+                if (!isset($datos[$campoObligatorio]) || ($datos[$campoObligatorio] !== false && trim((string)$datos[$campoObligatorio]) === '')) {
                     throw new AppException("El campo '{$campoObligatorio}' es obligatorio.", 400);
                 }
             }
@@ -52,15 +62,19 @@ abstract class Model
                 continue;
             }
 
-            // Si es una actualización y se envía NULL explícitamente, lo conservamos para limpiar el campo en SQL
+            // 1. Conservación explícita de NULL en actualizaciones
             if (!$esInsercion && is_null($valor)) {
                 $datosLimpios[$columna] = null;
                 continue;
             }
-            if (!$esInsercion && is_bool($valor)) {
+
+            // 2. Aceptación directa de valores BOOLEANOS (tanto en inserción como en actualización)
+            // Convierte true => 1 y false => 0 (ideal para MySQL TINYINT/BOOLEAN)
+            if (is_bool($valor)) {
                 $datosLimpios[$columna] = (int)$valor;
                 continue;
             }
+
             $valorTexto = trim((string)$valor);
 
             if (!$esInsercion && $valorTexto === '') {
@@ -70,7 +84,6 @@ abstract class Model
             $metodoRegla = $this->campos[$columna];
 
             if (method_exists(Validar::class, $metodoRegla)) {
-
                 $resultado = Validar::$metodoRegla($valorTexto);
 
                 if ($resultado === false) {
@@ -89,6 +102,7 @@ abstract class Model
 
         return $datosLimpios;
     }
+
     /**
      * Función para guardar un registro en la base de datos.
      *
@@ -118,13 +132,11 @@ abstract class Model
      */
     public function update(array $datos, array $condiciones): bool
     {
-
         if (empty($condiciones)) {
             throw new AppException("Se requieren condiciones válidas para actualizar un registro.", 400);
         }
 
         $condicionesValidadas = $this->validarCampos($condiciones, false);
-
         $datosValidados = $this->validarCampos($datos, false);
 
         return $this->db->update(
@@ -151,17 +163,10 @@ abstract class Model
         return $this->db->delete($this->tabla, $condicionesValidadas);
     }
 
-
-
     /**
-     * funcion para traer registro de una tabla con 3 modos
-     * si quieres q sea mejor reescribela en la clase hija
+     * Función para traer registros de una tabla según el modo especificado.
      *
-     * @param string $modo  
-     *   all: trae todo de la tabla,
-     *   row: trae una sola fila,
-     *   count:trae el numero de filas
-     * 
+     * @param string $modo 'all' (matriz de registros), 'row' (un solo registro), 'count' (total de filas).
      * @return mixed
      */
     public function select(string $modo = 'all'): mixed

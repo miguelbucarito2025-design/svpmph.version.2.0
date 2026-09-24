@@ -184,6 +184,7 @@ article {
 }
 .menu-link {
   display: flex;
+  gap: 5px;
   height: 50px;
   align-items: center;
   border-radius: 10px;
@@ -1004,6 +1005,7 @@ button {
   border-color: transparent;
   pointer-events: none; /* Evita clics en elementos invisibles */
 }
+
 /* Filas internas del panel */
 .panel-row {
   display: flex;
@@ -1088,6 +1090,237 @@ button {
 
 .byte-text {
   color: #000000;
+}
+
+.campo-grupo-img {
+  border: 1px solid var(--body-segundary-from---);
+  border-radius: 10px;
+  padding: 10px 20px;
+}
+
+.container-archivos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+}
+.section-archivos {
+  padding: 30px;
+}
+
+.icon-pendiente {
+  color: var(--color-danger);
+}
+
+.icon-verificado {
+  color: var(--color-success);
+}
+
+.archivo-icono-wrapper {
+  display: flex;
+}
+
+.max-width-250 {
+  max-width: 250px;
+}
+.drop-zone-preview,
+.preview-placeholder {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+  justify-content: left;
+}
+
+.btn-ver-archivo {
+  border: none;
+  color: var(--color-blanco);
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  padding: 5px;
+  gap: 5px;
+  margin-top: 6px;
+  svg {
+    max-width: 30px;
+  }
+}
+
+/* Transición suave para la apertura estilo carpeta de Windows */
+.section-anuncio {
+  transition: all 0.35s ease-in-out;
+  max-height: 2000px;
+  opacity: 1;
+  overflow: hidden;
+}
+
+.section-anuncio.is-hidden {
+  display: block !important; /* Reemplazamos display:none para permitir animación */
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  border: none;
+  pointer-events: none;
+}
+
+.cancelarRegistrocolor {
+  color: var(--color-danger);
+  background-color: var(--color-blanco);
+  width: 100%;
+  text-align: center;
+}
+
+.archivo-vacio-text {
+  margin-top: 30px;
+}
+
+.drop-zone-preview input {
+  max-width: 40%;
+}
+.tarjeta-archivo {
+  color: #1e293b;
+  border-radius: 7px;
+  margin: 20px auto;
+  max-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex: 1 1;
+  max-width: 220px;
+  padding: 20px;
+  height: min-content;
+  transition: all 0.3s ease;
+
+  svg {
+    height: 50px;
+    width: 50px;
+    margin: 0;
+  }
+
+  &:hover {
+    scale: 1.07;
+    color: #0284c7;
+  }
+}
+
+.container-card-agremiado-img {
+  width: 100px;
+  margin: 0 auto 10px auto;
+  img {
+    border-radius: 8px;
+    box-shadow: 0 0 3px var(--sombra--);
+  }
+}
+
+.card-agremiado {
+  padding: 10px;
+  border-radius: 7px;
+  transition: all 0.2s ease;
+  text-align: center;
+  height: min-content;
+  &:hover {
+    background-color: #d0efff;
+  }
+}
+
+.is-hidden {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-10px);
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-bottom: 0;
+  border-color: transparent;
+  pointer-events: none; /* Evita clics en elementos invisibles */
+  transition: all 0.5s ease;
+}
+.margin-30 {
+  margin: 30px;
+}
+
+/* Sombras visuales para la selección masiva */
+.tarjeta-archivo {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.items-archiv {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  padding: 30px;
+}
+
+/* Documento que estaba EN REVISIÓN y ahora vas a VERIFICAR (Aprobar) */
+.tarjeta-archivo.archivo-sombreado-seleccionado {
+  border: 2px solid #10b981 !important; /* Verde */
+  background-color: #ecfdf5 !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.18);
+}
+
+/* Documento que estaba VERIFICADO y ahora vas a MARCAR COMO MALO / PENDIENTE */
+.tarjeta-archivo.archivo-sombreado-pendiente {
+  border: 2px solid #ef4444 !important; /* Rojo / Naranja de advertencia */
+  background-color: #fef2f2 !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.18);
+}
+
+.badge-success {
+  color: var(--color-success);
+}
+
+.badge-danger {
+  color: var(--color-danger);
+}
+
+.badge-estado {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+.transition {
+  transition: all 0.5s ease;
+}
+
+.card-gremio-seleccionada {
+  background-color: #1981d7;
+  transition: all 0.3s ease;
+  color: var(--color-blanco);
+  .badge-estado {
+    color: var(--color-blanco);
+  }
+  &:hover {
+    background-color: #1981d7;
+  }
+}
+
+.max-width-50 {
+  max-width: 50px;
+}
+
+.img-prueva {
+  text-align: center;
+  max-width: 35%;
+  margin: auto;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  img {
+    padding: 5px;
+    border-radius: 10px;
+  }
 }
 
 @media (max-width: 768px) {
