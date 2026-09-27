@@ -34,6 +34,106 @@ para usar phpDocumentor =========> composer doc
 
 
 
+
+
+
+# Manual de Comandos de Docker para el Proyecto (SVMPH)
+
+Documentación reglamentada de comandos para la gestión del entorno de desarrollo
+basado en contenedores (Nginx + PHP-FPM + MySQL) mediante Docker Compose.
+
+---
+
+## 1. Comandos de Gestión del Entorno (Ciclo de Vida)
+
+* **Iniciar el entorno en segundo plano:**
+  docker compose up -d
+  Explicación: Construye y levanta todos los servicios definidos en `docker-compose.yml` 
+  sin bloquear la terminal (`-d` es modo desacoplado / detached).
+
+* **Detener y eliminar los contenedores activos:**
+  docker compose down
+  Explicación: Apaga los contenedores y libera los puertos (3306, 8080) de la laptop 
+  sin borrar los datos de la base de datos guardados en el volumen.
+
+* **Verificar el estado de los contenedores del proyecto:**
+  docker compose ps
+  Explicación: Muestra qué contenedores están corriendo, sus puertos expuestos 
+  y si se encuentran en estado 'Up' o 'Exited'.
+
+---
+
+## 2. Comandos de Inspección y Diagnóstico
+
+* **Ver los registros de salida (Logs) en tiempo real:**
+  docker compose logs -f
+  Explicación: Muestra los errores de PHP, Nginx o MySQL en vivo (`-f` sigue la salida). 
+  Ideal para depurar errores HTTP 500 o fallos de conexión.
+
+* **Inspeccionar un contenedor específico (ejemplo: App Web):**
+  docker logs svpmph_app_web
+  Explicación: Muestra el historial de eventos e impresiones del contenedor seleccionado.
+
+---
+
+## 3. Comandos de Operación y Mantenimiento de Base de Datos
+
+* **Importar respaldo de base de datos (.sql) en PowerShell:**
+  Get-Content respaldo.sql | docker exec -i svpmph_base_datos mysql -usvpmph_user -ppassword_seguro_123 svpmph_db
+  Explicación: Inyecta las instrucciones de un archivo SQL local directamente 
+  al motor de MySQL corriendo dentro del contenedor.
+
+* **Listar las tablas existentes en la base de datos desde consola:**
+  docker exec -i svpmph_base_datos mysql -usvpmph_user -ppassword_seguro_123 svpmph_db -e "SHOW TABLES;"
+  Explicación: Ejecuta la consulta SQL directamente en la base de datos del contenedor 
+  sin necesidad de abrir un cliente gráfico.
+
+* **Acceder a la consola interactiva de la base de datos:**
+  docker exec -it svpmph_base_datos mysql -usvpmph_user -ppassword_seguro_123 svpmph_db
+  Explicación: Abre una terminal cliente interactiva (`-it`) dentro de MySQL 
+  para ejecutar consultas de forma directa.
+
+---
+
+## 4. Comandos de Acceso Directo al Sistema de Archivos del Contenedor
+
+* **Entrar a la consola Bash del contenedor Web:**
+  docker exec -it svpmph_app_web bash
+  Explicación: Permite "entrar" físicamente al sistema operativo Linux aislado 
+  donde está corriendo Nginx y PHP para revisar archivos o permisos.
+
+
+docker compose stop
+**** con eso apagas docker
+
+docker compose start
+**** con esto lo enciendes
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Esos puntos que mencionas son justamente la columna vertebral para mantener una hoja de estilos limpia, escalable y sin el clásico desastre de especificidad (`!important` por todos lados) cuando el proyecto empieza a crecer.
 
 Aquí tienes los estándares y buenas prácticas fundamentales explicados al grano:

@@ -26,7 +26,7 @@ header("Expires: 0");
     <meta property="og:url" content="https://svpmph.org/">
     <meta property="og:type" content="website">
     <meta property="og:image" content="multimedia/index/001.ico?v=1.2">
-    <base href="/svpmph.version.2.0/">
+    <base href="<?= URL_BASE ?>">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="robots" content="index, follow">
     <meta http-equiv="content-language" content="es-VE">
