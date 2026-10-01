@@ -14,18 +14,23 @@ class CuotasModel  extends Model
 
     protected array $campos = [
         'id' => 'esEntero',
-        'inscripcion_id' => 'esEntero',
-        'cuota' => 'esEntero',
+        'cuenta_id' => 'esEntero',
+        'cuota' => 'esTexto',
         'pago_id' => 'esEntero',
         'monto' => 'esDecimal',
-        'status' => 'esCadena'
+        'status' => 'esCadena',
+        'corte' => 'esFechaHora',
+        'origen' => 'esCadena',
+        'origen_id' => 'esEntero'
     ];
     protected array $camposMinimos = [
-        'inscripcion_id',
+        'cuenta_id',
         'cuota',
-        'pago_id',
         'monto',
-        'status'
+        'status',
+        'corte',
+        'origen',
+        'origen_id'
     ];
 
     protected array $camposUnicos = [];

@@ -13,16 +13,16 @@ services:
       - php
       - db
 
-  # 2. Intérprete PHP 8.2 FPM (Con Composer + Xdebug + PDO)
+  # 2. Intérprete PHP 8.2 FPM (Con Composer + Xdebug + PDO + Cron)
   php:
     build:
       context: .
       dockerfile_inline: |
         FROM php:8.2-fpm
-        
-        # Instalar dependencias del sistema y extensiones de PHP
+
+        # Instalar dependencias del sistema, extensiones y CRON
         RUN apt-get update && apt-get install -y \
-            git unzip libzip-dev libpng-dev libjpeg-dev libfreetype6-dev \
+            git unzip libzip-dev libpng-dev libjpeg-dev libfreetype6-dev cron \
             && docker-php-ext-configure gd --with-freetype --with-jpeg \
             && docker-php-ext-install pdo pdo_mysql zip gd \
             && pecl install xdebug \
@@ -33,7 +33,6 @@ services:
     container_name: svpmph_app_php
     restart: always
     environment:
-      # Configuración de Xdebug para conectarse a VS Code
       XDEBUG_MODE: debug
       XDEBUG_SESSION: VSCODE
       XDEBUG_CONFIG: "client_host=host.docker.internal client_port=9003"
@@ -42,18 +41,38 @@ services:
       - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
     working_dir: /var/www/html
 
-  # 3. Base de Datos MySQL
+  # 3. Worker ejecutor de la Cola de Correos en segundo plano (Reusa la construcción de PHP)
+  worker_correos:
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM php:8.2-fpm
+        RUN apt-get update && apt-get install -y \
+            libzip-dev libpng-dev libjpeg-dev libfreetype6-dev \
+            && docker-php-ext-configure gd --with-freetype --with-jpeg \
+            && docker-php-ext-install pdo pdo_mysql zip gd
+    container_name: svpmph_app_worker
+    restart: always
+    volumes:
+      - .:/var/www/html:rw
+    working_dir: /var/www/html
+    command: sh -c "while true; do php /var/www/html/cron/procesar_correos.php; sleep 60; done"
+    depends_on:
+      - db
+      - php
+
+  # 4. Base de Datos MySQL
   db:
     image: mysql:8.0
     container_name: svpmph_base_datos
     restart: always
     ports:
-      - "3306:3306"
+      - "3307:3306"
     environment:
-      MYSQL_DATABASE: 'svpmph_db'
-      MYSQL_USER: 'svpmph_user'
-      MYSQL_PASSWORD: 'password_seguro_123'
-      MYSQL_ROOT_PASSWORD: 'root_password_123'
+      MYSQL_DATABASE: "svpmph_db"
+      MYSQL_USER: "svpmph_user"
+      MYSQL_PASSWORD: "password_seguro_123"
+      MYSQL_ROOT_PASSWORD: "root_password_123"
     volumes:
       - db_data:/var/lib/mysql
 

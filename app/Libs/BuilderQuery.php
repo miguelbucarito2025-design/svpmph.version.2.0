@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Libs;
 
-use App\Libs\Exceptions\DatabaseException;
+
 use App\Libs\Exceptions\AppException;
+use App\Libs\Exceptions\DataBaseException;
 use PDO;
 use PDOException;
 use Throwable;
@@ -164,7 +165,7 @@ class BuilderQuery
             $stmt = $this->db->prepare($sql);
             return $stmt->execute($valores);
         } catch (PDOException $e) {
-            throw new DatabaseException($e->getMessage(), $sql, 500);
+            throw new DataBaseException($e->getMessage(), $sql, 500);
         }
     }
 
@@ -184,7 +185,7 @@ class BuilderQuery
                 default => false,
             };
         } catch (PDOException $e) {
-            throw new DatabaseException($e->getMessage(), $sql, 500);
+            throw new DataBaseException($e->getMessage(), $sql, 500);
         }
     }
 
@@ -245,7 +246,7 @@ class BuilderQuery
 
             return $ejecutado;
         } catch (Throwable $e) {
-            throw new DatabaseException($e->getMessage(), $sql, 500);
+            throw new DataBaseException($e->getMessage(), $sql, 500);
         }
     }
 }

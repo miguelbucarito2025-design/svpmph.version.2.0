@@ -33,6 +33,8 @@ use App\Controllers\TerminosController;
 use App\Controllers\UsuariosController;
 use App\Controllers\PromocionController;
 use App\Controllers\RegistroGremioController;
+use App\Controllers\SolicitudController;
+use App\Controllers\TramitesController;
 use App\Libs\Enrutador;
 use App\Libs\ManejadorExcepciones;
 use App\Helpers\EnvLoader;
@@ -182,6 +184,20 @@ Enrutador::post('archivo/verificar/Lote', [ArchivosController::class, 'verificar
 Enrutador::get('logs', [ErrrorController::class, 'verErrores'], [5]);
 Enrutador::get('errror/obtenerLogs', [ErrrorController::class, 'obtenerLogs'], [5]);
 Enrutador::post('errror/limpiarLogs', [ErrrorController::class, 'limpiarLogs'], [5]);
+
+
+
+Enrutador::get('tramites', [TramitesController::class, 'index'], [3, 4, 5]);
+Enrutador::post('tramites/guardar', [TramitesController::class, 'guardar'], [4, 5]);
+Enrutador::post('tramites/paginar', [TramitesController::class, 'paginar'], [4, 5]);
+Enrutador::post('tramites/actualizar', [TramitesController::class, 'actualizar'], [4, 5]);
+Enrutador::post('tramites/eliminar', [TramitesController::class, 'eliminar'], [4, 5]);
+Enrutador::get('tramites-solicitar', [TramitesController::class, 'solicitar'], [1, 5]);
+Enrutador::post('tramites/solicitar/disponibles', [TramitesController::class, 'ofertas'], [1, 5]);
+
+
+Enrutador::post('solicitud/guardar', [SolicitudController::class, 'guardar'], [1, 5]);
+
 
 // Despacho de la petición
 Enrutador::despachar();

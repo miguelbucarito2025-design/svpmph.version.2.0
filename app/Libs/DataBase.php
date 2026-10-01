@@ -6,7 +6,7 @@ namespace App\Libs;
 
 use PDO;
 use PDOException;
-use App\Libs\Exceptions\DatabaseException;
+use App\Libs\Exceptions\DataBaseException;
 use Exception;
 
 /**
@@ -48,7 +48,7 @@ class DataBase
      * Constructor privado para impedir la instanciación directa.
      * Inicializa los parámetros de entorno y establece la conexión PDO.
      * 
-     * @throws DatabaseException Si ocurre un error al conectar con la base de datos.
+     * @throws DataBaseException Si ocurre un error al conectar con la base de datos.
      */
     private function __construct()
     {
@@ -62,7 +62,7 @@ class DataBase
 
             // Si DB_NAME llegó vacío, lanzamos excepción inmediata antes de conectar
             if (empty(trim($this->db_name))) {
-                throw new DatabaseException("Error de configuración: La variable DB_NAME no fue cargada en el entorno.", "", 500);
+                throw new DataBaseException("Error de configuración: La variable DB_NAME no fue cargada en el entorno.", "", 500);
             }
 
             $dsn = "mysql:host=" . trim($this->host) .
@@ -82,7 +82,7 @@ class DataBase
             // BLINDAJE EXTRA: Seleccionar la base de datos explícitamente por si la DSN perdió el parámetro
             $this->pdo->exec("USE `" . trim($this->db_name) . "`;");
         } catch (PDOException $e) {
-            throw new DatabaseException("Error de conexión a BD: " . $e->getMessage(), "", 500);
+            throw new DataBaseException("Error de conexión a BD: " . $e->getMessage(), "", 500);
         }
     }
 

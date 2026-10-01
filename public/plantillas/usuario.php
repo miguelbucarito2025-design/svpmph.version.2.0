@@ -142,12 +142,28 @@
 
               <?php } ?>
 
+              <?php if ($_SESSION['usuario_rol'] == 5) { ?>
+
+                <li onclick="redirec('tramites-solicitar')" class=" <?= (($pag ?? '')  === 'tramitesSolicitudes') ? 'linkactivo' : ''; ?> ">
+                  <svg class="icon-sistema-rellen">
+                    <use href="#icono-tramites" />
+                  </svg>Tramites y Solicitudes
+                </li>
+              <?php } ?>
+
               <li onclick="redirec('agremiados')" class=" <?= (($pag ?? '')  === 'agremiados') ? 'linkactivo' : ''; ?> ">
                 <svg class="icon-sistema-rellen">
                   <use href="#icono-agremiados" />
                 </svg>Agremiados
               </li>
+              <?php if ($_SESSION['usuario_rol'] > 3) { ?>
 
+                <li onclick="redirec('tramites')" class=" <?= (($pag ?? '')  === 'tramites') ? 'linkactivo' : ''; ?> ">
+                  <svg class="icon-sistema-rellen">
+                    <use href="#icono-tramites" />
+                  </svg>Tramites
+                </li>
+              <?php } ?>
 
               <li onclick="redirec('promocion')" class=" <?= (($pag ?? '')  === 'promociones') ? 'linkactivo' : ''; ?> ">
                 <svg class="icono-outline">

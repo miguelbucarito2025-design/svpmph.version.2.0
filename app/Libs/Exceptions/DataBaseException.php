@@ -15,7 +15,7 @@ use Throwable;
  *
  * @package App\Libs\Exceptions
  */
-class DatabaseException extends Exception
+class DataBaseException extends Exception
 {
     /**
      * Consulta SQL que provocó la excepción.

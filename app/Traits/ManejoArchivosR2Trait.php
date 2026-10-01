@@ -85,24 +85,34 @@ trait ManejoArchivosR2Trait
      * @param int $minutosExpiracion Minutos de validez del enlace generado (por defecto 60 min).
      * @return string|null URL amigable completa para el frontend o null si la clave es vacía.
      */
-    protected function obtenerArchivo(?string $key, int $minutosExpiracion = 5): ?string
+    protected function obtenerArchivo(?string $key, int $minutosExpiracion = 15): ?string
     {
         if (empty($key) || str_contains($key, '..')) {
             return null;
         }
 
-        $session = new Session();
-        $usuarioId = $session->get('usuario_id');
-        // Empaquetamos la key y la identidad del usuario en el token
-        $token = Seguridad::encriptarParams([
-            'r2_key'     => $key,
-            'usuario_id' => $usuarioId
-        ], $minutosExpiracion);
+        // 1. Extraer el nombre de la carpeta (ej: 'Logos', 'certificados', etc.)
+        $partes = explode('/', ltrim($key, '/'));
+        $carpeta = $partes[0] ?? '';
 
-        if (empty($token)) {
-            return null;
+        // 2. Definir las carpetas que requieren auditoría estricta de sesión y token en PHP
+        $carpetasSensibles = ['certificados', 'documento', 'carrera', 'rol'];
+
+        // 3. SI ES SENSIBLE: Usar su sistema actual de token cifrado + Controller PHP
+        if (in_array(strtolower($carpeta), $carpetasSensibles, true)) {
+            $session = new Session();
+            $usuarioId = $session->get('usuario_id');
+
+            $token = Seguridad::encriptarParams([
+                'r2_key'     => $key,
+                'usuario_id' => $usuarioId
+            ], $minutosExpiracion);
+
+            return !empty($token) ? "archivo/obtener/{$token}" : null;
         }
-        // Construimos la URL amigable apuntando al endpoint de tu enrutador
-        return "archivo/obtener/{$token}";
+
+        // 4. SI ES PÚBLICA/SEMI-PRIVADA (Flyers, Logos, perfiles, IMG): Usar Presigned URL directa de R2
+        $r2Service = new R2Service();
+        return $r2Service->obtenerUrlPrivada($key, $minutosExpiracion);
     }
 }

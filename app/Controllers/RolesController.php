@@ -8,7 +8,6 @@ use App\Controllers\Abstract\Controller;
 use App\Libs\Exceptions\AppException;
 use App\Helpers\R2Service;
 use App\Helpers\Validar;
-use App\Models\OfertasModel;
 use App\Models\RolModel;
 use App\Traits\CifrarTrait;
 use App\Traits\ManejoArchivosR2Trait;

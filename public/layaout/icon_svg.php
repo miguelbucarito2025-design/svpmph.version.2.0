@@ -376,4 +376,34 @@
             <line x1="14" y1="11" x2="14" y2="17" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
         </symbol>
     </defs>
+
+    <symbol id="icono-tramites" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <!-- Carpeta de expediente / trámite -->
+        <path d="M5 4 h4 l3 3 h7 a2 2 0 0 1 2 2 v9 a2 2 0 0 1 -2 2 h-14 a2 2 0 0 1 -2 -2 v-12 a2 2 0 0 1 2 -2 z" />
+
+        <!-- Engranaje de procesamiento de solicitud dentro de la carpeta -->
+        <path d="M12 11 a1.5 1.5 0 1 0 0 3 a1.5 1.5 0 0 0 0 -3 z" />
+        <path d="M12 10 v1" />
+        <path d="M12 14 v1" />
+        <path d="M10 12.5 h1" />
+        <path d="M13 12.5 h1" />
+    </symbol>
+    <symbol id="icono-divisa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <!-- Círculo exterior de la moneda -->
+        <path d="M12 2 a 10 10 0 1 0 10 10 A 10 10 0 0 0 12 2 z" />
+
+        <!-- Símbolo de Dólar / Divisa ($) -->
+        <path d="M12 6 v12" />
+        <path d="M15 9.5 c0 -1.38 -1.34 -2.5 -3 -2.5 s-3 1.12 -3 2.5 c0 2.5 6 1.5 6 4 c0 1.38 -1.34 2.5 -3 2.5 s-3 -1.12 -3 -2.5" />
+    </symbol>
+    <symbol id="icono-dias-espera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <!-- Calendario de fondo -->
+        <path d="M4 5 a2 2 0 0 1 2 -2 h12 a2 2 0 0 1 2 2 v14 a2 2 0 0 1 -2 2 h-12 a2 2 0 0 1 -2 -2 z" />
+        <path d="M16 2 v4" />
+        <path d="M8 2 v4" />
+        <path d="M4 10 h16" />
+
+        <!-- Reloj de arena interno (Representación del tiempo / espera estimada) -->
+        <path d="M9 13 h6 l-3 3 l3 3 h-6 l3 -3 z" />
+    </symbol>
 </svg>

@@ -303,8 +303,16 @@ class Validar
      * @param int $max
      * @return int|null
      */
-    public static function esEntero(mixed $valor, int $min = 0, int $max = PHP_INT_MAX): ?int
+    public static function esEntero(mixed $valor, $negative = false, int $min = 0, int $max = PHP_INT_MAX): ?int
     {
+
+        if (!$negative) {
+            if ($valor < 0) {
+
+                return null;
+            }
+        }
+
         if (!is_scalar($valor)) {
             return null;
         }
@@ -318,6 +326,7 @@ class Validar
         ];
 
         $resultado = filter_var($valorLimpio, FILTER_VALIDATE_INT, $opciones);
+
 
         return $resultado !== false ? $resultado : null;
     }
@@ -449,8 +458,17 @@ class Validar
      * @param mixed $valor
      * @return float|null
      */
-    public static function esDecimal(mixed $valor): ?float
+    public static function esDecimal(mixed $valor, $negative = false): ?float
     {
+
+        if (!$negative) {
+            if ($valor < 0) {
+
+                return null;
+            }
+        }
+
+
         if (!is_scalar($valor)) {
             return null;
         }
