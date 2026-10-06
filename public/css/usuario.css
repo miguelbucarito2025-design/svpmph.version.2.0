@@ -969,6 +969,48 @@ fieldset:hover {
   }
 }
 
+.card-cuotas {
+  text-align: left;
+  width: 100%;
+  max-width: 900px;
+  border: 1px solid var(--color-blanco);
+  padding: 2px;
+  background-color: var(--color-blanco);
+  gap: 10px;
+  border-radius: 7px;
+  display: flex;
+  transition: all 0.5s ease;
+  max-height: min-content;
+  &:hover {
+    scale: 103%;
+    box-shadow: 0 0 80px var(--color-blanco);
+    border: 1px solid var(--color-success);
+    color: var(--color-success);
+    .card-title-tramite {
+      -webkit-line-clamp: 2;
+    }
+  }
+
+  span {
+    line-height: 2;
+  }
+}
+
+.container-card-cuota-svg {
+  display: flex;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  span {
+    display: flex;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    flex-direction: column;
+    flex-wrap: wrap;
+    width: 100px;
+  }
+}
 .card-tramite-seleccionada {
   scale: 103%;
   box-shadow: 0 0 80px var(--color-blanco);
@@ -1383,6 +1425,10 @@ button {
   color: var(--color-danger);
 }
 
+.badge-info {
+  color: var(--info--);
+}
+
 .badge-estado {
   display: flex;
   width: 100%;
@@ -1421,6 +1467,10 @@ button {
     padding: 5px;
     border-radius: 10px;
   }
+}
+
+.badge-warning {
+  color: var(--warning--) !important;
 }
 
 @media (max-width: 768px) {

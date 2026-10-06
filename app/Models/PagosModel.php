@@ -14,26 +14,21 @@ class PagosModel  extends Model
 
     protected array $campos = [
         'id' => 'esEntero',
-        'cuota_id' => 'esEntero',
         'metodo' => 'esTexto',
         'referencia' => 'esTexto',
         'monto' => 'esDecimal',
-        'banco_origen_id' => 'esEntero',
         'destinario_id' => 'esEntero',
-        'fecha' => 'esFecha',
-        'status' => 'esCadena',
-        'cedula_id' => 'esCedula'
-    ];
-    protected array $camposMinimos = [
-        'cuota_id',
-        'metodo',
-        'monto',
-        'banco_origen_id',
-        'destinario_id',
-        'fecha',
-        'status',
-        'cedula_id'
+        'fecha' => 'esFechaHora',
+        'status' => 'esTexto',
+        'tasa_id' => 'esEntero',
+        'revisado_por' => 'esEntero',
+        'cuenta_id' => 'esEntero',
+        'img' => 'esRutaArchivo'
 
+    ];
+
+    protected array $camposMinimos = [
+        'cuenta_id'
     ];
 
     protected array $camposUnicos = [];

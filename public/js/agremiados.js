@@ -192,7 +192,7 @@ function renderizarTarjetasAgremiados(datos) {
     const cedula = item.id_cedula
       ? `V-${new Intl.NumberFormat("es-VE").format(item.id_cedula)}`
       : "Sin Cédula";
-    const esActivo = item.estado == 1;
+    const esActivo = item.estado;
 
     // CASO A: La tarjeta YA EXISTE en pantalla -> Solo actualizamos el estado/badge sin tocar el <img>
     if (tarjetasExistentes.has(idCuenta)) {

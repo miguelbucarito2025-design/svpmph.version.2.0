@@ -26,4 +26,25 @@ class DestinarioModel  extends Model
         'cedula_id',
         'datos'
     ];
+
+
+    public function traerPorOrigen(?int $oferta)
+    {
+
+        $sql = 'SELECT id,destinario,datos FROM ' . $this->tabla . '  WHERE ';
+        $value = [];
+        if ($oferta !== NULL) {
+            $sql .= 'oferta_id=? ';
+            $value[] = $oferta;
+        } else {
+            $sql .= 'oferta_id IS NULL';
+        }
+        $result = $this->db->select($sql, $value);
+        if (empty($result)) {
+            return [];
+        }
+
+
+        return $this->cifrarDatos($result, ['id']);
+    }
 }

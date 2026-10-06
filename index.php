@@ -20,11 +20,12 @@ use App\Controllers\AuthController;
 use App\Controllers\CarrerasController;
 use App\Controllers\CuentaController;
 use App\Controllers\DashboardController;
-use App\Controllers\ErrrorController;
+use App\Controllers\ErrorController;
 use App\Controllers\FacilitadorController;
 use App\Controllers\HomeController;
 use App\Controllers\NucleoController;
 use App\Controllers\OfertasController;
+use App\Controllers\PagosController;
 use App\Controllers\ProgramasController;
 use App\Controllers\RegistroController;
 use App\Controllers\RolesController;
@@ -181,23 +182,32 @@ Enrutador::get('archivo/obtener', [ArchivosController::class, 'obtener']);
 Enrutador::post('archivo/user/obtener', [ArchivosController::class, 'traerArchivos']);
 Enrutador::post('archivo/verificar/Lote', [ArchivosController::class, 'verificarLote']);
 
-Enrutador::get('logs', [ErrrorController::class, 'verErrores'], [5]);
-Enrutador::get('errror/obtenerLogs', [ErrrorController::class, 'obtenerLogs'], [5]);
-Enrutador::post('errror/limpiarLogs', [ErrrorController::class, 'limpiarLogs'], [5]);
+Enrutador::get('logs', [ErrorController::class, 'verErrores'], [5]);
+Enrutador::get('errror/obtenerLogs', [ErrorController::class, 'obtenerLogs'], [5]);
+Enrutador::post('errror/limpiarLogs', [ErrorController::class, 'limpiarLogs'], [5]);
 
 
 
 Enrutador::get('tramites', [TramitesController::class, 'index'], [3, 4, 5]);
+Enrutador::get('tramites-solicitar', [TramitesController::class, 'solicitar'], [1, 5]);
 Enrutador::post('tramites/guardar', [TramitesController::class, 'guardar'], [4, 5]);
 Enrutador::post('tramites/paginar', [TramitesController::class, 'paginar'], [4, 5]);
 Enrutador::post('tramites/actualizar', [TramitesController::class, 'actualizar'], [4, 5]);
 Enrutador::post('tramites/eliminar', [TramitesController::class, 'eliminar'], [4, 5]);
-Enrutador::get('tramites-solicitar', [TramitesController::class, 'solicitar'], [1, 5]);
 Enrutador::post('tramites/solicitar/disponibles', [TramitesController::class, 'ofertas'], [1, 5]);
 
 
 Enrutador::post('solicitud/guardar', [SolicitudController::class, 'guardar'], [1, 5]);
 
+
+Enrutador::get('cuotas', [PagosController::class, 'index'], [1, 5]);
+Enrutador::get('pagos-admin', [PagosController::class, 'admin'], [1, 5]);
+Enrutador::post('cuotas/obtener/user/cuotas', [PagosController::class, 'buscar'], [1, 5]);
+Enrutador::post('destinario/buscar', [PagosController::class, 'destinariosBuscar'], [1, 5]);
+Enrutador::post('pagos/guardar/user', [PagosController::class, 'guardar'], [1, 5]);
+Enrutador::post('pagos/listar', [PagosController::class, 'listar'], [5, 4, 3]);
+Enrutador::post('pagos/eliminar', [PagosController::class, 'eliminar'], [5, 4, 3]);
+Enrutador::post('pagos/verificar', [PagosController::class, 'actualizar'], [5, 4, 3]);
 
 // Despacho de la petición
 Enrutador::despachar();

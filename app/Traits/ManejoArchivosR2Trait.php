@@ -96,7 +96,7 @@ trait ManejoArchivosR2Trait
         $carpeta = $partes[0] ?? '';
 
         // 2. Definir las carpetas que requieren auditoría estricta de sesión y token en PHP
-        $carpetasSensibles = ['certificados', 'documento', 'carrera', 'rol'];
+        $carpetasSensibles = ['certificados', 'documento', 'carrera', 'rol', 'pagos'];
 
         // 3. SI ES SENSIBLE: Usar su sistema actual de token cifrado + Controller PHP
         if (in_array(strtolower($carpeta), $carpetasSensibles, true)) {

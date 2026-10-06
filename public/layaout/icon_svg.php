@@ -352,7 +352,27 @@
             <line x1="8" y1="17" x2="12" y2="17" />
             <path d="M15 16l1.5 1.5 3.5-3.5" />
         </symbol>
+        <symbol id="icono-administracion-pagos" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Panel / Tablero de gestión centrado en zona segura (4px a 20px) -->
+            <path d="M5 4 h14 a2 2 0 0 1 2 2 v12 a2 2 0 0 1 -2 2 h-14 a2 2 0 0 1 -2 -2 v-12 a2 2 0 0 1 2 -2 z" />
 
+            <!-- Barra de control / Encabezado de administración -->
+            <path d="M3 9 h18" />
+
+            <!-- Engranaje / Ajuste de control (Administración) -->
+            <path d="M8 14 h3" />
+            <path d="M8 17 h5" />
+
+            <!-- Indicador de flujo financiero / Check de gestión -->
+            <path d="M15 13 l2 2 l3 -3" />
+        </symbol>
+        <symbol id="icono-duplicar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Elemento base / capa posterior (zona segura 4px a 20px) -->
+            <path d="M8 8 h10 a2 2 0 0 1 2 2 v10 a2 2 0 0 1 -2 2 h-10 a2 2 0 0 1 -2 -2 v-10 a2 2 0 0 1 2 -2 z" />
+
+            <!-- Elemento duplicado / capa frontal desplazada -->
+            <path d="M16 8 v-2 a2 2 0 0 0 -2 -2 h-10 a2 2 0 0 0 -2 2 v10 a2 2 0 0 0 2 2 h2" />
+        </symbol>
         <symbol id="icono-usuario-llave" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
             <circle cx="9" cy="7" r="4" />
@@ -405,5 +425,27 @@
 
         <!-- Reloj de arena interno (Representación del tiempo / espera estimada) -->
         <path d="M9 13 h6 l-3 3 l3 3 h-6 l3 -3 z" />
+    </symbol>
+
+    <symbol id="icono-cuotas-pagos" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <!-- Tarjeta centrada dejando 3px de margen a los bordes -->
+        <path d="M5 6 h14 a2 2 0 0 1 2 2 v8 a2 2 0 0 1 -2 2 h-14 a2 2 0 0 1 -2 -2 v-8 a2 2 0 0 1 2 -2 z" />
+
+        <!-- Banda magnética -->
+        <path d="M3 10 h18" />
+
+        <!-- Chip / Detalle de pago corto -->
+        <path d="M7 14 h2" />
+    </symbol>
+
+    <symbol id="icono-cuotas" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <!-- Calendario / Plazo de pago (zona segura 4px a 20px) -->
+        <path d="M5 5 a2 2 0 0 1 2 -2 h10 a2 2 0 0 1 2 2 v14 a2 2 0 0 1 -2 2 h-10 a2 2 0 0 1 -2 -2 z" />
+        <path d="M5 9 h14" />
+
+        <!-- Segmentos / Fraccionamiento de cuotas (1, 2, 3) -->
+        <path d="M8 13 h2" />
+        <path d="M14 13 h2" />
+        <path d="M8 17 h8" />
     </symbol>
 </svg>

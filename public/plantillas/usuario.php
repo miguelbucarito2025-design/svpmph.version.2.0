@@ -104,7 +104,7 @@
 
 
 
-        <?php if ($_SESSION['usuario_rol'] < 3) { ?>
+        <?php if ($_SESSION['usuario_rol'] < 9) { ?>
           <br>
           <a href="gremio/estatus" class="menu-link  <?= (($pag ?? '')  === 'gremioEstatus') ? 'linkactivo' : ''; ?>">
             <svg class="menu-icon">
@@ -112,7 +112,13 @@
             </svg>
             <span>Estatus del Gremio</span>
           </a>
-
+          <br>
+          <a href="tramites-solicitar" class="menu-link  <?= (($pag ?? '')  === 'tramitesSolicitudes') ? 'linkactivo' : ''; ?>">
+            <svg class="menu-icon">
+              <use href="#icono-tramites" />
+            </svg>
+            <span>Tramites y Solicitudes</span>
+          </a>
         <?php } ?>
         <?php if ($_SESSION['usuario_rol'] >= 3) { ?>
 
@@ -140,15 +146,13 @@
                   <span>Estatus del Gremio</span>
                 </a>
 
+
+
               <?php } ?>
 
               <?php if ($_SESSION['usuario_rol'] == 5) { ?>
 
-                <li onclick="redirec('tramites-solicitar')" class=" <?= (($pag ?? '')  === 'tramitesSolicitudes') ? 'linkactivo' : ''; ?> ">
-                  <svg class="icon-sistema-rellen">
-                    <use href="#icono-tramites" />
-                  </svg>Tramites y Solicitudes
-                </li>
+
               <?php } ?>
 
               <li onclick="redirec('agremiados')" class=" <?= (($pag ?? '')  === 'agremiados') ? 'linkactivo' : ''; ?> ">
@@ -293,7 +297,35 @@
           </svg>
           <span>Documentos</span>
         </a>
+        <section class="menu-grupo <?= ($seccionActiva === 'pagos') ? 'abierto' : ''; ?>">
 
+          <button type="button" class="grupo-titulo">
+            <div class="link-content">
+              <svg class="menu-icon">
+                <use href="#icono-cuotas-pagos" />
+              </svg>
+              <span> Pagos</span>
+              <span class="flecha">▾</span>
+            </div>
+          </button>
+
+          <!-- Lista simple de enlaces (Sin anidaciones raras) -->
+          <ul class="grupo-lista">
+            <li onclick="redirec('cuotas')" class=" <?= (($pag ?? '')  === 'cuotas') ? 'linkactivo' : ''; ?> ">
+              <svg class="icono-outline">
+                <use href="#icono-cuotas" />
+              </svg>
+              Cuotas
+            </li>
+            <li onclick="redirec('pagos-admin')" class=" <?= (($pag ?? '')  === 'cuotasAdministrar') ? 'linkactivo' : ''; ?> ">
+              <svg class="icono-outline">
+                <use href="#icono-administracion-pagos" />
+              </svg>
+              Adminstrar Pagos
+            </li>
+          </ul>
+
+        </section>
 
         <!-- Enlace Suelto (Sin Grupo) -->
         <a href="logout">
@@ -304,6 +336,8 @@
             <span>Logout</span>
           </div>
         </a>
+
+
 
 
       </nav>

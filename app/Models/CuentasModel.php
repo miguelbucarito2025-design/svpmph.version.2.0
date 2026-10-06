@@ -424,4 +424,11 @@ class CuentasModel extends Model
 
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
+
+
+    public function obtenerAutoridadesSpeciales(): ?array
+    {
+        $sql = 'SELECT * FROM ' . $this->tabla . ' WHERE rol_id >= 4 ';
+        return $this->db->select($sql, [], 'all');
+    }
 }

@@ -54,16 +54,16 @@ trait ManejoFechasTrait
     /**
      * Suma o resta tiempo a una fecha dada mediante expresiones relativas.
      *
-     * @param string $fechaBase      Fecha inicial en formato 'YYYY-MM-DD'.
-     * @param string $modificador    Expresión relativa (ej: '-30 days', '-1 year', '+2 months').
-     * @param string $formatoSalida  Formato de retorno (por defecto 'Y-m-d').
-     * @return string Fecha calculada.
+     * @param string $fechaBase      Fecha inicial (ej: '2026-10-04 14:30:00' o 'now').
+     * @param string $modificador    Expresión relativa (ej: '+1 day', '+24 hours', '+2 days').
+     * @param string $formatoSalida  Formato de retorno (por defecto 'Y-m-d H:i:s').
+     * @return string Fecha y hora calculada.
      * 
      * @throws Exception Si el modificador o la fecha son inválidos.
      */
-    public function modificarFecha(string $fechaBase, string $modificador, string $formatoSalida = 'Y-m-d'): string
+    public function modificarFecha(string $fechaBase, string $modificador, string $formatoSalida = 'Y-m-d H:i:s'): string
     {
-        $fecha = new DateTime($fechaBase);
+        $fecha = new \DateTime($fechaBase);
         $fecha->modify($modificador);
 
         return $fecha->format($formatoSalida);

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Libs;
 
-use App\Controllers\ErrrorController;
+use App\Controllers\ErrorController;
 use Throwable;
 use ErrorException;
 use App\Helpers\Logger;
@@ -169,7 +169,7 @@ class ManejadorExcepciones
         }
 
 
-        $error = new ErrrorController();
+        $error = new ErrorController();
         $error->index($codigoHttp, $mensaje);
         exit;
     }

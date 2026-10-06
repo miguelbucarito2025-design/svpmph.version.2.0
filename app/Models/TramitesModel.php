@@ -136,9 +136,9 @@ class TramitesModel  extends Model
      * optiene el todo por el id
      *
      * @param integer $id
-     * @return array devuelve solo el nombre
+     * @return array devuelve el arreglo
      */
-    public function obtenerPorId(int $id): ?array
+    public function obtenerPorId(int $id): array
     {
         $sql = 'SELECT * FROM ' . $this->tabla . ' WHERE id=?';
         return $this->db->select($sql, [$id], 'row');

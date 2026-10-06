@@ -7,7 +7,7 @@
 
      <h2 class="title-error">Error <?= $codigo ?? '' ?></h2>
      <p><?= $mensaje ?? '' ?></p>
-     <button class="btn-volver" type="button" onclick="window.history.go(-1)">
+     <button class="btn-volver" type="button" <?= ($codigo ?? '') == ! 403 ? 'onclick="window.history.go(-1)"' : 'onclick="window.location.href=`' . URL_BASE . 'login`"'  ?>>
          <svg class="icono-outline">
              <use href="#icon-salir"></use>
          </svg>

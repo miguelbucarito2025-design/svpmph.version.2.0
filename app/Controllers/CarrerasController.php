@@ -24,7 +24,6 @@ class CarrerasController extends Controller
         $r2Service = new R2Service();
         $urlPublica = $this->obtenerArchivo($this->session->get('foto_perfil'));
 
-        $r2Service = new R2Service();
 
 
         $this->vista->render(
@@ -184,7 +183,6 @@ class CarrerasController extends Controller
         $roles = $model->paginar($datos);
         $total = $model->select('count');
 
-        $r2Service = new R2Service();
         $roles = $this->cifrarDatos($roles, [
             'id',
         ]);

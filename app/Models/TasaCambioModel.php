@@ -60,7 +60,7 @@ class TasaCambioModel extends Model
 
     public function ultimaTasaRegistrada()
     {
-        $sql = 'SELECT tasa_bs, fecha_oficial 
+        $sql = 'SELECT id,tasa_bs, fecha_oficial 
                 FROM ' . $this->tabla . '
                 ORDER BY fecha_oficial DESC 
                 LIMIT 1';
