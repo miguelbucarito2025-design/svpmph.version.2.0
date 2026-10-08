@@ -39,7 +39,7 @@
 
                 <div class="campo-grupo">
                     <label for="id_cedula">Cédula de Identidad *</label>
-                    <input type="text" id="id_cedula" name="id_cedula" value="<?= htmlspecialchars($datos['datos']['id_cedula'] ?? '') ?>" placeholder="Ej: V-12345678" required>
+                    <input type="text" id="id_cedula" name="id_cedula" value="<?= htmlspecialchars($datos['datos']['id_cedula'] ?? '') ?>" placeholder="Ej: 12345678" required>
                 </div>
 
                 <div class="campo-grupo">

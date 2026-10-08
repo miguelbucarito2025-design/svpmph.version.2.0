@@ -27,7 +27,7 @@
         <li>
           <svg class="icono-outline">
             <use href="#icono-usuario" />
-          </svg> <?= $nombreUsuario ?? '' ?>
+          </svg> <?= ucfirst($nombreUsuario ?? '') ?>
         </li>
         <li><b><?= $nombreRol ?? '' ?>-LTE</b></li>
       </ul>
@@ -104,15 +104,13 @@
 
 
 
-        <?php if ($_SESSION['usuario_rol'] < 9) { ?>
-          <br>
+        <?php if ($_SESSION['usuario_rol'] == 1) { ?>
           <a href="gremio/estatus" class="menu-link  <?= (($pag ?? '')  === 'gremioEstatus') ? 'linkactivo' : ''; ?>">
             <svg class="menu-icon">
               <use href="#icono-estatus" />
             </svg>
             <span>Estatus del Gremio</span>
           </a>
-          <br>
           <a href="tramites-solicitar" class="menu-link  <?= (($pag ?? '')  === 'tramitesSolicitudes') ? 'linkactivo' : ''; ?>">
             <svg class="menu-icon">
               <use href="#icono-tramites" />
@@ -136,25 +134,6 @@
 
             <!-- Lista simple de enlaces (Sin anidaciones raras) -->
             <ul class="grupo-lista">
-
-              <?php if ($_SESSION['usuario_rol'] <= 3) { ?>
-                <br>
-                <a href="gremio/estatus" class="menu-link  <?= (($pag ?? '')  === 'gremioEstatus') ? 'linkactivo' : ''; ?>">
-                  <svg class="menu-icon">
-                    <use href="#icono-estatus" />
-                  </svg>
-                  <span>Estatus del Gremio</span>
-                </a>
-
-
-
-              <?php } ?>
-
-              <?php if ($_SESSION['usuario_rol'] == 5) { ?>
-
-
-              <?php } ?>
-
               <li onclick="redirec('agremiados')" class=" <?= (($pag ?? '')  === 'agremiados') ? 'linkactivo' : ''; ?> ">
                 <svg class="icon-sistema-rellen">
                   <use href="#icono-agremiados" />
@@ -167,60 +146,61 @@
                     <use href="#icono-tramites" />
                   </svg>Tramites
                 </li>
+
+                <li onclick="redirec('promocion')" class=" <?= (($pag ?? '')  === 'promociones') ? 'linkactivo' : ''; ?> ">
+                  <svg class="icono-outline">
+                    <use href="#icono-promociones" />
+                  </svg>Promociones
+                </li>
+
+                <li onclick="redirec('carreras')" class=" <?= (($pag ?? '')  === 'carreras') ? 'linkactivo' : ''; ?> ">
+                  <svg class="icono-outline">
+                    <use href="#icono-carreras-menciones" />
+                  </svg>Carreras y Grados
+                </li>
               <?php } ?>
-
-              <li onclick="redirec('promocion')" class=" <?= (($pag ?? '')  === 'promociones') ? 'linkactivo' : ''; ?> ">
-                <svg class="icono-outline">
-                  <use href="#icono-promociones" />
-                </svg>Promociones
-              </li>
-
-              <li onclick="redirec('carreras')" class=" <?= (($pag ?? '')  === 'carreras') ? 'linkactivo' : ''; ?> ">
-                <svg class="icono-outline">
-                  <use href="#icono-carreras-menciones" />
-                </svg>Carreras y Grados
-              </li>
 
             </ul>
 
           </section>
         <?php } ?>
 
-        <section class="menu-grupo <?= ($seccionActiva === 'academico') ? 'abierto' : ''; ?>">
+        <?php if ($_SESSION['usuario_rol'] == 5) {  ?>
+          <section class="menu-grupo <?= ($seccionActiva === 'academico') ? 'abierto' : ''; ?>">
 
-          <button type="button" class="grupo-titulo">
-            <div class="link-content">
-              <svg class="icono-outline">
-                <use href="#icono-programas" />
-              </svg>
-              <span>Academico</span>
-              <span class="flecha">▾</span>
-            </div>
-          </button>
-
-          <!-- Lista simple de enlaces (Sin anidaciones raras) -->
-          <ul class="grupo-lista">
-            <?php if ($_SESSION['usuario_rol'] >= 3) { ?>
-
-              <li onclick="redirec('secciones')" class=" <?= (($pag ?? '')  === 'secciones') ? 'linkactivo' : ''; ?> ">
+            <button type="button" class="grupo-titulo">
+              <div class="link-content">
                 <svg class="icono-outline">
-                  <use href="#icono-secciones-academicas" />
-                </svg>Gestionar Secciones
-              </li>
-
-              <li onclick="redirec('facilitadores')" class="<?= (($pag ?? '')  === 'facilitador') ? 'linkactivo' : ''; ?>  ">
-                <svg class="icono-outline">
-                  <use href="#icono-facilitadores" />
+                  <use href="#icono-programas" />
                 </svg>
-                Facilitadores
-              </li>
-            <?php } ?>
+                <span>Academico</span>
+                <span class="flecha">▾</span>
+              </div>
+            </button>
 
-          </ul>
+            <!-- Lista simple de enlaces (Sin anidaciones raras) -->
+            <ul class="grupo-lista">
+              <?php if ($_SESSION['usuario_rol'] >= 3) { ?>
 
-        </section>
-        <?php if ($_SESSION['usuario_rol'] === 5) {
-        ?>
+                <li onclick="redirec('secciones')" class=" <?= (($pag ?? '')  === 'secciones') ? 'linkactivo' : ''; ?> ">
+                  <svg class="icono-outline">
+                    <use href="#icono-secciones-academicas" />
+                  </svg>Gestionar Secciones
+                </li>
+
+                <li onclick="redirec('facilitadores')" class="<?= (($pag ?? '')  === 'facilitador') ? 'linkactivo' : ''; ?>  ">
+                  <svg class="icono-outline">
+                    <use href="#icono-facilitadores" />
+                  </svg>
+                  Facilitadores
+                </li>
+              <?php } ?>
+
+            </ul>
+
+          </section> <?php } ?>
+
+        <?php if ($_SESSION['usuario_rol'] === 5) {  ?>
           <section class="menu-grupo <?= ($seccionActiva === 'administracion') ? 'abierto' : ''; ?>">
 
 
@@ -290,44 +270,43 @@
         <?php
         }
         ?>
-        <br>
-        <a href="archivos" class="menu-link <?= ($seccionActiva === 'documentos') ? 'linkactivo' : ''; ?>">
-          <svg class="menu-icon">
-            <use href="#icono-documentos" />
-          </svg>
-          <span>Documentos</span>
-        </a>
-        <section class="menu-grupo <?= ($seccionActiva === 'pagos') ? 'abierto' : ''; ?>">
 
-          <button type="button" class="grupo-titulo">
-            <div class="link-content">
-              <svg class="menu-icon">
-                <use href="#icono-cuotas-pagos" />
-              </svg>
-              <span> Pagos</span>
-              <span class="flecha">▾</span>
-            </div>
-          </button>
+        <?php
+        if ($_SESSION['usuario_rol'] === 1) {
+        ?>
 
-          <!-- Lista simple de enlaces (Sin anidaciones raras) -->
-          <ul class="grupo-lista">
-            <li onclick="redirec('cuotas')" class=" <?= (($pag ?? '')  === 'cuotas') ? 'linkactivo' : ''; ?> ">
-              <svg class="icono-outline">
-                <use href="#icono-cuotas" />
-              </svg>
-              Cuotas
-            </li>
-            <li onclick="redirec('pagos-admin')" class=" <?= (($pag ?? '')  === 'cuotasAdministrar') ? 'linkactivo' : ''; ?> ">
-              <svg class="icono-outline">
-                <use href="#icono-administracion-pagos" />
-              </svg>
-              Adminstrar Pagos
-            </li>
-          </ul>
 
-        </section>
+          <a href="cuotas" class="menu-link <?= ($seccionActiva === 'cuotas') ? 'linkactivo' : ''; ?>">
+            <svg class="menu-icon">
+              <use href="#icono-cuotas" />
+            </svg>
+            <span> Pagos</span>
+          </a>
 
-        <!-- Enlace Suelto (Sin Grupo) -->
+        <?php
+        }
+        if ($_SESSION['usuario_rol'] >= 3) {
+        ?>
+
+
+          <a href="pagos-admin" class="menu-link <?= ($seccionActiva === 'cuotas') ? 'linkactivo' : ''; ?>">
+            <svg class="menu-icon">
+              <use href="#icono-cuotas-pagos" />
+            </svg>
+            <span>Adminstrar Pagos</span>
+          </a>
+
+        <?php }
+        if ($_SESSION['usuario_rol'] == 5) {
+        ?>
+          <a href="archivos" class="menu-link <?= ($seccionActiva === 'documentos') ? 'linkactivo' : ''; ?>">
+            <svg class="menu-icon">
+              <use href="#icono-documentos" />
+            </svg>
+            <span>Documentos</span>
+          </a>
+        <?php } ?>
+
         <a href="logout">
           <div class="logout">
             <svg class="icono-outline">

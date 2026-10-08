@@ -317,16 +317,22 @@ class PagosController extends Controller
             'offset' => 'esEntero',
 
         ]);
+        $destin = null;
         if ($this->session->get('usuario_rol') >= 3) {
             $id =  $this->getDatosEntrada();
+            if ($this->session->get('usuario_rol') !== 5) {
+                $destin = $this->session->get('usuario_id');
+            }
         }
+
+
 
         $cuenta = isset($id['cuenta_id'])  ? Validar::esDesencriptarId($id['cuenta_id']) : $this->session->get('usuario_id');
 
 
 
         $model = new CuotasModel();
-        $cuotas = $model->traerPorUsuario($cuenta, $datos['limit'], $datos['offset']);
+        $cuotas = $model->traerPorUsuario($cuenta, $datos['limit'], $datos['offset'], $destin);
         $total = $model->totalCuotasUser($cuenta);
 
 
@@ -348,10 +354,11 @@ class PagosController extends Controller
         $datos['status'] = Validar::esCadena($filtros['status'] ?? '') ?? null;
 
         $datos['id'] = $this->session->get('usuario_id');
-        $datos['rol'] = $this->session->get('usuario_rol');
+        $datos['destin'] = $this->session->get('usuario_rol');
         $model = new CuotasModel();
+
         $cuotas = $model->paginar($datos);
-        $total = count($cuotas);
+        $total = count($model->obtenerTotal($datos['id'], $datos['destin']));
 
 
         $this->respuesta->json($cuotas, 200, "Usuarios obtenidos con éxito", [], (int)$total);
@@ -438,7 +445,6 @@ class PagosController extends Controller
         unset($datos['id']);
         unset($datos['cuenta_id']);
 
-        $this->respuesta->json(true);
         $cuotas = new CuotasModel;
 
         $db = new BuilderQuery;
@@ -449,10 +455,10 @@ class PagosController extends Controller
             $cuotas->update($datos, $condicion);
             $mensaje = '
             Revisión Terminada:  
-            Su pago ha sido Examinado y se actualizo el statuss
+            Su pago ha sido Examinado y se actualizo el status
             Concepto: ' . $datos['cuota'] . '   
             Status:' . $datos['status'] . ' 
-            Fecha de limite: ' . $datos['corte'] . '   
+            Fecha limite: ' . $datos['corte'] . '   
             ';
 
             $notificaciones->crear(

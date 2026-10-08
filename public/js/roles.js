@@ -35,7 +35,7 @@ function formularioTerminos(datos) {
   contenedor.innerHTML = `
     <h2 class="h2-agregar  grey">
      ${svgTerminos}
-      Vinculación de Terminos y Condiciones
+      Terminos y Condiciones
     </h2>
 
     <form method="post" class="form-usuario" id="formTerminos" enctype="multipart/form-data">

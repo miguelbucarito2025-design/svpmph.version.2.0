@@ -99,12 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
           imgVistaPrevia.src = "";
         } else {
           if (resultado.code === 400) {
-            AlertApp.show(
-              "Advertencia",
-              resultado.message,
-              "warning",
-              "perfil",
-            );
+            AlertApp.show("Advertencia", resultado.message, "warning", "foto");
           } else {
             AlertApp.show("Error del Servidor", resultado.message, "error");
           }

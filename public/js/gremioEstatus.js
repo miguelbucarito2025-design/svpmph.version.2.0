@@ -38,7 +38,8 @@ function cargarEstatusGremio(contenedorOrSelector) {
       const apellido1 = (info.apellido || "").trim();
       const apellido2 = (info.s_apellido || "").trim();
       txtNombreCompleto.textContent =
-        `${nombre1}${nombre2} ${apellido1}${apellido2}`.trim() || "Afiliado";
+        `${nombre1}  ${nombre2} ${apellido1}  ${apellido2}`.trim() ||
+        "Afiliado";
     }
 
     if (txtCedula) {

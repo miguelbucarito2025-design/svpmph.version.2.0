@@ -239,7 +239,7 @@ if (agregarPrograma) {
     const formAgregarNodo = crearFormularioAgregar();
 
     AlertApp.show("", formAgregarNodo, "", null, {
-      claseExtra: "ventana-modal",
+      claseExtra: "ventana-modal modal-large",
       btnTexto: "Cerrar",
       btnIcono: svgCerrar,
       btnClase: "btn-ghost-danger",
@@ -359,7 +359,7 @@ function abrirModalEdicion(programa) {
   const formEditar = crearFormularioEditar(programa);
 
   AlertApp.show("", formEditar, "", null, {
-    claseExtra: "ventana-modal",
+    claseExtra: "ventana-modal modal-large",
     btnTexto: "Cerrar",
     btnIcono: svgCerrar,
     btnClase: "btn-ghost-danger",

@@ -39,7 +39,7 @@
                 <svg class="icono-outline">
                     <use href="#icono-ajustes"></use>
                 </svg>
-                <span>Acciones de Limpieza</span>
+                <span>Acciones</span>
                 <svg class="icono-outline arrow-icon">
                     <use href="#icono-flecha-abajo"></use>
                 </svg>

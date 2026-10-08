@@ -60,10 +60,14 @@ class CuotasModel  extends Model
      * @return array|null Colección de cuotas asociadas
      * @throws AppException Si se supera el límite permitido de registros
      */
-    public function traerPorUsuario(int $cuenta, int $limit = 10, int $offset = 0): ?array
+    public function traerPorUsuario(int $cuenta, int $limit = 10, int $offset = 0, ?int $destin = null): ?array
     {
         if ($limit >= 90) {
             throw new AppException('Límite de registros alcanzado. No puede sobrecargar el DOM', 400);
+        }
+
+        if ($destin !== null) {
+            $destin = 'AND d.cuenta_id=' . $destin;
         }
 
         $sql = 'SELECT 
@@ -89,6 +93,7 @@ class CuotasModel  extends Model
             LEFT JOIN solicitudes_insumos s ON c.origen_id=s.id 
             LEFT JOIN inscripcion i ON c.origen_id=i.oferta_id
             WHERE c.cuenta_id = ? 
+            ' . $destin . '
             ORDER BY c.id DESC 
             LIMIT ? OFFSET ?';
 
@@ -129,6 +134,90 @@ class CuotasModel  extends Model
     }
 
 
+    /**
+     * @summary Obtiene el total de cuotas por estado indexado por el nombre del estado.
+     * @description Realiza una consulta agrupada por 'status' para una 'cuenta_id' específica.
+     *              Transforma la matriz devuelta por la base de datos en un arreglo asociativo
+     *              donde cada clave (key) corresponde al estado y su valor a la cantidad total.
+     * 
+     * @param int $id Identificador único de la cuenta.
+     * @table cuotas
+     * @column cuenta_id - Filtro asociativo por cuenta.
+     * @column status - Nombre o valor del estado de la cuota.
+     * 
+     * @returns array|null Retorna ['ESTADO' => cantidad] o null en caso de no haber datos.
+     */
+    public function obtenerTotalPorId(int $id): ?array
+    {
+        $sql = 'SELECT 
+                status, 
+                COUNT(*) AS cantidad_total
+            FROM cuotas 
+            WHERE cuenta_id = ?
+            GROUP BY status';
+
+        $resultados = $this->db->select($sql, [$id], 'all');
+
+        if (empty($resultados)) {
+            return null;
+        }
+
+        $totalesPorClave = [];
+        foreach ($resultados as $fila) {
+            // Asignamos el estado como CLAVE y la cantidad como VALOR
+            $totalesPorClave[$fila['status']] = (int) $fila['cantidad_total'];
+        }
+
+        return $totalesPorClave;
+    }
+
+    /**
+     * @summary Obtiene el conteo total de cuotas agrupadas por su estado según la cuenta o destinatario.
+     * @description Realiza un LEFT JOIN entre cuotas, pagos y destinatarios. Aplica un filtro WHERE
+     *              sobre 'd.cuenta_id' únicamente cuando $destin no es igual a 5, y agrupa los
+     *              resultados por el estado ('c.status') devolviendo un arreglo [estado => total].
+     * 
+     * @param int $id Identificador único de la cuenta.
+     * @param int|null $destin Identificador opcional de destino o modo de filtrado.
+     * @table cuotas c
+     * @table pagos p
+     * @table destinario d
+     * 
+     * @returns array|null Arreglo asociativo tipo ['ESTADO' => cantidad] o null si no hay registros.
+     */
+    public function obtenerTotal(int $id, ?int $destin = null): ?array
+    {
+        $where = '';
+        $params = [];
+
+        // Si $destin es distinto de 5, filtramos por la cuenta
+        if ($destin !== 5) {
+            $where = 'WHERE d.cuenta_id = ?';
+            $params[] = $id;
+        }
+
+        $sql = "SELECT 
+                c.status, 
+                COUNT(*) AS cantidad_total
+            FROM cuotas c 
+            LEFT JOIN pagos p ON p.id = c.pago_id 
+            LEFT JOIN destinario d ON p.destinario_id = d.id
+            {$where}
+            GROUP BY c.status";
+
+        $resultados = $this->db->select($sql, $params, 'all');
+
+        if (empty($resultados)) {
+            return null;
+        }
+
+        $totalesPorClave = [];
+        foreach ($resultados as $fila) {
+            $totalesPorClave[$fila['status']] = (int) $fila['cantidad_total'];
+        }
+
+        return $totalesPorClave;
+    }
 
 
 
@@ -140,11 +229,15 @@ class CuotasModel  extends Model
 
     /**
      * Nombre del método: paginar
-     * Descripción: Pagina ÚNICAMENTE a los agremiados que poseen cuotas/solicitudes 
-     *              registradas, calculando sus métricas sin duplicar filas y
-     *              cumpliendo con el estándar ONLY_FULL_GROUP_BY de MySQL.
+     * Descripción: Pagina a los agremiados. Si el rol es 5 (Admin), trae a TODOS los agremiados
+     *              (tengan o no cuotas registadas). Si es distinto de 5, filtra únicamente por
+     *              la cuenta y destinatario asociado.
      * Autor: Aprendiz & Mentor Backend
-     * Fecha: 2026-10-05
+     * Fecha: 2026-10-07
+     * 
+     * @param array $datos Parámetros de entrada (limit, offset, buscar, status, id, rol/destin).
+     * @return array Lista de agremiados paginados.
+     * @throws AppException Si no se proporciona una cuenta válida.
      */
     public function paginar(array $datos): array
     {
@@ -152,12 +245,13 @@ class CuotasModel  extends Model
         $offset = (int)($datos['offset'] ?? 0);
         $buscar = $datos['buscar'] ?? null;
         $status = !empty($datos['status']) ? $datos['status'] : null;
+        $rol    = (int)($datos['rol'] ?? $datos['destin'] ?? 0);
 
         if (!isset($datos['id'])) {
             throw new AppException("Cuenta Invalida", 500);
         }
 
-        // 1. Columnas a seleccionar de la cuenta y agregación
+        // 1. Campos a seleccionar
         $campos = 'c.id AS cuenta_id, 
                d.nombre, 
                d.apellido, 
@@ -175,11 +269,12 @@ class CuotasModel  extends Model
                COALESCE(m.cuotas_rechazadas, 0) AS cuotas_rechazadas,
                COALESCE(m.total_cuotas, 0) AS total_cuotas';
 
-        // 2. Condición inicial estricta
+        // 2. Condiciones base generales
         $condicionesBase = ["c.estado = 1", "r.id = 1"];
-
         $joinDestinatario = "";
-        if (((int)($datos['rol'] ?? 0)) !== 5) {
+
+        // Si NO es Rol 5 (Admin Global), restringimos a los datos del destinatario/cuenta específica
+        if ($rol !== 5) {
             $condicionesBase[] = "t.cuenta_id = " . (int)$datos['id'];
             $joinDestinatario  = "
             LEFT JOIN cuotas cu ON cu.cuenta_id = c.id
@@ -189,19 +284,19 @@ class CuotasModel  extends Model
 
         $clausIni = implode(' AND ', $condicionesBase);
 
-        // 3. Invocación al trait LikeSQLTraits
+        // 3. Generación de filtro LIKE
         $camposlike = ['d.nombre', 'd.apellido', 'd.id_cedula'];
         $like       = $this->likeClaus($camposlike, $buscar, $clausIni);
 
         $where  = $like['claus'] ?? '';
         $params = $like['values'] ?? [];
 
-        // 4. Si se solicita filtrar por status opcional de cuota
+        // 4. Filtro opcional por status de cuota
         if ($status !== null) {
             $where .= (empty($where) ? ' WHERE ' : ' AND ') . "COALESCE(m.tiene_status, 0) > 0";
         }
 
-        // 5. Consulta SQL con INNER JOIN en la subconsulta de cuotas (Garantiza al menos 1 cuota)
+        // 5. Consulta SQL con LEFT JOIN en las métricas (Asegura traer usuarios sin cuotas)
         $sql = "SELECT 
                 $campos
             FROM cuentas c
@@ -209,7 +304,7 @@ class CuotasModel  extends Model
             LEFT JOIN rol r ON c.rol_id = r.id 
             LEFT JOIN gremio g ON c.id = g.cuenta_id
             $joinDestinatario
-            INNER JOIN (
+            LEFT JOIN (
                 SELECT 
                     cuenta_id,
                     COUNT(id) AS total_cuotas,
@@ -236,7 +331,7 @@ class CuotasModel  extends Model
             return [];
         }
 
-        // 6. Mapeo final
+        // 6. Mapeo y formateo final
         return array_map(function ($array) {
             $array = $this->cifrarDatos($array, ['cuenta_id']);
             $array['foto'] = $this->obtenerArchivo($array['foto'] ?? $array['rol_img']);

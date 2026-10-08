@@ -242,4 +242,44 @@ class GremioModel  extends Model
             return $rowCifrado; // ¡RESERVA CRUCIAL DEL RETURN!
         }, $result);
     }
+
+
+
+    /**
+     * @summary Obtiene el conteo total de agremiados agrupados por su estado en el gremio.
+     * @description Realiza un conteo agrupado en la tabla 'gremio' según la columna 'estado' 
+     *              (0 = Inactivo, 1 = Activo), retornando un arreglo asociativo indexado por estado.
+     * 
+     * @table gremio
+     * @column estado - Estado del registro en el gremio (0: Inactivo, 1: Activo).
+     * 
+     * @returns array|null Arreglo asociativo tipo ['activos' => total, 'inactivos' => total] 
+     *                     o null si no hay registros.
+     */
+    public function obtenerTotalGremio(): ?array
+    {
+        $sql = "SELECT 
+                estado, 
+                COUNT(*) AS cantidad_total
+            FROM gremio
+            GROUP BY estado";
+
+        $resultados = $this->db->select($sql, [], 'all');
+
+        if (empty($resultados)) {
+            return null;
+        }
+
+        $totalesPorEstado = [
+            'inactivos' => 0,
+            'activos'   => 0
+        ];
+
+        foreach ($resultados as $fila) {
+            $key = ((int)$fila['estado'] === 1) ? 'activos' : 'inactivos';
+            $totalesPorEstado[$key] = (int)$fila['cantidad_total'];
+        }
+
+        return $totalesPorEstado;
+    }
 }

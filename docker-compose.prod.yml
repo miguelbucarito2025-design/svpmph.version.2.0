@@ -1,0 +1,83 @@
+services:
+  # 1. Servidor Web Nginx
+  web:
+    image: nginx:alpine
+    container_name: svpmph_app_web
+    restart: always
+    ports:
+      # Exponemos el puerto 8080 internamente en el VPS
+      # (El Nginx/Certbot principal del VPS redirigirá el tráfico del dominio a este puerto)
+      - "127.0.0.1:8080:80"
+    volumes:
+      - .:/var/www/html
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+      - app_uploads:/var/www/html/uploads # Persistencia de archivos subidos
+    depends_on:
+      - php
+      - db
+
+  # 2. Intérprete PHP 8.2 FPM (Producción Optimizada)
+  php:
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM php:8.2-fpm
+
+        # Instalar dependencias del sistema y extensiones necesarias (SIN Xdebug para producción)
+        RUN apt-get update && apt-get install -y \
+            git unzip libzip-dev libpng-dev libjpeg-dev libfreetype6-dev cron \
+            && docker-php-ext-configure gd --with-freetype --with-jpeg \
+            && docker-php-ext-install pdo pdo_mysql zip gd \
+            && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+        # Traer Composer directamente de la imagen oficial
+        COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+    container_name: svpmph_app_php
+    restart: always
+    volumes:
+      - .:/var/www/html
+      - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+      - app_uploads:/var/www/html/uploads # Persistencia de archivos subidos
+    working_dir: /var/www/html
+
+  # 3. Worker ejecutor de la Cola de Correos (Reutiliza la imagen del servicio PHP)
+  worker_correos:
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM php:8.2-fpm
+        RUN apt-get update && apt-get install -y \
+            libzip-dev libpng-dev libjpeg-dev libfreetype6-dev \
+            && docker-php-ext-configure gd --with-freetype --with-jpeg \
+            && docker-php-ext-install pdo pdo_mysql zip gd \
+            && apt-get clean && rm -rf /var/lib/apt/lists/*
+    container_name: svpmph_app_worker
+    restart: always
+    volumes:
+      - .:/var/www/html
+      - app_uploads:/var/www/html/uploads
+    working_dir: /var/www/html
+    command: sh -c "while true; do php /var/www/html/cron/procesar_correos.php; sleep 60; done"
+    depends_on:
+      - db
+      - php
+
+  # 4. Base de Datos MySQL (Segura y Privada)
+  db:
+    image: mysql:8.0
+    container_name: svpmph_base_datos
+    restart: always
+    # Escuchando únicamente en 127.0.0.1 para conectarte seguro con DBeaver mediante Túnel SSH
+    ports:
+      - "127.0.0.1:3306:3306"
+    environment:
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
+      MYSQL_USER: "${MYSQL_USER}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
+  app_uploads: # Volumen persistente para que las fotos/carnets NUNCA se borren

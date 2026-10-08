@@ -12,7 +12,7 @@ trait MensageTrait
     public function enviarToken(string $correo, string $token): void
     {
         // Subimos 2 niveles desde app/Traits para llegar a public/
-        $rutaPlantilla = 'public/mensajes/token.html';
+        $rutaPlantilla = 'public/mensages/token.html';
 
         if (!file_exists($rutaPlantilla)) {
             throw new AppException('No se encontró la plantilla del token.', 500);

@@ -129,6 +129,10 @@ class RegistroController extends Controller
             );
         } catch (AppException $e) {
             $db->rollBack();
+            if ($e->getCode() !== 409) {
+
+                throw $e;
+            }
             $this->respuesta->json(
                 false,
                 $e->getCode() > 0 ? $e->getCode() : 400,

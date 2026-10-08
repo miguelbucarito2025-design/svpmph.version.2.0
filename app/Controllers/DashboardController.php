@@ -7,6 +7,9 @@ namespace App\Controllers;
 use App\Controllers\Abstract\Controller;
 use App\Models\DatosModel;
 use App\Helpers\R2Service;
+use App\Models\ArchivosModel;
+use App\Models\CuotasModel;
+use App\Models\GremioModel;
 use App\Traits\ManejoArchivosR2Trait;
 
 class DashboardController extends Controller
@@ -19,41 +22,31 @@ class DashboardController extends Controller
         $this->requerirAutenticacion();
 
         $model = new DatosModel();
+        $archivos = new ArchivosModel;
+        $id = $this->session->get('usuario_id');
+        $total['archivos'] = $archivos->select('count');
+        $cuotas = new  CuotasModel;
+        $total['cuotas'] = $cuotas->obtenerTotal($id, $this->session->get('usuario_rol'));
+        $gremio = new GremioModel;
+        $total['gremio'] = $gremio->obtenerTotalGremio();
+
 
         $datos = $model->datosPersonalesYLaborales(
             $this->session->get('usuario_id')
         );
 
-        $reglasUsuario = [
-            'nombre',
-            'apellido',
-            'id_cedula',
-            'tlf',
-            'direccion',
-            'edad',
-            'foto'
-        ];
-
-        $reglasLaboral = [
-            'institucion_id',
-            'cargo_id'
-        ];
-        $r2Service = new R2Service();
         $foto = $datos['foto'] ?? 'perfiles/user.png';
+
         $urlPublica = $this->obtenerArchivo($foto);
-
         $this->session->set('foto_perfil', $foto);
-
-        $datosFaltantes = $this->faltanDatos($reglasUsuario, $datos);
-        $datosLaboralesFaltantes  = $this->faltanDatos($reglasLaboral, $datos);
 
         $this->vista->render(
             'usuario/dashborad',
             [
-                'datosLaboralesFaltantes' => $datosLaboralesFaltantes,
-                'datosFaltantes' => $datosFaltantes,
-                'nombreUsuario' => $this->session->get('usuario_nombre'),
                 'datos' => $datos,
+                'prueva' => $datos,
+                'total' => $total,
+                'nombreUsuario' => $this->session->get('usuario_nombre'),
                 'nombreRol' => $this->session->get('nombre_rol'),
                 'titlePag' => 'Dashboard',
                 'fotoUsuario' => $urlPublica

@@ -83,4 +83,4 @@
 
 </article>
 
-<script src="<?= URL_BASE ?>public/js/<?= $pag ?? '' ?>.js" defer></script>
+<script src="<?= URL_BASE ?>public/js/<?= $pag ?? '' ?>.js?v=1" defer></script>

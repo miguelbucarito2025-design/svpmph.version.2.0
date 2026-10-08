@@ -2,6 +2,14 @@
 
 declare(strict_types=1);
 
+// 1. PRIMERO simulas el entorno HTTP
+$_SERVER['REQUEST_METHOD'] = 'GET';
+$_SERVER['SCRIPT_NAME']    = '/index.php';
+$_SERVER['HTTP_HOST']      = 'localhost'; // O tu IP/dominio
+$_SERVER['REMOTE_ADDR']    = '127.0.0.1';
+
+
+
 require_once __DIR__ . '/../vendor/autoload.php'; // Ajusta la ruta a tu autoload/config
 
 use App\Traits\MensageTrait;
@@ -10,22 +18,23 @@ use App\Helpers\EnvLoader;
 use App\Helpers\Notificaciones;
 use App\Libs\Session;
 
+
+
 EnvLoader::load(__DIR__ . '/../app/Config/.env');
 ManejadorExcepciones::registrar();
 // ============================================================================
 // SIMULACIÓN DE CABECERAS Y ENTORNO HTTP REAL
 // ============================================================================
-$_SERVER['REQUEST_METHOD'] = 'GET';
-$_SERVER['SCRIPT_NAME']    = '/index.php';
-$_SERVER['HTTP_HOST']      = 'localhost';
-$_SERVER['REMOTE_ADDR']    = '127.0.0.1';
 
+
+// 2. LUEGO incluyes el autoload y la configuración
+require_once __DIR__ . '/../vendor/autoload.php';
 // Simular Navegador Real
 $_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36';
 
 // Simular Cabeceras de Origen y AJAX
-$_SERVER['HTTP_ORIGIN']           = 'http://localhost';
-$_SERVER['HTTP_REFERER']          = 'http://localhost/cron';
+$_SERVER['HTTP_ORIGIN']           =  URL_BASE;
+$_SERVER['HTTP_REFERER']          =  URL_BASE . 'cron';
 $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
 
 // 2. SIMULACIÓN DE SESIÓN (EJECUTADA ANTES DE CUALQUIER OUTPUT)

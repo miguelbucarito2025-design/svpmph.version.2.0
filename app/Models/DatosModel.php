@@ -69,6 +69,31 @@ class DatosModel  extends Model
         return $this->db->select($sql, [$idCuenta], 'row');
     }
 
+
+    /*     public function totalUser(int $rolId)
+    {
+        $sql = 'SELECT 
+                , 
+                COUNT(*) AS cantidad_total
+            FROM datos d INNER JOIN gremio g ON g.cuenta_id=d.cuenta_id
+            GROUP BY d.';
+
+        $resultados = $this->db->select($sql, [$rolId], 'all');
+
+        if (empty($resultados)) {
+            return null;
+        }
+
+        $totalesPorClave = [];
+        foreach ($resultados as $fila) {
+            // Asignamos el estado como CLAVE y la cantidad como VALOR
+            $totalesPorClave[$fila['status']] = (int) $fila['cantidad_total'];
+        }
+
+        return $totalesPorClave;
+    }
+ */
+
     public function datosPersonalesYLaborales(int $id)
     {
 
@@ -84,7 +109,6 @@ class DatosModel  extends Model
                 d.direccion,
                 d.edad,
                 d.foto,
-                l.institucion_id,
                 l.cargo_id
                 FROM
                 datos d LEFT JOIN datos_laborales l

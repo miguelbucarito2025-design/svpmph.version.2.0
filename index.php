@@ -201,10 +201,10 @@ Enrutador::post('solicitud/guardar', [SolicitudController::class, 'guardar'], [1
 
 
 Enrutador::get('cuotas', [PagosController::class, 'index'], [1, 5]);
-Enrutador::get('pagos-admin', [PagosController::class, 'admin'], [1, 5]);
-Enrutador::post('cuotas/obtener/user/cuotas', [PagosController::class, 'buscar'], [1, 5]);
+Enrutador::get('pagos-admin', [PagosController::class, 'admin'], [1, 3, 4, 5]);
+Enrutador::post('cuotas/obtener/user/cuotas', [PagosController::class, 'buscar'], [1, 3, 4, 5]);
 Enrutador::post('destinario/buscar', [PagosController::class, 'destinariosBuscar'], [1, 5]);
-Enrutador::post('pagos/guardar/user', [PagosController::class, 'guardar'], [1, 5]);
+Enrutador::post('pagos/guardar/user', [PagosController::class, 'guardar'], [1, 5, 3, 4]);
 Enrutador::post('pagos/listar', [PagosController::class, 'listar'], [5, 4, 3]);
 Enrutador::post('pagos/eliminar', [PagosController::class, 'eliminar'], [5, 4, 3]);
 Enrutador::post('pagos/verificar', [PagosController::class, 'actualizar'], [5, 4, 3]);

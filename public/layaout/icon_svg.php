@@ -226,6 +226,41 @@
             <path d="M15 13h1.5a1.5 1.5 0 0 1 0 3h-1.5v-3z" />
             <path d="M15 16h1.5a1.5 1.5 0 0 1 0 3h-1.5v-3z" />
         </symbol>
+        <symbol id="icono-dolar-espera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Signo $ desplazado levemente a la izquierda -->
+            <path d="M10 4 v16" />
+            <path d="M14 7.5 c0 -1.93 -1.79 -3.5 -4 -3.5 s-4 1.57 -4 3.5 c0 3.5 8 2.5 8 6 c0 1.93 -1.79 3.5 -4 3.5 s-4 -1.57 -4 -3.5" />
+
+            <!-- Reloj de espera en la esquina inferior derecha -->
+            <path d="M17 14 a3.5 3.5 0 1 0 0 7 a3.5 3.5 0 0 0 0 -7 z" />
+            <path d="M17 15.5 v2 h1.5" />
+        </symbol>
+        <symbol id="icono-dolar-rechazado" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Signo $ base -->
+            <path d="M10 4 v16" />
+            <path d="M14 7.5 c0 -1.93 -1.79 -3.5 -4 -3.5 s-4 1.57 -4 3.5 c0 3.5 8 2.5 8 6 c0 1.93 -1.79 3.5 -4 3.5 s-4 -1.57 -4 -3.5" />
+
+            <!-- 'X' de rechazo / faltante en la esquina inferior derecha -->
+            <path d="M15.5 15.5 l4 4" />
+            <path d="M19.5 15.5 l-4 4" />
+        </symbol>
+        <symbol id="icono-dolar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Eje vertical del signo $ -->
+            <path d="M12 4 v16" />
+
+            <!-- Curva del signo $ con margen de respiro -->
+            <path d="M16 7.5 c0 -1.93 -1.79 -3.5 -4 -3.5 s-4 1.57 -4 3.5 c0 3.5 8 2.5 8 6 c0 1.93 -1.79 3.5 -4 3.5 s-4 -1.57 -4 -3.5" />
+        </symbol>
+        <symbol id="icono-dolar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Círculo exterior con margen de respiro (3px a 21px) -->
+            <path d="M12 3 a 9 9 0 1 0 9 9 a 9 9 0 0 0 -9 -9 z" />
+
+            <!-- Eje vertical del signo $ -->
+            <path d="M12 7 v10" />
+
+            <!-- Símbolo '$' proporcional y centrado -->
+            <path d="M14.5 9.5 c0 -1.1 -1.1 -2 -2.5 -2 s-2.5 0.9 -2.5 2 c0 2 5 1.5 5 4 c0 1.1 -1.1 2 -2.5 2 s-2.5 -0.9 -2.5 -2" />
+        </symbol>
         <symbol id="icono-gremio" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <!-- Escudo base / Protección gremial -->
             <path d="M12 3 a 12 12 0 0 0 8 2 v9 c0 5.5 -3.8 10 -8 11.5 c-4.2 -1.5 -8 -6 -8 -11.5 V5 z" />

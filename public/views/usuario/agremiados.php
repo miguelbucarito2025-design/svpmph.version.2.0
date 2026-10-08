@@ -125,7 +125,7 @@
                     <svg class="icono-outline">
                         <use href="#icon-confirmar" />
                     </svg>
-                    Guardar Verificaciones
+                    Enviar
                 </button>
             </div>
         </div>

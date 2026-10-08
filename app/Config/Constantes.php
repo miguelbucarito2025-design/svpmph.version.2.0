@@ -1,3 +1,3 @@
 <?php
 
-define('URL_BASE', 'http://localhost:8080/');
+define('URL_BASE', 'http://' . $_SERVER['HTTP_HOST']  . '/');

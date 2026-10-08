@@ -125,4 +125,4 @@
         </div>
     </section>
 </article>
-<script src="<?= URL_BASE ?>public/js/programas.js" defer></script>
+<script src="<?= URL_BASE ?>public/js/programas.js?v=2" defer></script>

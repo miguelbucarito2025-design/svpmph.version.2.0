@@ -24,5 +24,5 @@
     </section>
 
 
-    <script src="<?= URL_BASE ?>public/js/<?= $pag ?? 'documentos' ?>.js" defer></script>
+    <script src="<?= URL_BASE ?>public/js/<?= $pag ?? 'documentos' ?>.js?v=3" defer></script>
 </article>

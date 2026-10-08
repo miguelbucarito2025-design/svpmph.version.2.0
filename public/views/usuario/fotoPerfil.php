@@ -67,5 +67,5 @@
         </div>
 
     </section>
-    <script src="<?= URL_BASE ?>public/js/foto.js" defer></script>
+    <script src="<?= URL_BASE ?>public/js/foto.js?v=1" defer></script>
 </article>

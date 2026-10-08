@@ -85,7 +85,7 @@ function cargarExpedienteDigital() {
             <div class="archivo-accion">
             ${
               tieneUrl
-                ? `<a href="${item.url}" target="_blank" rel="noopener noreferrer" class="btn-ver-archivo" title="Ver Documento">
+                ? `<a href="${item.url}" target="_blank" rel="noopener noreferrer"  title="Ver Documento">
                      <button type="button" class="success btn-ver-archivo max-width-250">
                         <svg class="icono-outline"><use href="#icon-confirmar" /></svg>
                         Ver Archivo
@@ -113,7 +113,7 @@ function abrirModalGestionArchivo(id, nombre, verificado, tieneUrl) {
   );
 
   AlertApp.show("", formModal, "", null, {
-    claseExtra: "ventana-modal modal-archivo-estilo",
+    claseExtra: "ventana-modal modal-archivo-estilo modal-large",
     btnTexto: "Cerrar",
     btnIcono: svgCerrar,
     btnClase: "btn-ghost-danger",

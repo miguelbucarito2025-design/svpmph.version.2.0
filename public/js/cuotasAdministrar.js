@@ -45,8 +45,47 @@ function estado(status) {
 }
 
 /**
- * Renderiza las tarjetas de usuarios en la primera vista (#contenedorOfertasCards-2)
- * Alineando el badge SVG dentro del cuerpo del texto para no obstruir la foto.
+ * @summary Genera el badge acorde al estado real devuelto por las métricas.
+ */
+function obtenerBadgeEstadoUsuario(usuario) {
+  const cuotasRechazadas = Number(usuario.cuotas_rechazadas || 0);
+  const cuotasEnProceso = Number(usuario.cuotas_en_proceso || 0);
+  const cuotasPendientes = Number(usuario.cuotas_pendientes || 0);
+
+  if (cuotasRechazadas > 0) {
+    return `
+      <div class="container-card-cuota-svg badge-danger style-inline-badge">
+        <span><svg class="icono-outline"><use href="#icono-cancelar" /></svg> Rechazada (${cuotasRechazadas})</span>
+      </div>`;
+  }
+
+  if (cuotasEnProceso > 0) {
+    return `
+      <div class="container-card-cuota-svg badge-info style-inline-badge">
+        <span><svg class="icono-outline"><use href="#icono-buscar" /></svg> En Espera (${cuotasEnProceso})</span>
+      </div>`;
+  }
+
+  if (cuotasPendientes > 0) {
+    return `
+      <div class="container-card-cuota-svg badge-warning style-inline-badge">
+        <span><svg class="icono-outline"><use href="#icono-no-verificado" /></svg> Sin Pagar (${cuotasPendientes})</span>
+      </div>`;
+  }
+
+  return `
+    <div class="container-card-cuota-svg badge-success style-inline-badge">
+      <span><svg class="icono-outline"><use href="#icono-estatus" /></svg> Al Día</span>
+    </div>`;
+}
+
+/**
+ * @summary Renderiza las tarjetas de los agremiados en el contenedor principal.
+ * @description Limpia el contenedor, instancia la lista de tarjetas usando DocumentFragment
+ *              y delega la renderización del badge de estado a obtenerBadgeEstadoUsuario().
+ *
+ * @param {Array<Object>} datos Arreglo con la información de los usuarios/agremiados.
+ * @returns {void}
  */
 function renderizarTabla(datos) {
   const contenedorGrid = document.getElementById("contenedorOfertasCards-2");
@@ -72,36 +111,8 @@ function renderizarTabla(datos) {
     const nombreCompleto =
       `${usuario.nombre || ""} ${usuario.apellido || ""}`.trim();
 
-    const cuotasEnProceso = Number(usuario.cuotas_en_proceso || 0);
-    const cuotasPendientes = Number(usuario.cuotas_pendientes || 0);
-
-    // Selección de la insignia SVG en versión Inline
-    let badgeEstadoSVG = "";
-    if (cuotasEnProceso > 0) {
-      badgeEstadoSVG = `
-        <div class="container-card-cuota-svg badge-info style-inline-badge">
-          <span>
-            <svg class="icono-outline"><use href="#icono-buscar" /></svg>
-            En Espera (${cuotasEnProceso})
-          </span>
-        </div>`;
-    } else if (cuotasPendientes > 0) {
-      badgeEstadoSVG = `
-        <div class="container-card-cuota-svg badge-danger style-inline-badge">
-          <span>
-            <svg class="icono-outline"><use href="#icono-no-verificado" /></svg>
-            Sin Pagar (${cuotasPendientes})
-          </span>
-        </div>`;
-    } else {
-      badgeEstadoSVG = `
-        <div class="container-card-cuota-svg badge-success style-inline-badge">
-          <span>
-            <svg class="icono-outline"><use href="#icono-estatus" /></svg>
-            Al Día
-          </span>
-        </div>`;
-    }
+    // Invocamos la función especializada para obtener el badge correcto
+    const badgeEstadoSVG = obtenerBadgeEstadoUsuario(usuario);
 
     card.innerHTML = `
       <div class="card-img">
@@ -125,8 +136,7 @@ function renderizarTabla(datos) {
           <div class="card-usuario-footer flex-between align-center margin-top-10">
             <small class="text-muted">Ingreso: ${escaparHTML(usuario.ingreso)}</small>
           </div>
-            ${badgeEstadoSVG}
-
+          ${badgeEstadoSVG}
         </div>
       </div>
     `;
