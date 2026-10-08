@@ -1,0 +1,32 @@
+name: Despliegue Automático al VPS
+
+on:
+  push:
+    branches:
+      - main # Asegúrate de que esta sea la rama que usas, a veces se llama 'master'
+
+jobs:
+  deploy:
+    name: Desplegar en el servidor
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v3
+
+      - name: Ejecutar despliegue en VPS por SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            # 1. Entrar a la ruta REAL del proyecto en el servidor web
+            cd /var/www/svpmph
+
+            # 2. Descargar los últimos cambios desde GitHub
+            git pull origin main
+
+            # 3. Reconstruir y levantar el sistema 
+            # (Usamos el nombre de archivo exacto que encontraste en el VPS)
+            docker compose -f docker-compose.yml up -d --build
