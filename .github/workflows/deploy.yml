@@ -3,7 +3,7 @@ name: Despliegue Automático al VPS
 on:
   push:
     branches:
-      - main # Asegúrate de que esta sea la rama que usas, a veces se llama 'master'
+      - main
 
 jobs:
   deploy:
@@ -21,12 +21,11 @@ jobs:
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            # 1. Entrar a la ruta REAL del proyecto en el servidor web
+            # 1. Entrar a la ruta del proyecto
             cd /var/www/svpmph
 
-            # 2. Descargar los últimos cambios desde GitHub
+            # 2. Descargar los cambios
             git pull origin main
 
-            # 3. Reconstruir y levantar el sistema 
-            # (Usamos el nombre de archivo exacto que encontraste en el VPS)
+            # 3. Levantar contenedores con Docker
             docker compose -f docker-compose.yml up -d --build
