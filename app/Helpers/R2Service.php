@@ -36,10 +36,12 @@ class R2Service
         $this->bucket = getenv('R2_BUCKET_NAME') ?: ($_ENV['R2_BUCKET_NAME'] ?? '');
 
         $this->s3 = new S3Client([
-            'version'     => 'latest',
-            'region'      => 'auto',
-            'endpoint'    => getenv('R2_ENDPOINT') ?: ($_ENV['R2_ENDPOINT'] ?? ''),
-            'credentials' => [
+            'version'                 => 'latest',
+            'region'                  => 'auto',
+            'endpoint'                => getenv('R2_ENDPOINT') ?: ($_ENV['R2_ENDPOINT'] ?? ''),
+            'use_path_style_endpoint' => true, // <--- ¡Vital para Cloudflare R2!
+            'signature_version'       => 'v4',    // <--- ¡Fuerza la firma correcta v4!
+            'credentials'             => [
                 'key'    => getenv('R2_ACCESS_KEY_ID') ?: ($_ENV['R2_ACCESS_KEY_ID'] ?? ''),
                 'secret' => getenv('R2_SECRET_ACCESS_KEY') ?: ($_ENV['R2_SECRET_ACCESS_KEY'] ?? ''),
             ],
