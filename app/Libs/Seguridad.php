@@ -334,4 +334,70 @@ class Seguridad
 
         return $lista;
     }
+
+
+    /**
+     * Banea una IP de forma permanente e inmediata ante una falta grave (Fuzzing / Bots).
+     */
+    public static function banearIpInmediata(string $ip, string $motivo): void
+    {
+        $ipSegura = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $ip);
+        $archivoFaltas = self::obtenerDirBaneos() . '/fuzzing_' . $ipSegura . '.json';
+
+        $datos = [
+            'ip'              => $ip,
+            'inicio'          => date('Y-m-d H:i:s'),
+            'faltas'          => 999, // Falta crítica directa
+            'motivo'          => $motivo,
+            'baneado'         => true,
+            'fecha_baneo'     => date('Y-m-d H:i:s'),
+            'ultima_anomalia' => date('Y-m-d H:i:s')
+        ];
+
+        @file_put_contents($archivoFaltas, json_encode($datos, JSON_PRETTY_PRINT));
+    }
+
+
+
+    /**
+     * Añade de forma autónoma una ruta escaneada por bots a la lista negra dinámica.
+     */
+    public static function aprenderRutaMaliciosa(string $uri): void
+    {
+        // Ignorar rutas muy cortas o legítimas que puedan ser errores humanos simples (ej. /favicon.ico)
+        if (strlen($uri) < 3 || in_array($uri, ['favicon.ico', 'robots.txt'])) {
+            return;
+        }
+
+        $archivoDinamico = __DIR__ . '/../../storage/data/rutas_prohibidas_dinamicas.json';
+        $rutasDinamicas = [];
+
+        if (file_exists($archivoDinamico)) {
+            $rutasDinamicas = json_decode(file_get_contents($archivoDinamico), true) ?: [];
+        }
+
+        // Si la ruta ya fue aprendida, no duplicar
+        if (!in_array($uri, $rutasDinamicas)) {
+            $rutasDinamicas[] = $uri;
+            // Mantener un límite razonable para evitar archivos gigantes (ej. últimas 500 rutas)
+            if (count($rutasDinamicas) > 500) {
+                array_shift($rutasDinamicas);
+            }
+            @file_put_contents($archivoDinamico, json_encode(array_values($rutasDinamicas), JSON_PRETTY_PRINT));
+        }
+    }
+
+    /**
+     * Verifica si una ruta pertenece a la lista negra aprendida autónomamente.
+     */
+    public static function esRutaAprendidaMaliciosa(string $uri): bool
+    {
+        $archivoDinamico = __DIR__ . '/../../storage/data/rutas_prohibidas_dinamicas.json';
+        if (!file_exists($archivoDinamico)) {
+            return false;
+        }
+
+        $rutasDinamicas = json_decode(file_get_contents($archivoDinamico), true) ?: [];
+        return in_array($uri, $rutasDinamicas);
+    }
 }

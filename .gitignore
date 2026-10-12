@@ -24,3 +24,4 @@ docs/
 *.conf
 *.conf.1
 
+*.yml

@@ -236,16 +236,7 @@ class UsuariosController extends Controller
             return;
         }
 
-        if (isset($result['id'])) {
-            $result['id'] = Seguridad::encriptarID($result['id']);
-        } else {
-            foreach ($result as &$r) {
-                if (isset($r['id'])) {
-                    $r['id'] = Seguridad::encriptarID($r['id']);
-                }
-            }
-            unset($r);
-        }
+
         $this->respuesta->json($result, 200, 'Cargos obtenidos exitosamente.');
     }
 

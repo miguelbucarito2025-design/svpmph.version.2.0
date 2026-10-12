@@ -5,21 +5,27 @@ configurarBusquedaTiempoReal(
     const contenedor = document.getElementById("cargo_id");
 
     if (!datosAgremiado.data || datosAgremiado.data.length === 0) {
-      contenedor.innerHTML = ` <option value="">No se encontro nada relacionado</option>`;
-
+      contenedor.innerHTML = `<option value="">No se encontro nada relacionado</option>`;
       return;
     }
 
-    const m = datosAgremiado.data[0] || datosAgremiado.data;
-    contenedor.innerHTML = `
-    <option value="${m.id}">
-    ${m.cargo}
-   </option>
-    `;
+    // Recorremos todos los elementos del arreglo y generamos un option por cada uno
+    const opcionesHTML = datosAgremiado.data
+      .map(
+        (m) => `
+      <option value="${m.id}">
+        ${m.cargo}
+      </option>
+    `,
+      )
+      .join("");
+
+    // Inyectamos todas las opciones en el select
+    contenedor.innerHTML = opcionesHTML;
   },
   {
     nombreParametro: "institucion_id",
-    tiempoDebounce: 300, // Espera 600ms tras escribir
+    tiempoDebounce: 300, // Espera 300ms tras escribir
   },
 );
 

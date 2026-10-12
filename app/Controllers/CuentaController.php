@@ -396,15 +396,15 @@ class CuentaController extends Controller
             }
         }
         $model = new CuentasModel;
-        $r2Service = new R2Service();
         $recursos = $model->selecionarPorIds($idsOriginales);
+        $r2 = new R2Service;
         foreach ($recursos as $r) {
 
-            $foto = $r2Service->eliminarArchivo($r['foto']);
+            if (!empty($r['foto'])) {
 
-            if (!$foto) {
-
-                throw new AppException('No se pudo eliminar El recurso ' . $r['foto'], 500);
+                if (!$r2->eliminarArchivo($r['foto'])) {
+                    throw new AppException('Error de Eliminacion');
+                }
             }
         }
         $registrosEliminados = $model->eliminarPorIds($idsOriginales);

@@ -61,7 +61,7 @@ trait ManejoArchivosR2Trait
      * @param array $keys Lista de rutas en R2.
      * @return void
      */
-    protected function eliminarArchivosR2(array $keys): void
+    protected function eliminarArchivosR2(null|array|string $keys): void
     {
         if (empty($keys)) {
             return;

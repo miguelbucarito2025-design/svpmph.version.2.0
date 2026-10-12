@@ -416,7 +416,7 @@ class CuentasModel extends Model
 
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
 
-        $sql = "SELECT c.id,d.foto FROM {$this->tabla} c LEFT JOIN datos d ON c.id=d.cuenta_id WHERE c.id IN ($placeholders)";
+        $sql = "SELECT c.id,d.foto FROM {$this->tabla} c LEFT JOIN datos d ON c.id=d.cuenta_id WHERE c.id IN ($placeholders) ";
         $db = DataBase::getConnect();
         $stmt = $db->prepare($sql);
 

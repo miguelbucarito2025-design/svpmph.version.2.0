@@ -8,6 +8,7 @@ use Exception;
 use App\Libs\Seguridad;
 use App\Libs\Session;
 
+
 /**
  * Clase Enrutador
  *
@@ -97,7 +98,7 @@ class Enrutador
 
                 // 3. Control de acceso por Rol
                 if (!empty($ruta['roles']) && !self::validarAccesoRol($session, $ruta['roles'])) {
-                    throw new Exception("Acceso denegado: No tienes permisos o tu sesión expiró.", 403);
+                    throw new Exception("Acceso denegado: No tienes permisos o tu sesión expiró. ruta: {$uriPeticion}", 403);
                 }
 
                 // 4. Procesamiento de Parámetros Encriptados
@@ -129,11 +130,18 @@ class Enrutador
                 return;
             }
         }
-
         // Si la ruta existía pero el verbo no coincidió
         if ($rutaEncontrada) {
-            throw new Exception("Método {$metodoPeticion} no permitido para esta ruta.", 405);
+            $ip = !empty($_SERVER['HTTP_CF_CONNECTING_IP']) ? $_SERVER['HTTP_CF_CONNECTING_IP'] : ($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
+            Seguridad::banearIpInmediata($ip, "Método no permitido para ruta existente: {$uriPeticion}");
+            throw new Exception("Método {$metodoPeticion} no permitido para la ruta. {$uriPeticion}", 405);
         }
+
+        // --- SISTEMA AUTÓNOMO DE APRENDIZAJE DEFENSIVO ---
+        $ip = !empty($_SERVER['HTTP_CF_CONNECTING_IP']) ? $_SERVER['HTTP_CF_CONNECTING_IP'] : ($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
+
+        // 1. El sistema aprende que esta ruta NO existe y la anota en la lista negra dinámica
+        Seguridad::aprenderRutaMaliciosa($uriPeticion);
 
         // La ruta no existe en el sistema
         throw new Exception("Ruta no encontrada: {$uriPeticion}", 404);

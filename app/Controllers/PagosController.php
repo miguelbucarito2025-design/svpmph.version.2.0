@@ -365,7 +365,7 @@ class PagosController extends Controller
         $model = new CuotasModel();
 
         $cuotas = $model->paginar($datos);
-        $total = count($model->obtenerTotal($datos['id'], $datos['destin']));
+        $total = (int) count($model->obtenerTotal($datos['id'] ?? [], $datos['destin'] ?? []) ?? []);
 
 
         $this->respuesta->json($cuotas, 200, "Usuarios obtenidos con éxito", [], (int)$total);

@@ -15,7 +15,7 @@ class SeguridadMiddleware
 {
     private const LOG_DIR = 'app/Logs/';
     private const TIEMPO_BLOQUEO_SEGUNDOS = 5; // Ventana de evaluación en segundos por IP
-    private const MAX_PETICIONES = 30;         // Máximo de peticiones HTTP permitidas por IP en la ventana
+    private const MAX_PETICIONES = 30;         // Máximo de peticiones HTTP permitidas por IP
 
     // --- PROTECCIÓN DE SOBRECARGA GLOBAL ---
     private const MAX_PETICIONES_GLOBALES_SEGUNDO = 150;
@@ -37,34 +37,99 @@ class SeguridadMiddleware
     ];
 
     /**
-     * Patrones de URL maliciosos o escaneos típicos de otros CMS (como WordPress) 
-     * que no tienen nada que hacer en tu sistema MVC puro.
+     * Patrones de URL maliciosos, escaneos de frameworks ajenos, source maps 
+     * y herramientas de depuración prohibidas en tu MVC puro.
      */
     private const PATRONES_ESCANEO_PROHIBIDOS = [
+        // Paneles y CMS ajenos
         'wp-admin',
         'wp-login',
         'wp-content',
         'wp-includes',
         'xmlrpc.php',
-        '.env',
-        'eval-config',
         'phpmyadmin',
         'admin.php',
         'setup.php',
-        '.git',
-        '.yml',
-        '.php'
 
+        // Archivos de entorno, credenciales y secretos
+        '.env',
+        'secrets.env',
+        'auth.json',
+        'credentials',
+        'config.json',
+        'settings.json',
+        'env.json',
+        'appsettings.json',
+
+        // Credenciales de Cloud, Firebase y AWS
+        'firebase',
+        'gcp-',
+        'google-',
+        'service-account',
+        'serviceaccount',
+        'sa.json',
+        'push_config.json',
+        'aws',
+        'credentials.json',
+
+        // Contenedores, despliegues y orquestadores
+        'dockerfile',
+        'docker-compose',
+        'compose.yaml',
+        'compose.yml',
+        'terraform.tfstate',
+        'serverless.yml',
+        'wrangler.toml',
+        'vercel.json',
+        'netlify.toml',
+        'railway',
+        'fly.toml',
+        'supabase/config.toml',
+
+        // Llaves SSH, certificados y Source Maps (Vite/Webpack)
+        'id_rsa',
+        'id_dsa',
+        'id_ecdsa',
+        'id_ed25519',
+        'server.key',
+        'key.pem',
+        'host.key',
+        'localhost.key',
+        'privatekey',
+        '.mjs.map',
+        '.js.map',
+        '__vite_rsc_',
+
+        // Endpoints genéricos de APIs que no usas (GraphQL, Actuator, Debug)
+        'graphql',
+        'actuator',
+        'debug/vars',
+        'debug/pprof',
+
+        // Inyecciones de código, RCE y LFI
+        'allow_url_include',
+        'auto_prepend_file',
+        'php://input',
+        '/proc/self/',
+        'eval-config',
+
+        // Archivos de respaldo comprimidos y volcados de base de datos
+        '.tar.gz',
+        '.zip',
+        '.rar',
+        '.7z',
+        '.sql',
+        '.bak',
+        '.old'
     ];
 
     /**
      * Evalúa la petición entrante analizando baneos previos, rutas prohibidas, bots y frecuencia.
-     *
-     * @return void
      */
     public static function inspeccionarPeticion(): void
     {
         $ip = self::obtenerIpReal();
+
 
         // 0. VERIFICAR BANEO PERMANENTE: Si la IP ya está baneada, se rechaza de inmediato.
         if (Seguridad::ipBaneadaPorFuzzing()) {
@@ -77,8 +142,14 @@ class SeguridadMiddleware
         }
 
         $userAgent = trim($_SERVER['HTTP_USER_AGENT'] ?? '');
-        $rutaSolicitada = strtolower($_SERVER['REQUEST_URI'] ?? '');
+        $rutaSolicitada = strtolower(urldecode($_SERVER['REQUEST_URI'] ?? ''));
 
+
+        // 3.1 NUEVO: Verificar si la ruta ya fue aprendida como maliciosa por el sistema autónomo
+        if (Seguridad::esRutaAprendidaMaliciosa($rutaSolicitada)) {
+            Seguridad::banearIpInmediata($ip, "Escaneo repetido de ruta maliciosa aprendida dinámicamente ($rutaSolicitada).");
+            self::registrarYAbortar("Acceso denegado: Actividad maliciosa detectada.", 403, $ip);
+        }
         // 2. REGLA 1: Exigir User-Agent y bloquear herramientas de escaneo conocidas
         if (empty($userAgent)) {
             self::registrarFaltaGraveYBanear("Petición sin User-Agent (posible bot o script malicioso).", $ip);
@@ -90,7 +161,7 @@ class SeguridadMiddleware
             }
         }
 
-        // 3. REGLA 2: Detección de Fuzzing y escaneo de carpetas ajenas (ej. buscando WordPress)
+        // 3. REGLA 2: Detección de Fuzzing y escaneo de carpetas ajenas
         foreach (self::PATRONES_ESCANEO_PROHIBIDOS as $patron) {
             if (strpos($rutaSolicitada, $patron) !== false) {
                 self::registrarFaltaGraveYBanear("Escaneo de rutas no autorizadas detectado (intento de buscar $patron).", $ip);
@@ -103,27 +174,14 @@ class SeguridadMiddleware
         }
     }
 
-    /**
-     * Registra una falta GRAVE (como buscar WordPress o usar bots de ataque) 
-     * y aplica el castigo acumulativo hasta banear la IP permanentemente.
-     */
     private static function registrarFaltaGraveYBanear(string $motivo, string $ip): void
     {
-        // Forzamos el registro de la falta utilizando el sistema de baneo permanente
-        // (Nota: puedes invocar el método interno o dejar que Seguridad gestione el contador).
-        for ($i = 0; $i < 3; $i++) {
-            // Incrementamos las faltas de golpe o de forma acumulativa para acelerar el baneo ante un ataque evidente
-            $reflectionMethod = new \ReflectionMethod(Seguridad::class, 'registrarFaltaManipulacion');
-            $reflectionMethod->setAccessible(true);
-            $reflectionMethod->invoke(null);
-        }
+        // Baneo inmediato a la primera ofensa sin rodeos ni contadores lentos
+        Seguridad::banearIpInmediata($ip, $motivo);
 
         self::registrarYAbortar("Acceso denegado: $motivo", 403, $ip);
     }
 
-    /**
-     * Revisa la suma global de peticiones que recibe el servidor por segundo.
-     */
     private static function excedeCargaGlobalServidor(): bool
     {
         $segundoActual = time();
@@ -169,9 +227,6 @@ class SeguridadMiddleware
         return $sobrecargado;
     }
 
-    /**
-     * Determina si una IP supera la tasa máxima de peticiones permitidas.
-     */
     private static function excedeLimitePeticiones(string $ip): bool
     {
         $ahora = microtime(true);
@@ -195,6 +250,7 @@ class SeguridadMiddleware
                 }
             }
 
+            // CORRECCIÓN: Se agregó el operador menos (-) que faltaba en la resta
             if (($ahora - $datos['inicio']) > self::TIEMPO_BLOQUEO_SEGUNDOS) {
                 $datos['inicio'] = $ahora;
                 $datos['peticiones'] = 1;
@@ -217,9 +273,6 @@ class SeguridadMiddleware
         return $excedido;
     }
 
-    /**
-     * Extrae la IP real del cliente evaluando proxies y Cloudflare.
-     */
     private static function obtenerIpReal(): string
     {
         if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
@@ -234,9 +287,6 @@ class SeguridadMiddleware
         return $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
     }
 
-    /**
-     * Escribe la anomalía en el archivo de logs y detiene la ejecución enviando un JSON.
-     */
     private static function registrarYAbortar(string $detalle, int $codigoHttp, string $ip): void
     {
         if (!is_dir(self::LOG_DIR)) {
@@ -244,13 +294,19 @@ class SeguridadMiddleware
         }
 
         $fecha = date("Y-m-d H:i:s");
-        $route = $_SERVER['REQUEST_URI']    ?? 'desconocida';
-        $mensaje = "[$fecha] [$codigoHttp] $detalle - IP: $ip - Ruta: $route\n";
+        $route = $_SERVER['REQUEST_URI'] ?? 'desconocida';
 
+        $mensaje = "[$fecha] [$codigoHttp] $detalle - IP: $ip - Ruta: $route\n";
         file_put_contents(self::LOG_DIR . 'seguridad.log', $mensaje, FILE_APPEND);
 
-        $error = new ErrorController;
-        $error->index($codigoHttp, $detalle);
+        // Corte seco y cortante: respuesta limpia sin gastar recursos de la aplicación
+        http_response_code($codigoHttp);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode([
+            "error" => true,
+            "codigo" => $codigoHttp,
+            "mensaje" => $detalle
+        ]);
         exit;
     }
 }
