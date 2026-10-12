@@ -11,12 +11,14 @@
             Formulario
         </h2>
         <hr />
+
+
         <form action="<?= $ruta ?? '' ?>" method="post" class="form-usuario" id="perfil">
             <div class="grid-form">
 
                 <div class="campo-grupo">
                     <label for="nombre">Primer Nombre *</label>
-                    <input type="text" id="nombre" name="nombre" value="<?= htmlspecialchars($datos['datos']['nombre'] ?? '') ?>" required>
+                    <input type="text" id="nombre" name="nombre" value="<?= htmlspecialchars($prueva['nombre'] ?? '') ?>" required>
                 </div>
 
 
@@ -24,37 +26,37 @@
                 <div class="campo-grupo">
 
                     <label for="s_nombre">Segundo Nombre </label>
-                    <input type="text" id="s_nombre" name="s_nombre" value="<?= htmlspecialchars($datos['datos']['s_nombre'] ?? '') ?>">
+                    <input type="text" id="s_nombre" name="s_nombre" value="<?= htmlspecialchars($prueva['s_nombre'] ?? '') ?>">
                 </div>
 
                 <div class="campo-grupo">
                     <label for="apellido">Primer Apellido *</label>
-                    <input type="text" id="apellido" name="apellido" value="<?= htmlspecialchars($datos['datos']['apellido'] ?? '') ?>" required>
+                    <input type="text" id="apellido" name="apellido" value="<?= htmlspecialchars($prueva['apellido'] ?? '') ?>" required>
                 </div>
 
                 <div class="campo-grupo">
                     <label for="s_apellido">Segundo Apellido</label>
-                    <input type="text" id="s_apellido" name="s_apellido" value="<?= htmlspecialchars($datos['datos']['s_apellido'] ?? '') ?>">
+                    <input type="text" id="s_apellido" name="s_apellido" value="<?= htmlspecialchars($prueva['s_apellido'] ?? '') ?>">
                 </div>
 
                 <div class="campo-grupo">
                     <label for="id_cedula">Cédula de Identidad *</label>
-                    <input type="text" id="id_cedula" name="id_cedula" value="<?= htmlspecialchars($datos['datos']['id_cedula'] ?? '') ?>" placeholder="Ej: 12345678" required>
+                    <input type="text" id="id_cedula" name="id_cedula" value="<?= htmlspecialchars($prueva['id_cedula'] ?? '') ?>" placeholder="Ej: 12345678" required>
                 </div>
 
                 <div class="campo-grupo">
                     <label for="tlf">Teléfono de Contacto *</label>
-                    <input type="tel" id="tlf" name="tlf" value="<?= htmlspecialchars($datos['datos']['tlf'] ?? '') ?>" placeholder="Ej: 0412-1234567" required>
+                    <input type="tel" id="tlf" name="tlf" value="<?= htmlspecialchars($prueva['tlf'] ?? '') ?>" placeholder="Ej: 0412-1234567" required>
                 </div>
 
                 <div class="campo-grupo">
                     <label for="edad">Fecha de nacimiento *</label>
-                    <input type="date" id="edad" name="edad" value="<?= htmlspecialchars($datos['datos']['edad'] ?? '') ?>" required>
+                    <input type="date" id="edad" name="edad" value="<?= htmlspecialchars($prueva['edad'] ?? '') ?>" required>
                 </div>
 
                 <div class="campo-grupo campo-full">
                     <label for="direccion">Dirección de Habitación *</label>
-                    <textarea id="direccion" name="direccion" rows="3" required><?= htmlspecialchars($datos['datos']['direccion'] ?? '') ?></textarea>
+                    <textarea id="direccion" name="direccion" rows="3" required><?= htmlspecialchars($prueva['direccion'] ?? '') ?></textarea>
                 </div>
 
             </div>

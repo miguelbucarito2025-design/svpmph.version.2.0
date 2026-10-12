@@ -47,7 +47,7 @@
                     class="reg-input"
                     placeholder=" "
                     required />
-                <label for="usuario" class="reg-label">Key</label>
+                <label for="key" class="reg-label">Key</label>
             </div>
 
 

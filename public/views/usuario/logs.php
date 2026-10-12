@@ -7,6 +7,7 @@
     </div>
     <br>
 
+
     <section>
         <div class="toolbar-top-bar d-flex justify-content-between align-items-center">
             <div class="toolbar-metrics d-flex align-items-center gap-3">
@@ -65,6 +66,19 @@
             </div>
         </div>
     </section>
+    <!-- BLOQUE DE RESUMEN INTELIGENTE DEL SISTEMA -->
+    <div class="seccion-log mb-3" id="seccionResumenSistema">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+            <h4 style="font-size: 15px; font-weight: 600; color: #6366f1; margin: 0;">
+                <span style="display:inline-block; width:10px; height:10px; background:#6366f1; border-radius:50%; margin-right:6px;"></span>
+                Resumen Inteligente y Diagnóstico
+            </h4>
+        </div>
+        <div id="terminalResumen" style="background: #f8f9fa; border-radius: 8px; padding: 12px; border: 1px solid #e2e8f0;">
+            <div class="text-muted small">Cargando análisis inteligente del sistema...</div>
+        </div>
+    </div>
+
 
     <div class="container-logs-card">
         <!-- BLOQUE 1: ERRORES DE APLICACIÓN (PHP / APP) -->

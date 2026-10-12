@@ -23,17 +23,19 @@ class DashboardController extends Controller
 
         $model = new DatosModel();
         $archivos = new ArchivosModel;
-        $id = $this->session->get('usuario_id');
-        $total['archivos'] = $archivos->select('count');
-        $cuotas = new  CuotasModel;
-        $total['cuotas'] = $cuotas->obtenerTotal($id, $this->session->get('usuario_rol'));
-        $gremio = new GremioModel;
-        $total['gremio'] = $gremio->obtenerTotalGremio();
+        $rol = $this->session->get('usuario_rol');
+        if ($rol === 5) {
+
+            $id = $this->session->get('usuario_id');
+            $total['archivos'] = $archivos->select('count');
+            $cuotas = new  CuotasModel;
+            $total['cuotas'] = $cuotas->obtenerTotal($id, $this->session->get('usuario_rol'));
+            $gremio = new GremioModel;
+            $total['gremio'] = $gremio->obtenerTotalGremio();
+        }
 
 
-        $datos = $model->datosPersonalesYLaborales(
-            $this->session->get('usuario_id')
-        );
+        $datos = $model->datosPersonalesYLaborales($this->session->get('usuario_id'));
 
         $foto = $datos['foto'] ?? 'perfiles/user.png';
 
@@ -43,9 +45,8 @@ class DashboardController extends Controller
         $this->vista->render(
             'usuario/dashborad',
             [
-                'datos' => $datos,
                 'prueva' => $datos,
-                'total' => $total,
+                'total' => $total ?? [],
                 'nombreUsuario' => $this->session->get('usuario_nombre'),
                 'nombreRol' => $this->session->get('nombre_rol'),
                 'titlePag' => 'Dashboard',

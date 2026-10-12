@@ -36,6 +36,8 @@ class UsuariosController extends Controller
             $this->session->get('usuario_id')
         );
 
+
+
         $urlPublica = $this->obtenerArchivo($this->session->get('foto_perfil'));
 
         $ruta = empty($datos) ? 'perfil/guardar' : 'perfil/actualizar';
@@ -44,7 +46,7 @@ class UsuariosController extends Controller
             'usuario/perfil',
             [
                 'nombreUsuario' => $this->session->get('usuario_nombre'),
-                'datos' => $datos,
+                'prueva' => $datos,
                 'nombreRol' => $this->session->get('nombre_rol'),
                 'titlePag' => 'Datos Personales',
                 'grup' => 'perfil',
@@ -191,7 +193,7 @@ class UsuariosController extends Controller
             'usuario/datosLaborales',
             [
                 'nombreUsuario' => $this->session->get('usuario_nombre'),
-                'datos'         => $datos,
+                'prueva'         => $datos,
                 'nombreRol'     => $this->session->get('nombre_rol'),
                 'titlePag'      => 'Datos Laborales',
                 'grup'          => 'perfil',

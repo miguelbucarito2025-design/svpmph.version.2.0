@@ -11,6 +11,7 @@ use App\Helpers\Validar;
 use App\Models\ArchivosModel;
 use App\Traits\CifrarTrait;
 use App\Traits\ManejoArchivosR2Trait;
+use App\Models\DatosModel;
 
 class ArchivosController extends Controller
 {
@@ -23,6 +24,11 @@ class ArchivosController extends Controller
         $this->requerirAutenticacion();
         $urlPublica = $this->obtenerArchivo($this->session->get('foto_perfil'));
 
+        $model = new DatosModel();
+        $datos = $model->datosPersonalesYLaborales($this->session->get('usuario_id'));
+        if (empty($datos)) {
+            $this->respuesta->redirect('/perfil');
+        }
 
 
         $this->vista->render(
@@ -31,6 +37,7 @@ class ArchivosController extends Controller
                 'token'   => $this->session->get('csrf_token'),
                 'nombreUsuario' => $this->session->get('usuario_nombre'),
                 'nombreRol' => $this->session->get('nombre_rol'),
+                'prueva' => $datos,
                 'titlePag' => 'Archivos',
                 'pag' => 'documentos',
                 'grup' => 'gremio',

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Controllers\Abstract\Controller;
-use App\Helpers\R2Service;
+use App\Helpers\LogAnalyzer;
 use App\Traits\ManejoArchivosR2Trait;
 
 class ErrorController extends Controller
@@ -87,10 +87,14 @@ class ErrorController extends Controller
             $logDb = !empty($contenido) ? $contenido : '--- Sin errores de Base de Datos ---';
         }
 
+        $logService = new LogAnalyzer('app/Logs/', 'storage/');
+
+
         $this->respuesta->json([
             'status' => 'success',
             'app'    => ['log' => $logApp, 'peso' => $pesoApp],
-            'db'     => ['log' => $logDb,  'peso' => $pesoDb]
+            'db'     => ['log' => $logDb,  'peso' => $pesoDb],
+            'resumen' => $logService->obtenerResumenParaVista()
         ]);
     }
 

@@ -13,6 +13,7 @@ use App\Models\PromocionModel;
 use App\Traits\CifrarTrait;
 use App\Traits\GeneradorCodigoTrait;
 use App\Traits\ManejoArchivosR2Trait;
+use App\Models\DatosModel;
 use Throwable;
 
 class RegistroGremioController extends Controller
@@ -93,7 +94,11 @@ class RegistroGremioController extends Controller
 
         $urlPublica = $this->obtenerArchivo($this->session->get('foto_perfil'));
 
-
+        $model = new DatosModel();
+        $datos = $model->datosPersonalesYLaborales($this->session->get('usuario_id'));
+        if (empty($datos)) {
+            $this->respuesta->redirect('/perfil');
+        }
 
 
         $this->vista->render(
@@ -103,6 +108,7 @@ class RegistroGremioController extends Controller
                 'nombreUsuario' => $this->session->get('usuario_nombre'),
                 'nombreRol' => $this->session->get('nombre_rol'),
                 'titlePag' => 'Estatus',
+                'prueva' => $datos,
                 'pag' => 'gremioEstatus',
                 'grup' => 'gremio',
                 'fotoUsuario' => $urlPublica

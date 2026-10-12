@@ -18,7 +18,7 @@
                 <div class="campo-grupo">
                     <label for="nombre">Institución *</label>
                     <select name="institucion_id" id="institucion_id">
-                        <option value="<?= $datos['datos']['institucion_id'] ?? '' ?>"><?= !empty($datos['datos']['institucion']) ? 'Actual--> ' . $datos['datos']['institucion'] : '---Seleccione---'; ?></option>
+                        <option value="<?= $prueva['institucion_id'] ?? '' ?>"><?= !empty($prueva['institucion']) ? 'Actual--> ' . $prueva['institucion'] : '---Seleccione---'; ?></option>
                         <?php
 
                         if (empty($institucion)) {
@@ -46,7 +46,7 @@
 
                     <label for="s_nombre">Cargo</label>
                     <select name="cargo_id" id="cargo_id">
-                        <option value="<?= $datos['datos']['cargo_id'] ?? '' ?>"><?= !empty($datos['datos']['cargo']) ? 'Actual--> ' . $datos['datos']['cargo'] : '---Seleccione---'; ?></option>
+                        <option value="<?= $prueva['cargo_id'] ?? '' ?>"><?= !empty($prueva['cargo']) ? 'Actual--> ' . $prueva['cargo'] : '---Seleccione---'; ?></option>
 
 
                     </select>

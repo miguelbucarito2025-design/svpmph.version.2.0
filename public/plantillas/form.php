@@ -4,14 +4,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <?php
+  include_once 'public/layaout/head.php';
 
+  ?>
   <link rel="stylesheet" href="<?= URL_BASE ?>public/css/form.css?v=<?php echo time(); ?>" />
   <link rel="stylesheet" href="<?= URL_BASE ?>public/css/global.css?v=<?php echo time(); ?>" />
   <script defer src="<?= URL_BASE ?>public/js/global.js?v=<?php echo time(); ?>"></script>
   <meta name="csrf-token" content="<?= $_SESSION['csrf_token'] ?? '' ?>">
 
 
-  <title>Document</title>
+  <title>Sistem - SVPMPH</title>
 </head>
 
 <body>

@@ -7,10 +7,13 @@
             <b>¡Sistema en Evolución Constante!</b>
             Estamos trabajando en nuevas funciones. Al permanecer activo en la plataforma SVPMPH,
             serás el primero en enterarte de las próximas actualizaciones de carnetización , trámites, Cursos y mucho más!.
+
+
         </p>
     </div>
     <?php
-    if (empty($prueva)) { ?>
+    if (empty($prueva)) {
+    ?>
         <section class="section-usuario section-inf section-anuncio">
 
             <h2 class="section-usuario-h2">
@@ -69,6 +72,7 @@
 
     ?>
     <?php if ($_SESSION['usuario_rol'] == 1 && !empty($prueva)) { ?>
+        <br>
         <section class="dashboard-content text-pag">
 
             <div class="main-grid">

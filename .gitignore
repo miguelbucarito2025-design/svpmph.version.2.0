@@ -21,3 +21,8 @@ docs/
 *.
 
 
+*.conf
+*.conf.1
+
+
+docker-compose.prod.yml

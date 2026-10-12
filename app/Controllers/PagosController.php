@@ -16,6 +16,7 @@ use App\Models\PagosModel;
 use App\Traits\ManejoArchivosR2Trait;
 use App\Models\TramitesModel;
 use App\Helpers\Notificaciones;
+use App\Models\DatosModel;
 
 class PagosController extends Controller
 {
@@ -29,6 +30,11 @@ class PagosController extends Controller
 
         $urlPublica = $this->obtenerArchivo($this->session->get('foto_perfil'));
 
+        $model = new DatosModel();
+        $datos = $model->datosPersonalesYLaborales($this->session->get('usuario_id'));
+        if (empty($datos)) {
+            $this->respuesta->redirect('/perfil');
+        }
 
 
         $this->vista->render(
@@ -37,6 +43,7 @@ class PagosController extends Controller
                 'token'   => $this->session->get('csrf_token'),
                 'nombreUsuario' => $this->session->get('usuario_nombre'),
                 'nombreRol' => $this->session->get('nombre_rol'),
+                'prueva' => $datos,
                 'titlePag' => 'Cuotas',
                 'pag' => 'cuotas',
                 'grup' => 'pagos',

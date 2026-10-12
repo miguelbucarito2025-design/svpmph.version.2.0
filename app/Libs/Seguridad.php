@@ -25,7 +25,8 @@ class Seguridad
      */
     private static function obtenerDirBaneos(): string
     {
-        $dir = sys_get_temp_dir() . '/baneos_permanentes';
+        // Ruta persistente dentro de tu proyecto en lugar del directorio temporal del sistema
+        $dir = __DIR__ . '/../../storage/data/baneos';
         if (!is_dir($dir)) {
             @mkdir($dir, 0755, true);
         }

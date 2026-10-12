@@ -17,6 +17,31 @@
   align-items: center;
 }
 
+.success {
+  background-color: var(--color-success);
+}
+
+.container-button-anuncion {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 20px;
+}
+.button-anuncio {
+  max-width: 100%;
+  min-width: 100px;
+  height: 40px;
+  display: flex;
+  border: none;
+  line-height: 40px;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  border-radius: 5px; /* Crecimiento | Encogimiento | Ancho Base */
+  flex: 1 1 300px;
+}
 .form-container-menu > ul > li {
   display: flex;
   justify-content: center;

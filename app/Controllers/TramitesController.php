@@ -11,6 +11,7 @@ use App\Helpers\Validar;
 use App\Traits\CifrarTrait;
 use App\Traits\ManejoArchivosR2Trait;
 use App\Models\TramitesModel;
+use App\Models\DatosModel;
 
 class TramitesController extends Controller
 {
@@ -253,6 +254,11 @@ class TramitesController extends Controller
     {
         $this->requerirAutenticacion();
         $urlPublica = $this->obtenerArchivo($this->session->get('foto_perfil'));
+        $model = new DatosModel();
+        $datos = $model->datosPersonalesYLaborales($this->session->get('usuario_id'));
+        if (empty($datos)) {
+            $this->respuesta->redirect('/perfil');
+        }
 
 
 
@@ -263,6 +269,7 @@ class TramitesController extends Controller
                 'nombreUsuario' => $this->session->get('usuario_nombre'),
                 'nombreRol' => $this->session->get('nombre_rol'),
                 'titlePag' => 'Tramites y Solicitudes',
+                'prueva' => $datos,
                 'pag' => 'tramitesSolicitudes',
                 'grup' => 'gremio',
                 'fotoUsuario' => $urlPublica

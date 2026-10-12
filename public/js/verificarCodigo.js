@@ -6,11 +6,15 @@ const svgCerrar = `
   </svg>
 `;
 
-const formUsuario = document.createElement("div");
-formUsuario.innerHTML = `
-    <h2 class="title-login">Verificado</h2>
+// 1. Inicializamos el primer formulario del token (respetando tu arquitectura)
+inicializarFormulario("form-token", "token-verificar", (res) => {
+  // Creamos el contenedor del formulario de nueva contraseña
+  const formUsuario = document.createElement("div");
+  formUsuario.className = "modal-ofertas-container"; // O tu clase base de modales
+  formUsuario.innerHTML = `
+    <h2 class="title-login success">Verificado</h2>
     <hr>
-    <form method="post" id="form-newUserPass">
+    <form method="post" class="form-usuario" id="form-newUserPass">
         <p>Coloque el usuario y la nueva contraseña para completar la recuperación.<br><br></p>
         
         <div class="div-input campo-icon">
@@ -33,67 +37,61 @@ formUsuario.innerHTML = `
             <div class="container-svg">
                 <svg class="icono-outline"><use href="#icono-candado"></use></svg>
             </div>
-            <!-- 1. CORREGIDO: name="contrasena_confirm" y label for="contrasena-nueva" -->
             <input type="password" name="contrasena_confirm" id="contrasena-nueva" placeholder=" " required />
             <label for="contrasena-nueva">Confirmar Contraseña</label>
         </div>
-
-
-        <button class="btn-summit" type="submit">
-            <svg class="icono-outline"><use href="#icono-login"></use></svg>
-            Actualizar
-        </button>
     </form>
-`;
 
-inicializarFormulario("form-token", "token/verificar", (res) => {
-  // 1. Mostrar Modal con el botón rojo transparente y la X de cierre
-  AlertApp.show("", formUsuario, "none", null, {
+    <hr />
+
+    <div class="container-button-anuncion">
+      <button type="submit" class="success button-anuncio" form="form-newUserPass">
+        <svg class="icono-outline"><use href="#icono-login"></use></svg>
+        Actualizar
+      </button>
+    </div>
+    
+  `;
+
+  // 2. Mostramos el Modal con el componente creado (igual que en carreras.js)
+  AlertApp.show("", formUsuario, "", null, {
+    claseExtra: "ventana-modal modal-large",
     btnTexto: "Cerrar",
     btnIcono: svgCerrar,
     btnClase: "btn-ghost-danger",
     ocultarHeader: true,
-    claseExtra: "modal-formulario-expandido",
   });
 
-  const pass = document.getElementById("contrasena");
-  const passNew = document.getElementById("contrasena-nueva");
-  const formNewUser = document.getElementById("form-newUserPass");
+  // 3. Validaciones visuales auxiliares dentro del contenedor
+  const pass = formUsuario.querySelector("#contrasena");
+  const passNew = formUsuario.querySelector("#contrasena-nueva");
 
-  // 2. Validación visual al salir del SEGUNDO campo de contraseña
-  passNew.addEventListener("blur", () => {
-    const v1 = pass.value.trim();
-    const v2 = passNew.value.trim();
+  if (passNew) {
+    passNew.addEventListener("blur", () => {
+      const v1 = pass.value.trim();
+      const v2 = passNew.value.trim();
 
-    if (v1 !== "" && v2 !== "" && v1 !== v2) {
+      if (v1 !== "" && v2 !== "" && v1 !== v2) {
+        AlertApp.show(
+          "Contraseñas no coinciden",
+          "Las contraseñas no son iguales. Por favor, verifique e intente de nuevo.",
+          "warning",
+        );
+      }
+    });
+  }
+
+  // 4. Inicializamos el segundo formulario usando exactamente la misma función global
+  inicializarFormulario(
+    "form-newUserPass",
+    "cuenta/recuperada",
+    (respuesta) => {
       AlertApp.show(
-        "Contraseñas no coinciden",
-        "Las contraseñas no son iguales. Por favor, verifique e intente de nuevo.",
-        "warning",
+        "Éxito",
+        "La contraseña ha sido actualizada con éxito.",
+        "success",
+        "dashboard",
       );
-    }
-  });
-
-  // 3. Barrera de seguridad: Evita el envío por AJAX si no coinciden
-  formNewUser.addEventListener("submit", (e) => {
-    if (pass.value !== passNew.value) {
-      e.preventDefault();
-      e.stopImmediatePropagation(); // Cancela la ejecución de inicializarFormulario
-      AlertApp.show(
-        "Atención",
-        "No puede continuar porque las contraseñas no coinciden.",
-        "warning",
-      );
-    }
-  });
-
-  // 4. Inicialización del procesamiento AJAX hacia PHP
-  inicializarFormulario("form-newUserPass", "cuenta/recuperada", () => {
-    AlertApp.show(
-      "Éxito",
-      "La contraseña ha sido actualizada con éxito.",
-      "success",
-      "dashboard",
-    );
-  });
+    },
+  );
 });

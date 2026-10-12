@@ -478,7 +478,8 @@ hr {
   background-color: #7d93b0;
   color: var(--color-blanco);
   padding: auto 20px;
-  min-width: 120px;
+  margin: auto 10px;
+  max-width: 120px;
   border: 1px solid var(--sombra--);
   border-radius: 5px;
   height: 30px;

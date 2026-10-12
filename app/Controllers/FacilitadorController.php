@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Controllers\Abstract\Controller;
-use App\Helpers\R2Service;
 use App\Helpers\Validar;
 use App\Models\FacilitadorOfertaModel;
 use App\Traits\ManejoArchivosR2Trait;
@@ -20,7 +19,6 @@ class FacilitadorController extends Controller
         $this->requerirAutenticacion();
 
 
-        $r2Service = new R2Service();
         $foto = $this->session->get('foto_perfil');
         $urlPublica = $this->obtenerArchivo($foto);
 
@@ -31,7 +29,8 @@ class FacilitadorController extends Controller
                 'nombreRol' => $this->session->get('nombre_rol'),
                 'titlePag' => 'Facilitadores',
                 'fotoUsuario' => $urlPublica,
-                'pag' => 'facilitador'
+                'pag' => 'facilitador',
+                'grup' => ''
             ],
             'usuario'
         );

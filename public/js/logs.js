@@ -108,6 +108,11 @@ function cargarLogs() {
     .then((res) => {
       const payload = res.data || res;
 
+      // Renderizar el resumen inteligente si viene en la respuesta
+      if (payload.resumen) {
+        renderizarResumenSistema(payload.resumen);
+      }
+
       if (res.status === "success" || payload.status === "success") {
         if (terminalApp)
           terminalApp.innerHTML = parsearTextoALogCards(
@@ -130,7 +135,7 @@ function cargarLogs() {
           );
         }
       }
-    })
+    }) // <--- CORREGIDO: Se quitó el punto y coma indebido (era ); en lugar de );)
     .catch((err) => {
       console.error("Error al obtener logs:", err);
     })
@@ -138,7 +143,6 @@ function cargarLogs() {
       peticionEnCurso = false;
     });
 }
-
 /**
  * Convierte el texto plano del archivo .log en Tarjetas HTML interactivas
  */
@@ -355,3 +359,65 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+/**
+ * Renderiza las tarjetas de resumen inteligente (Seguridad y Base de Datos)
+ */
+function renderizarResumenSistema(resumen) {
+  const contenedorResumen = document.getElementById("terminalResumen");
+  if (!contenedorResumen) return;
+
+  let htmlCards =
+    '<div class="row g-3" style="display: flex; gap: 12px; flex-wrap: wrap;">';
+  let hayContenido = false;
+
+  // 1. Tarjeta de Última Alerta de Seguridad
+  if (resumen.ultima_alerta_seguridad) {
+    hayContenido = true;
+    const alerta = resumen.ultima_alerta_seguridad;
+    htmlCards += `
+            <div style="flex: 1; min-width: 280px; background: #ffffff; border-radius: 6px; padding: 10px 14px; border: 1px solid #fbcfe8; border-left: 4px solid #db2777; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="background-color: #db2777; color: #fff; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 4px;">
+                        🛡️ Alerta de Seguridad
+                    </span>
+                    <small style="font-size: 12px; font-weight: 500; color:#64748b;">
+                        🕒 ${escaparHTML(alerta.fecha)}
+                    </small>
+                </div>
+                <div style="font-size: 12px; color: #334155; margin-top: 8px; white-space: pre-line; background: #fdf2f8; padding: 8px; border-radius: 4px;">
+                    ${escaparHTML(alerta.analisis)}
+                </div>
+            </div>
+        `;
+  }
+
+  // 2. Tarjeta de Último Análisis de Base de Datos
+  if (resumen.ultimo_analisis_db) {
+    hayContenido = true;
+    const dbAnalisis = resumen.ultimo_analisis_db;
+    htmlCards += `
+            <div style="flex: 1; min-width: 280px; background: #ffffff; border-radius: 6px; padding: 10px 14px; border: 1px solid #bfdbfe; border-left: 4px solid #2563eb; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="background-color: #2563eb; color: #fff; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 4px;">
+                        ⚡ Diagnóstico DB
+                    </span>
+                    <small style="font-size: 12px; font-weight: 500; color:#64748b;">
+                        🕒 ${escaparHTML(dbAnalisis.fecha)}
+                    </small>
+                </div>
+                <div style="font-size: 12px; color: #334155; margin-top: 8px; white-space: pre-line; background: #eff6ff; padding: 8px; border-radius: 4px;">
+                    ${escaparHTML(dbAnalisis.analisis)}
+                </div>
+            </div>
+        `;
+  }
+
+  htmlCards += "</div>";
+
+  if (!hayContenido) {
+    contenedorResumen.innerHTML = `<div class="text-muted p-3 text-center" style="background:#ffffff; border-radius:6px; border:1px dashed #cbd5e1; color:#64748b; font-size:13px;">No hay resúmenes o análisis recientes en este momento.</div>`;
+  } else {
+    contenedorResumen.innerHTML = htmlCards;
+  }
+}

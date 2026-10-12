@@ -12,6 +12,8 @@ class HomeController extends Controller
 
     public function index()
     {
-        $this->vista->render('index/article_index', [], 'index');
+
+        $this->respuesta->redirect('https://svpmph.org');
+        //$this->vista->render('index/article_index', [], 'index');
     }
 }

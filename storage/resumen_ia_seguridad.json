@@ -1,0 +1,26 @@
+[
+    {
+        "fecha": "2026-10-12 05:45:47",
+        "tipo": "seguridad",
+        "analisis": "**An\u00e1lisis de Riesgo:**\n\nEl patr\u00f3n de intentos id\u00e9nticos (16 por cada IP) indica un **ataque automatizado coordinado** (scripted attack), probablemente mediante bots o herramientas de escaneo.\n\n**Riesgos T\u00e9cnicos:**\n1.  **Brute Force \/ Credential Stuffing:** Intento de compromiso de cuentas mediante pruebas sistem\u00e1ticas de credenciales.\n2.  **Reconocimiento (Enumeraci\u00f3n):** Escaneo de directorios, par\u00e1metros o vulnerabilidades espec\u00edficas en la capa de aplicaci\u00f3n.\n3.  **Agotamiento de recursos:** Posible Denegaci\u00f3n de Servicio (DoS) a nivel de aplicaci\u00f3n si la frecuencia de las peticiones escala.\n\n**Recomendaci\u00f3n:**\n**Bloqueo inmediato** de las tres direcciones IP en el Firewall de Aplicaciones Web (WAF) o mediante reglas de `iptables`\/`nftables`. Se recomienda implementar pol\u00edticas de *rate limiting* y detecci\u00f3n de anomal\u00edas para mitigar ataques futuros de origen distribuido.",
+        "notificado": true
+    },
+    {
+        "fecha": "2026-10-12 05:39:29",
+        "tipo": "seguridad",
+        "analisis": "**Riesgo t\u00e9cnico:** La IP `172.18.0.1` pertenece a un rango de red privada (RFC 1918), lo que indica que el origen es interno (probablemente un contenedor Docker o un servicio en la infraestructura local). Los 19 intentos sugieren un ataque de **fuerza bruta**, **escaneo de red** o un **error de configuraci\u00f3n** en un proceso automatizado. El riesgo principal es el **movimiento lateral** dentro de la red.\n\n**Recomendaci\u00f3n:** **No bloquear en el firewall perimetral**. Se debe realizar una auditor\u00eda de logs internos para identificar el recurso o contenedor asociado a esa IP. Si la actividad no es un proceso leg\u00edtimo, proceda al aislamiento del host o contenedor afectado en la red interna.",
+        "notificado": true
+    },
+    {
+        "fecha": "2026-10-12 05:35:16",
+        "tipo": "seguridad",
+        "analisis": "**Riesgo t\u00e9cnico:**\nLa actividad indica un posible ataque de **fuerza bruta (brute-force)**, **enumeraci\u00f3n de usuarios** o **credential stuffing**. El patr\u00f3n de m\u00faltiples intentos acumulados sugiere un escaneo automatizado para comprometer credenciales o identificar directorios\/servicios vulnerables.\n\n**Recomendaci\u00f3n:**\n**Bloquear la IP** de forma inmediata en el firewall o WAF. Se recomienda adem\u00e1s implementar pol\u00edticas de *rate limiting* y monitorizar logs en busca de otros vectores de ataque asociados a este origen.",
+        "notificado": true
+    },
+    {
+        "fecha": "2026-10-12 05:30:05",
+        "tipo": "seguridad",
+        "analisis": "**Riesgo t\u00e9cnico:** Ataque de fuerza bruta (*brute force*) o escaneo de vulnerabilidades (*vulnerability scanning*). La recurrencia de 44 intentos indica un patr\u00f3n de actividad automatizada para el reconocimiento de vectores de ataque o la extracci\u00f3n de credenciales.\n\n**Recomendaci\u00f3n:** Bloqueo inmediato en el firewall o WAF. La IP pertenece a infraestructura de AWS, lo que sugiere el uso de instancias comprometidas o bots de escaneo distribuidos.",
+        "notificado": true
+    }
+]

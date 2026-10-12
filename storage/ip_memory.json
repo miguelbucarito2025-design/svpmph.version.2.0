@@ -1,0 +1,44 @@
+{
+    "34.86.36.208": {
+        "puntos": 1221,
+        "primera_vez": "2026-10-12 05:29:55",
+        "ultima_vez": "2026-10-12 01:59:48",
+        "analizado_por_ia": true,
+        "notificado": false
+    },
+    "35.195.42.59": {
+        "puntos": 30,
+        "primera_vez": "2026-10-12 05:29:55",
+        "ultima_vez": "2026-10-12 01:59:48",
+        "analizado_por_ia": true,
+        "notificado": false
+    },
+    "47.128.110.87": {
+        "puntos": 30,
+        "primera_vez": "2026-10-12 05:29:55",
+        "ultima_vez": "2026-10-12 01:59:48",
+        "analizado_por_ia": true,
+        "notificado": false
+    },
+    "185.195.59.111": {
+        "puntos": 30,
+        "primera_vez": "2026-10-12 05:29:55",
+        "ultima_vez": "2026-10-12 01:59:48",
+        "analizado_por_ia": true,
+        "notificado": false
+    },
+    "5.189.135.170": {
+        "puntos": 90,
+        "primera_vez": "2026-10-12 05:29:55",
+        "ultima_vez": "2026-10-12 01:59:48",
+        "analizado_por_ia": true,
+        "notificado": false
+    },
+    "172.18.0.1": {
+        "puntos": 99,
+        "primera_vez": "2026-10-12 05:35:06",
+        "ultima_vez": "2026-10-12 01:59:48",
+        "analizado_por_ia": true,
+        "notificado": false
+    }
+}

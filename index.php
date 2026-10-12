@@ -187,7 +187,6 @@ Enrutador::get('errror/obtenerLogs', [ErrorController::class, 'obtenerLogs'], [5
 Enrutador::post('errror/limpiarLogs', [ErrorController::class, 'limpiarLogs'], [5]);
 
 
-
 Enrutador::get('tramites', [TramitesController::class, 'index'], [3, 4, 5]);
 Enrutador::get('tramites-solicitar', [TramitesController::class, 'solicitar'], [1, 5]);
 Enrutador::post('tramites/guardar', [TramitesController::class, 'guardar'], [4, 5]);
@@ -208,6 +207,8 @@ Enrutador::post('pagos/guardar/user', [PagosController::class, 'guardar'], [1, 5
 Enrutador::post('pagos/listar', [PagosController::class, 'listar'], [5, 4, 3]);
 Enrutador::post('pagos/eliminar', [PagosController::class, 'eliminar'], [5, 4, 3]);
 Enrutador::post('pagos/verificar', [PagosController::class, 'actualizar'], [5, 4, 3]);
+
+Enrutador::get('error', [ErrorController::class, 'index']);
 
 // Despacho de la petición
 Enrutador::despachar();

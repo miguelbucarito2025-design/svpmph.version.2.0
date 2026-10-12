@@ -49,7 +49,8 @@ class SeccionController extends Controller
                 'titlePag' => 'Seccciones',
                 'fotoUsuario' => $urlPublica,
                 'pag' => 'secciones',
-                'nucleos' => $nucleosResult
+                'nucleos' => $nucleosResult,
+                'grup' => ''
             ],
             'usuario'
         );

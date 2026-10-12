@@ -41,7 +41,13 @@ class CuentaController extends Controller
         if (empty($datosCuenta)) {
             throw new AppException('No se encontraron los datos de la cuenta.', 404);
         }
-        $r2Service = new R2Service();
+
+        $model = new DatosModel();
+        $datos = $model->datosPersonalesYLaborales($this->session->get('usuario_id'));
+        if (empty($datos)) {
+            $this->respuesta->redirect('/perfil');
+        }
+
         $urlPublica = $this->obtenerArchivo($this->session->get('foto_perfil'));
 
         // Retiramos la contraseña del arreglo por seguridad antes de pasar a la vista
@@ -53,6 +59,7 @@ class CuentaController extends Controller
                 'ventana' => 'cuenta',
                 'token'   => $this->session->get('csrf_token'),
                 'cuenta'  => $datosCuenta,
+                'prueva' => $datos,
                 'nombreUsuario' => $this->session->get('usuario_nombre'),
                 'nombreRol' => $this->session->get('nombre_rol'),
                 'titlePag' => 'Cuenta',
@@ -68,9 +75,12 @@ class CuentaController extends Controller
     {
         $this->requerirAutenticacion();
 
-        $r2Service = new R2Service();
         $urlPublica = $this->obtenerArchivo($this->session->get('foto_perfil'));
-
+        $model = new DatosModel();
+        $datos = $model->datosPersonalesYLaborales($this->session->get('usuario_id'));
+        if (empty($datos)) {
+            $this->respuesta->redirect('/perfil');
+        }
 
         $this->vista->render(
             'usuario/fotoPerfil',
@@ -79,6 +89,7 @@ class CuentaController extends Controller
                 'nombreUsuario' => $this->session->get('usuario_nombre'),
                 'nombreRol' => $this->session->get('nombre_rol'),
                 'titlePag' => 'Foto Perfil',
+                'prueva' => $datos,
                 'pag' => 'foto',
                 'grup' => 'perfil',
                 'fotoUsuario' => $urlPublica,
