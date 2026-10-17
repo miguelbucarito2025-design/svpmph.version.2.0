@@ -75,5 +75,5 @@
         </div>
     </section>
 
-    <script src="<?= URL_BASE ?>public/js/<?= $pag ?? '' ?>.js" defer></script>
+    <script src="<?= URL_BASE ?>public/js/<?= $pag ?? '' ?>.js?v=2.7" defer></script>
 </article>

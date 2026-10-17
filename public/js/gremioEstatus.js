@@ -131,7 +131,7 @@ function abrirModalRegistroGremio(valoresIniciales = {}) {
   const formModal = crearFormularioRegistroGremio();
 
   AlertApp.show("", formModal, "", null, {
-    claseExtra: "ventana-modal modal-registro-estilo",
+    claseExtra: "ventana-modal   modal-large",
     btnTexto: "Cerrar",
     btnIcono: svgCerrar,
     btnClase: "btn-ghost-danger",
@@ -240,7 +240,7 @@ function crearFormularioRegistroGremio() {
 
     <hr class="divider-modal" />
 
-    <form method="post" class="form-usuario grid-form" id="formRegistroGremioModal">
+    <form method="post" class="grid-form" id="formRegistroGremioModal">
       
       <!-- Selector Mención -->
       <div class="campo-grupo campo-grupo-img">
@@ -345,7 +345,7 @@ function miFuncionPersonalizada(id, nombre, verificado, tieneUrl) {
   let form = formularioArchivo(id, nombre, verificado, tieneUrl);
 
   AlertApp.show("", form, "", null, {
-    claseExtra: "ventana-modal modal-archivo-estilo",
+    claseExtra: "ventana-modal modal-archivo-estilo modal-large",
     btnTexto: "Cerrar",
     btnIcono: svgCerrar,
     btnClase: "btn-ghost-danger",

@@ -1617,6 +1617,15 @@ button {
     width: 100%;
   }
 
+  .img-prueva {
+    max-width: 70%;
+
+    img {
+      padding: 5px;
+      border-radius: 10px;
+    }
+  }
+
   .metric-items {
     svg {
       width: 30px !important;
